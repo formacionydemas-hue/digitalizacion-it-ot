@@ -65,7 +65,7 @@
 
         <!-- Dyslexia Toggle -->
         <button onclick="toggleDyslexiaFont()" id="dyslexiaBtn" class="bg-indigo-700 hover:bg-indigo-600 px-3 py-1.5 rounded-lg font-medium shadow transition">
-          Fuente Dislexia: OFF
+          Texto expandido: OFF
         </button>
 
         <!-- Dynamic Font Size Controls -->
@@ -335,7 +335,10 @@
             <li><strong>Investigación y Desarrollo (I+D):</strong> Sistemas de simulación, análisis de datos y colaboración para acelerar nuevos productos.</li>
           </ul>
 
-          <h2 class="text-xl font-bold mt-6">2.3. Semejanzas y Diferencias entre IT y OT</h2>
+         <h2 class="text-xl font-bold mt-6">2.3. Semejanzas y Diferencias entre IT y OT</h2>
+          
+          <!-- TABLA 1: DIFERENCIAS -->
+          <h3 class="text-lg font-bold text-indigo-400 mt-4 mb-2">Diferencias</h3>
           <div class="overflow-x-auto my-4">
             <table class="w-full text-left border-collapse text-sm">
               <thead>
@@ -370,21 +373,43 @@
             </table>
           </div>
 
-          <div class="bg-red-950/20 border-l-4 border-red-500 p-4 rounded-r-lg my-6">
-            <h3 class="font-bold text-red-400">🛡️ ¡IMPORTANTE! Medidas de Ciberseguridad Empresarial</h3>
-            <p class="text-sm mt-1">Algunas medidas fundamentales indicadas en el tema para protegerse de ciberataques:</p>
-            <ul class="list-disc pl-6 text-sm mt-2 space-y-1">
-              <li>Instalar actualizaciones periódicas de software y firmware en todos los dispositivos.</li>
-              <li>Activar la autenticación de dos factores (2FA).</li>
-              <li>No hacer clic en enlaces ni descargar adjuntos de fuentes desconocidas.</li>
-              <li>Utilizar software antivirus y antimalware actualizado.</li>
-              <li>Tener extrema precaución en redes Wi-Fi públicas debido a su exposición.</li>
-            </ul>
+          <!-- TABLA 2: SEMEJANZAS Y RELACIONES -->
+          <h3 class="text-lg font-bold text-indigo-400 mt-6 mb-2">Semejanzas y Relaciones</h3>
+          <div class="overflow-x-auto my-4">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="bg-indigo-900 text-white">
+                  <th class="p-3 border">Criterio</th>
+                  <th class="p-3 border">IT (Tecnologías de la Información)</th>
+                  <th class="p-3 border">OT (Tecnologías de la Operación)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="bg-subcard">
+                  <td class="p-3 border font-bold">1. Interconexión</td>
+                  <td class="p-3 border">Los dos entornos requieren una interconexión entre dispositivos y sistemas para conseguir sus objetivos.</td>
+                  <td class="p-3 border">La convergencia entre IT y OT permite una gestión más eficiente de la empresa.</td>
+                </tr>
+                <tr>
+                  <td class="p-3 border font-bold">2. Gestión de datos</td>
+                  <td class="p-3 border">IT gestiona datos de la empresa y operaciones.</td>
+                  <td class="p-3 border">OT gestiona datos de producción y rendimiento. (Tanto IT como OT gestionan datos, aunque en contextos diferentes).</td>
+                </tr>
+                <tr class="bg-subcard">
+                  <td class="p-3 border font-bold">3. Mejora de eficiencia</td>
+                  <td class="p-3 border">Busca mejorar la eficiencia en la gestión de datos y procesos.</td>
+                  <td class="p-3 border">Busca mejorar la eficiencia en la producción y la operación.</td>
+                </tr>
+                <tr>
+                  <td class="p-3 border font-bold">4. Colaboración</td>
+                  <td class="p-3 border">La colaboración entre los equipos de IT y OT es esencial para garantizar una implementación efectiva y segura.</td>
+                  <td class="p-3 border">Garantiza una implementación efectiva y segura de la tecnología en toda la organización.</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-        </div>
-      </div>
 
-      <!-- PAGINATION CONTROLS (BOTTOM) -->
+                <!-- PAGINATION CONTROLS (BOTTOM) -->
       <div class="bg-card p-4 rounded-xl shadow-md flex justify-between items-center">
         <button onclick="prevTemarioPage()" id="btn-prev-bottom" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-lg shadow">⬅️ Anterior</button>
         <span id="page-indicator-bottom" class="font-bold text-sm">Página 1 de 5</span>
@@ -595,7 +620,7 @@
     function toggleDyslexiaFont() {
       isDyslexic = !isDyslexic;
       const btn = document.getElementById('dyslexiaBtn');
-      btn.innerText = `Fuente Dislexia: ${isDyslexic ? 'ON' : 'OFF'}`;
+      btn.innerText = `Texto expandido: ${isDyslexic ? 'ON' : 'OFF'}`;
       setTheme(currentTheme);
     }
 
