@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="es" style="font-size: 16px;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digitalización Aplicada - Tema 1: Entornos IT y OT</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts for Accessibility -->
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* Theme definitions */
+    body.theme-light { background-color: #f8fafc; color: #0f172a; }
+    body.theme-light .bg-card { background-color: #ffffff; border: 1px solid #e2e8f0; color: #0f172a; }
+    body.theme-light .bg-subcard { background-color: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1; }
+
+    body.theme-dark { background-color: #0f172a; color: #f8fafc; }
+    body.theme-dark .bg-card { background-color: #1e293b; border: 1px solid #334155; color: #f8fafc; }
+    body.theme-dark .bg-subcard { background-color: #0f172a; color: #e2e8f0; border: 1px solid #334155; }
+
+    body.theme-sepia { background-color: #fbf0d9; color: #433422; }
+    body.theme-sepia .bg-card { background-color: #f4e4c1; border: 1px solid #d7c49e; color: #433422; }
+    body.theme-sepia .bg-subcard { background-color: #e8d5b0; color: #36291b; border: 1px solid #cbb892; }
+
+    body.theme-contrast { background-color: #000000; color: #ffff00; }
+    body.theme-contrast .bg-card { background-color: #111111; border: 2px solid #ffff00; color: #ffff00; }
+    body.theme-contrast .bg-subcard { background-color: #222222; border: 1px solid #ffff00; color: #ffffff; }
+
+    /* Dyslexia mode */
+    .dyslexic-font, .dyslexic-font * {
+      font-family: 'Atkinson Hyperlegible', sans-serif !important;
+      letter-spacing: 0.05em !important;
+      word-spacing: 0.1em !important;
+      line-height: 1.9 !important;
+    }
+
+    /* Flashcard 3D flip */
+    .perspective { perspective: 1000px; }
+    .card-inner { transition: transform 0.6s; transform-style: preserve-3d; }
+    .card-flipped { transform: rotateY(180deg); }
+    .card-front, .card-back { backface-visibility: hidden; position: absolute; inset: 0; }
+    .card-back { transform: rotateY(180deg); }
+  </style>
+</head>
+<body class="theme-light transition-colors duration-200 min-h-screen flex flex-col font-sans" id="appBody">
+
+  <!-- ACCESSIBILITY BAR -->
+  <header class="bg-slate-900 text-white p-3 shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-3">
+      <div class="flex items-center space-x-2">
+        <span class="text-xl font-bold tracking-wide">🎓 FP Digitalización</span>
+        <span class="text-xs bg-indigo-600 px-2.5 py-1 rounded-full font-semibold">Admin. y Finanzas</span>
+      </div>
+      
+      <!-- Accessibility Controls -->
+      <div class="flex flex-wrap items-center gap-2 text-xs">
+        <!-- Palette Selectors -->
+        <div class="flex bg-slate-800 rounded-lg p-1 border border-slate-700">
+          <button onclick="setTheme('light')" class="px-2 py-1 rounded hover:bg-slate-700" title="Modo Claro">☀️ Claro</button>
+          <button onclick="setTheme('dark')" class="px-2 py-1 rounded hover:bg-slate-700" title="Modo Oscuro">🌙 Oscuro</button>
+          <button onclick="setTheme('sepia')" class="px-2 py-1 rounded hover:bg-slate-700" title="Modo Sepia">📖 Sepia</button>
+          <button onclick="setTheme('contrast')" class="px-2 py-1 rounded hover:bg-slate-700 font-bold text-yellow-300" title="Alto Contraste">⚡ Contraste</button>
+        </div>
+
+        <!-- Dyslexia Toggle -->
+        <button onclick="toggleDyslexiaFont()" id="dyslexiaBtn" class="bg-indigo-700 hover:bg-indigo-600 px-3 py-1.5 rounded-lg font-medium shadow transition">
+          Texto expandido: OFF
+        </button>
+
+        <!-- Dynamic Font Size Controls -->
+        <div class="flex bg-slate-800 rounded-lg p-1 items-center border border-slate-700">
+          <span class="px-1 text-slate-300 font-medium">Tamaño:</span>
+          <button id="btn-font-sm" onclick="setFontSize('sm')" class="px-2 py-0.5 rounded hover:bg-slate-700 font-bold">A-</button>
+          <button id="btn-font-md" onclick="setFontSize('md')" class="px-2 py-0.5 rounded bg-indigo-600 text-white font-bold ring-2 ring-white">A</button>
+          <button id="btn-font-lg" onclick="setFontSize('lg')" class="px-2 py-0.5 rounded hover:bg-slate-700 text-base font-bold">A+</button>
+          <button id="btn-font-xl" onclick="setFontSize('xl')" class="px-2 py-0.5 rounded hover:bg-slate-700 text-lg font-bold">A++</button>
+        </div>
+
+        <button onclick="stopAudio()" class="bg-red-600 hover:bg-red-500 px-2.5 py-1.5 rounded-lg text-white font-medium transition" title="Detener lectura de voz">
+          🛑 Detener Voz
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN NAVIGATION TABS -->
+  <nav class="bg-slate-800 text-slate-200 border-b border-slate-700 shadow-inner">
+    <div class="max-w-7xl mx-auto flex flex-wrap justify-center sm:justify-start gap-1 p-2">
+      <button onclick="switchTab('temario')" id="tab-temario" class="px-4 py-2 rounded-lg font-semibold bg-indigo-600 text-white">📖 Temario Completo</button>
+      <button onclick="switchTab('tarjetas')" id="tab-tarjetas" class="px-4 py-2 rounded-lg font-semibold hover:bg-slate-700">🃏 Tarjetas (Flashcards)</button>
+      <button onclick="switchTab('cuestionario')" id="tab-cuestionario" class="px-4 py-2 rounded-lg font-semibold hover:bg-slate-700">❓ Cuestionario (Anti-Repetición)</button>
+      <button onclick="switchTab('clasificador')" id="tab-clasificador" class="px-4 py-2 rounded-lg font-semibold hover:bg-slate-700">⚖️ Clasificador IT/OT</button>
+      <button onclick="switchTab('asistente')" id="tab-asistente" class="px-4 py-2 rounded-lg font-semibold hover:bg-slate-700">💡 Conceptos y Analogías</button>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="max-w-7xl mx-auto p-4 sm:p-6 flex-grow w-full" id="mainContent">
+
+    <!-- TAB 1: TEMARIO PAGINADO (COMPLETO DEL PDF) -->
+    <section id="sec-temario" class="space-y-6">
+      
+      <!-- PAGINATION CONTROLS (TOP) -->
+      <div class="bg-card p-4 rounded-xl shadow-md flex flex-wrap justify-between items-center gap-3">
+        <div class="flex items-center space-x-2">
+          <button onclick="prevTemarioPage()" id="btn-prev-top" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-lg shadow text-sm">⬅️ Anterior</button>
+          <span id="page-indicator-top" class="font-bold text-sm px-2">Página 1 de 5</span>
+          <button onclick="nextTemarioPage()" id="btn-next-top" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-lg shadow text-sm">Siguiente ➡️</button>
+        </div>
+
+        <!-- Direct Jump Selector -->
+        <div class="flex items-center space-x-2 text-sm">
+          <label for="pageSelect" class="font-semibold">Ir a la sección:</label>
+          <select id="pageSelect" onchange="showTemarioPage(parseInt(this.value))" class="bg-slate-800 text-white border border-slate-600 rounded-lg p-1.5 font-medium">
+            <option value="1">1. Introducción y ¿Qué es la Digitalización?</option>
+            <option value="2">2. Ventajas e Impacto en las Empresas</option>
+            <option value="3">3. Transformación Interna, Retos y Casos de Éxito</option>
+            <option value="4">4. Entornos IT y OT: Concepto y Evolución</option>
+            <option value="5">5. Departamentos IT, Diferencias y semejanzas IT-OT</option>
+          </select>
+        </div>
+
+        <button onclick="readCurrentPage()" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-1">
+          🔊 Escuchar esta página
+        </button>
+      </div>
+
+      <!-- PAGE 1 CONTENT -->
+      <div id="temario-page-1" class="temario-page space-y-6">
+        <div class="bg-card p-6 rounded-xl shadow-md space-y-4">
+          <span class="text-xs font-bold uppercase tracking-wider text-indigo-500">Sección 1 de 5 • Tema 1 PDF</span>
+          <h1 class="text-2xl font-bold text-indigo-600 border-b pb-2">Fundamentos de la Digitalización en los Sectores Productivos</h1>
+          
+          <h2 class="text-xl font-bold mt-4">Introducción</h2>
+          <p>Las empresas actuales son muy diferentes a las de otros tiempos. Muchas de las tareas que antes se hacían manualmente ahora se realizan de manera digital. Los cálculos que se hacían con papel y bolígrafo se han sustituido por hojas de cálculo como Excel, los informes manuscritos han dado paso a documentos Word compartidos en línea, las cartas se han convertido en correos electrónicos y los teléfonos tradicionales se han transformado en smartphones. En definitiva, hemos incorporado máquinas y herramientas «inteligentes» que han transformado nuestra manera de trabajar y de vivir.</p>
+
+          <h2 class="text-xl font-bold mt-6">1. ¿Qué es la digitalización?</h2>
+          <p>La digitalización engloba una gran variedad de actividades, tanto las que llevan a cabo las empresas como las que hacemos las personas en nuestra vida cotidiana. Gracias a esta transformación, podemos organizar mejor las tareas, acceder a la información de manera inmediata y mantenernos conectados con otras personas en tiempo real.</p>
+          <p>En su esencia, la digitalización se refiere al <strong>proceso de convertir información analógica en digital</strong>. Esto significa que cualquier cosa que pueda ser representada en forma de datos —documento de texto, imagen, sonido o incluso un proceso empresarial— se transforma en ceros y unos para que pueda ser almacenada, procesada y transmitida por dispositivos electrónicos.</p>
+          
+          <p>Pero la digitalización va más allá; es un cambio en cómo vivimos, trabajamos y nos relacionamos. En el ámbito empresarial, la digitalización implica utilizar tecnología para automatizar procesos, mejorar la eficiencia, fomentar la innovación y crear nuevas formas de interacción con clientes y socios. Es una herramienta que permite a las empresas:</p>
+          <ul class="list-disc pl-6 space-y-1">
+            <li>optimizar sus operaciones existentes, reduciendo costes</li>
+            <li>explorar nuevos modelos de negocio, productos y servicios antes inexistentes (comercios en línea, reparto con drones, etc.)</li>
+          </ul>
+
+          <div class="bg-subcard p-4 rounded-lg my-4">
+            <h3 class="font-bold text-base mb-1">Ejemplo práctico: Comercio Electrónico</h3>
+            <p class="text-sm">En el caso del comercio electrónico, por ejemplo, las tiendas pueden contactar a proveedores de cualquier lugar del mundo utilizando correo electrónico, aplicaciones de mensajería o videollamadas, desde un ordenador o teléfono inteligente. Los pedidos se reciben en pocas horas o días e incluso se pueden programar automáticamente cuando el stock baja por debajo del nivel establecido. Toda la información relacionada como listas de productos, facturas o registros de inventario se guarda en la nube, permitiendo que los trabajadores tengan acceso a ellos y colaboren de manera simultánea.</p>
+          </div>
+
+          <div class="bg-indigo-950/20 border-l-4 border-indigo-500 p-4 rounded-r-lg">
+            <h3 class="font-bold text-indigo-400">Origen etimológico del término "Digitalización"</h3>
+            <p class="text-sm mt-1">La palabra «digitalización» tiene su origen en el término latino <em>digitalis</em>, que significa «relativo al dedo». ¿Y por qué esta relación? Porque los humanos empezaron contando con los dedos de las manos; como tenemos diez, surgió el sistema de numeración decimal, formado por diez dígitos. Con el tiempo, la palabra «dígito» pasó a utilizarse para referirse a cualquier número. Así, cuando hablamos de «digital», nos referimos al proceso de convertir una señal analógica —como un sonido o una imagen— en números o dígitos para que pueda ser procesado por dispositivos electrónicos.</p>
+          </div>
+
+          <h2 class="text-xl font-bold mt-6">Breve historia de la digitalización</h2>
+          <p>La digitalización es el resultado de décadas de innovaciones tecnológicas. Algunos de los momentos clave han sido:</p>
+          <ul class="list-disc pl-6 space-y-2">
+            <li><strong>Años 50:</strong> Invención del transistor – inicio de la electrónica moderna</li>
+            <li><strong>Años 70:</strong> Nacimiento de Internet (ARPANET) y circuitos integrados</li>
+            <li><strong>Años 70-80:</strong> Aparición del microprocesador</li>
+            <li><strong>Años 80:</strong> Popularización del ordenador personal y creación de la World Wide Web</li>
+            <li><strong>Años 2000:</strong> Expansión de los smartphones</li>
+            <li><strong>Años 2010:</strong> Big Data y computación en la nube</li>
+            <li><strong>Años 2020:</strong> Inteligencia Artificial y automatización avanzada</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- PAGE 2 CONTENT -->
+      <div id="temario-page-2" class="temario-page space-y-6 hidden">
+        <div class="bg-card p-6 rounded-xl shadow-md space-y-4">
+          <span class="text-xs font-bold uppercase tracking-wider text-indigo-500">Sección 2 de 5 • Tema 1 PDF</span>
+          <h1 class="text-2xl font-bold text-indigo-600 border-b pb-2">1.1. ¿Por qué se digitalizan las empresas? (Ventajas e Impacto)</h1>
+          <p>La digitalización es mucho más que utilizar ordenadores o internet; implica transformar procesos, modelos de negocio y la manera de relacionarse con clientes y trabajadores. Las empresas que adoptan la digitalización consiguen beneficios clave como los siguientes:</p>
+
+          <div class="space-y-4 my-4">
+            <div class="bg-subcard p-4 rounded-lg">
+              <h3 class="font-bold text-lg text-indigo-400">1. Incremento de la eficiencia y reducción de errores</h3>
+              <p class="mt-1">La automatización de tareas repetitivas —como el procesamiento de pedidos en una tienda en línea— permite ahorrar tiempo y evitar errores humanos.</p>
+              <p class="mt-1">Además, la implementación de sistemas de gestión inteligente y robots industriales minimiza los tiempos de inactividad y acelera la producción, mejorando la productividad y reduciendo costes.</p>
+            </div>
+
+            <div class="bg-subcard p-4 rounded-lg">
+              <h3 class="font-bold text-lg text-indigo-400">2. Mejor acceso a la información y trabajo más flexible</h3>
+              <p class="mt-1">La información se encuentra disponible en tiempo real, lo que facilita la coordinación de equipos y el teletrabajo. Esto posibilita la creación de equipos internacionales y que las empresas respondan más rápidamente a los cambios del mercado.</p>
+            </div>
+
+            <div class="bg-subcard p-4 rounded-lg">
+              <h3 class="font-bold text-lg text-indigo-400">3. Innovación en productos y servicios</h3>
+              <p class="mt-1">La recopilación y análisis de datos de los clientes (como cookies, encuestas de satisfacción o historial de navegación) permite comprender mejor su comportamiento y adaptar la oferta a sus necesidades.</p>
+              <p class="mt-1">Esto da lugar a servicios personalizados, publicidad ajustada a los intereses del usuario y nuevos formatos de negocio como libros electrónicos, formación en línea o software de pago por uso en la nube.</p>
+            </div>
+
+            <div class="bg-subcard p-4 rounded-lg">
+              <h3 class="font-bold text-lg text-indigo-400">4. Optimización de la cadena de suministro</h3>
+              <p class="mt-1">Las tecnologías digitales, como los sensores IoT o la inteligencia artificial, permiten:</p>
+              <ul class="list-disc pl-6 mt-1 space-y-1">
+                <li>Prever la demanda</li>
+                <li>Gestionar inventarios y stocks de forma eficiente</li>
+                <li>Reaccionar de manera ágil ante cambios en el mercado</li>
+              </ul>
+            </div>
+
+            <div class="bg-subcard p-4 rounded-lg">
+              <h3 class="font-bold text-lg text-indigo-400">5. Nuevos modelos de negocio</h3>
+              <p class="mt-1">La digitalización ha hecho posible el nacimiento de negocios disruptivos y plataformas innovadoras:</p>
+              <ul class="list-disc pl-6 mt-1 space-y-1">
+                <li><strong>Economía colaborativa:</strong> Wallapop, Uber, Airbnb</li>
+                <li><strong>Servicios de suscripción:</strong> Netflix, Amazon Prime</li>
+                <li><strong>Ecosistemas digitales:</strong> Google Workspace, Amazon Web Services, Apple</li>
+              </ul>
+            </div>
+
+            <div class="bg-subcard p-4 rounded-lg">
+              <h3 class="font-bold text-lg text-indigo-400">6. Mejora de la comunicación con el cliente</h3>
+              <p class="mt-1">Gracias a las redes sociales, aplicaciones móviles y plataformas en línea, las empresas pueden interactuar de manera directa y personalizada con sus clientes. Esto les permite resolver dudas, atender quejas y mejorar la experiencia de compra.</p>
+              <p class="mt-1">Las opiniones publicadas por los consumidores en webs como TripAdvisor o Amazon también ayudan a las empresas a perfeccionar sus productos y servicios.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE 3 CONTENT -->
+      <div id="temario-page-3" class="temario-page space-y-6 hidden">
+        <div class="bg-card p-6 rounded-xl shadow-md space-y-4">
+          <span class="text-xs font-bold uppercase tracking-wider text-indigo-500">Sección 3 de 5 • Tema 1 PDF</span>
+          <h1 class="text-2xl font-bold text-indigo-600 border-b pb-2">1.2. Transformación Digital Interna, Retos y Casos de Éxito</h1>
+          
+          <h2 class="text-xl font-bold mt-4">1.2. La transformación digital dentro de las empresas</h2>
+          <p>La transformación digital, además de todo lo anterior, puede exigir cambios profundos en la estructura u organización de la empresa de diferentes formas:</p>
+          <ul class="list-disc pl-6 space-y-2">
+            <li><strong>Estructuras más flexibles:</strong> se pasa de estructuras rígidas y jerárquicas a equipos multidisciplinarios, con autonomía para introducir innovaciones en su área.</li>
+            <li><strong>Cambios en la cultura organizacional:</strong> se valora y fomenta el aprendizaje continuo, la mentalidad de crecimiento y la adaptación al cambio.</li>
+            <li><strong>Liderazgo para la transformación:</strong> se buscan jefes que, además de entender las tecnologías digitales, sepan motivar al personal para adoptarlas.</li>
+            <li><strong>Competencias digitales:</strong> se requiere no sólo dominio de herramientas y tecnologías específicas, sino también otras habilidades necesarias para impulsar el cambio (<em>soft skills</em>: creatividad, trabajo en equipo, resolución de problemas...).</li>
+            <li><strong>Evaluación del impacto digital:</strong> se utilizan indicadores de rendimiento (KPIs) para medir la productividad, la eficiencia y la satisfacción del cliente.</li>
+          </ul>
+
+          <h2 class="text-xl font-bold mt-6">1.3. Retos de la digitalización</h2>
+          <p>A pesar de las ventajas, las empresas también tienen que hacer frente a retos importantes:</p>
+          <ul class="list-disc pl-6 space-y-2">
+            <li><strong>Seguridad en la información:</strong> más digitalización implica mayor vulnerabilidad a ataques informáticos, lo que obliga a invertir en ciberseguridad.</li>
+            <li><strong>Brecha digital:</strong> existen numerosas desigualdades entre empresas y territorios con diferente nivel de acceso a la tecnología.</li>
+            <li><strong>Resistencia al cambio:</strong> algunos trabajadores pueden mostrar reticencia ante nuevas formas de trabajar.</li>
+            <li><strong>Inversión inicial:</strong> puede ser alta, tanto en tecnología como en formación de los empleados.</li>
+            <li><strong>Regulación:</strong> necesidad de adaptarse continuamente a nuevas normativas, especialmente sobre privacidad y protección de datos.</li>
+          </ul>
+
+          <h2 class="text-xl font-bold mt-6">Casos reales de éxito</h2>
+          <p>Para comprender mejor cómo las empresas han abordado con éxito los desafíos y han capitalizado las ventajas de la digitalización, es útil estudiar casos reales:</p>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+            <div class="bg-subcard p-4 rounded-lg">
+              <h3 class="font-bold text-indigo-400">👟 Nike: Experiencia del Cliente</h3>
+              <p class="text-sm mt-1">Transformó su modelo enfocándose en la experiencia digital con su app Nike+, pasando de fabricante a proveedor de experiencias personalizadas.</p>
+            </div>
+
+            <div class="bg-subcard p-4 rounded-lg">
+              <h3 class="font-bold text-indigo-400">🛋️ IKEA: Realidad Aumentada</h3>
+              <p class="text-sm mt-1">Integró realidad aumentada en su app IKEA Place, permitiendo a los clientes visualizar muebles en sus propios hogares antes de comprar.</p>
+            </div>
+
+            <div class="bg-subcard p-4 rounded-lg">
+              <h3 class="font-bold text-indigo-400">🏦 BBVA: Banca Digital</h3>
+              <p class="text-sm mt-1">Destacó en banca digital invirtiendo en blockchain, inteligencia artificial y banca móvil para ofrecer servicios personalizados y eficientes.</p>
+            </div>
+
+            <div class="bg-subcard p-4 rounded-lg">
+              <h3 class="font-bold text-indigo-400">📦 Amazon: Logística Inteligente</h3>
+              <p class="text-sm mt-1">Uso masivo de robots en almacenes e IA para prever la demanda, revolucionando la entrega y la gestión de inventario.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAGE 4 CONTENT -->
+      <div id="temario-page-4" class="temario-page space-y-6 hidden">
+        <div class="bg-card p-6 rounded-xl shadow-md space-y-4">
+          <span class="text-xs font-bold uppercase tracking-wider text-indigo-500">Sección 4 de 5 • Tema 1 PDF</span>
+          <h1 class="text-2xl font-bold text-indigo-600 border-b pb-2">2. ¿Qué son las tecnologías IT y OT?</h1>
+          
+          <p>La digitalización se refiere a la transformación de procesos, actividades y operaciones tradicionales en formatos digitales. No obstante, no es lo mismo utilizar una cámara digital para fotografiar una cara que un ordenador realice el reconocimiento facial; en ambos casos se trata de tecnología pero su complejidad e impacto son muy diferentes.</p>
+          <p>En este sentido, se diferencian dos grandes grupos de tecnologías:</p>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+            <div class="bg-blue-950/30 border border-blue-800 p-4 rounded-xl">
+              <h3 class="font-bold text-lg text-blue-400">🧠 Tecnologías IT (Información)</h3>
+              <p class="text-sm font-semibold text-slate-300">"Digitalización en Negocio"</p>
+              <p class="text-sm mt-2">Herramientas digitales enfocadas en el procesamiento de datos y la gestión de información. Son como el <strong>cerebro de la empresa</strong>: ayudan a organizar, comunicarse y tomar decisiones.</p>
+              <p class="text-xs mt-3 font-semibold">Ejemplos:</p>
+              <p class="text-xs">Algoritmos de búsqueda, análisis de datos gráficos, traducción simultánea, simuladores de vuelo, plataformas colaborativas (SQL, Cloud, CRM, ERP, HTTP).</p>
+            </div>
+
+            <div class="bg-orange-950/30 border border-orange-800 p-4 rounded-xl">
+              <h3 class="font-bold text-lg text-orange-400">⚙️ Tecnologías OT (Operación)</h3>
+              <p class="text-sm font-semibold text-slate-300">"Digitalización en Planta"</p>
+              <p class="text-sm mt-2">Herramientas enfocadas en el control y automatización de procesos físicos en entorno industrial o comercial. Son como los <strong>brazos y piernas de la compañía</strong>.</p>
+              <p class="text-xs mt-3 font-semibold">Ejemplos:</p>
+              <p class="text-xs">Sensores de luz, termostatos, cámaras de seguimiento de movimiento, brazos robóticos, vehículos autónomos (Machinery, SCADA, PLCs, Modbus).</p>
+            </div>
+          </div>
+
+          <div class="bg-amber-950/20 border-l-4 border-amber-500 p-4 rounded-r-lg my-4">
+            <h3 class="font-bold text-amber-400">🍳 Analogía Explicativa: El Robot de Cocina</h3>
+            <p class="text-sm mt-1">Imagina que buscas en tu móvil una receta para un robot de cocina. La <strong>IT sería el móvil y el vídeo de la receta</strong>, mientras que la <strong>OT sería el robot de cocina</strong> que utilizas para cocinar. Del mismo modo que hay una estrecha relación entre la receta y los utensilios de cocina, en las empresas la conexión entre IT y OT es cada vez mayor.</p>
+          </div>
+
+          <h2 class="text-xl font-bold mt-6">2.1. ¿Cómo evolucionaron las tecnologías IT-OT?</h2>
+          <p>Las tecnologías IT y OT han evolucionado desde una total autonomía hasta la interdependencia actual en 5 etapas:</p>
+          <ol class="list-decimal pl-6 space-y-2">
+            <li><strong>1. IT y OT diferenciadas (1970-1990):</strong> Funcionaban por separado en la mayoría de organizaciones. La comunicación era escasa.</li>
+            <li><strong>2. Convergencia (1990-2000):</strong> Se establecieron puentes, facilitando la integración de datos operativos en la gestión.</li>
+            <li><strong>3. Ciberseguridad (2000-2010):</strong> Aumentaron los ciberataques y la necesidad de proteger sistemas industriales de control.</li>
+            <li><strong>4. IA y Edge Computing (2010-2020):</strong> Uso de IA para optimizar operaciones y computación en el borde (Edge Computing) para procesar datos cerca de la fuente sin enviarlos a la nube.</li>
+            <li><strong>5. Integración completa y Gemelos Digitales (Actualidad):</strong> Se crea un «gemelo digital» (réplica virtual de la operación física) para simular y optimizar procesos en tiempo real.</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- PAGE 5 CONTENT -->
+      <div id="temario-page-5" class="temario-page space-y-6 hidden">
+        <div class="bg-card p-6 rounded-xl shadow-md space-y-4">
+          <span class="text-xs font-bold uppercase tracking-wider text-indigo-500">Sección 5 de 5 • Tema 1 PDF</span>
+          <h1 class="text-2xl font-bold text-indigo-600 border-b pb-2">2.2. Departamentos IT, Diferencias y semejanzas IT-OT</h1>
+          
+          <h2 class="text-xl font-bold mt-4">2.2. ¿Qué departamentos constituyen entornos IT?</h2>
+          <p>Aunque cualquier departamento puede beneficiarse de soluciones IT, algunos están especialmente ligados a ellas:</p>
+          <ul class="list-disc pl-6 space-y-2">
+            <li><strong>Finanzas:</strong> Utilizan sistemas <strong>ERP</strong> (<em>Enterprise Resource Planning</em>) para automatizar la contabilidad, presupuestos, análisis de flujo de efectivo y proyecciones.</li>
+            <li><strong>Recursos Humanos:</strong> Utilizan sistemas <strong>HRIS</strong> (<em>Human Resource Information System</em>) para reclutamiento, nóminas y evaluación del desempeño.</li>
+            <li><strong>Marketing y Ventas:</strong> Utilizan sistemas <strong>CRM</strong> para segmentación de mercado, campañas personalizadas y gestión de relaciones con clientes.</li>
+            <li><strong>Investigación y Desarrollo (I+D):</strong> Sistemas de simulación, análisis de datos y colaboración para acelerar nuevos productos.</li>
+          </ul>
+
+        <h2 class="text-xl font-bold mt-6">2.3. Semejanzas y Diferencias entre IT y OT</h2>
+          
+          <!-- TABLA 1: DIFERENCIAS -->
+          <h3 class="text-lg font-bold text-indigo-400 mt-4 mb-2">Diferencias</h3>
+          <div class="overflow-x-auto my-4">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="bg-indigo-900 text-white">
+                  <th class="p-3 border">Criterio</th>
+                  <th class="p-3 border">IT (Tecnologías de la Información)</th>
+                  <th class="p-3 border">OT (Tecnologías de la Operación)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="bg-subcard">
+                  <td class="p-3 border font-bold">1. Enfoque y objetivo</td>
+                  <td class="p-3 border">Recopilar información, crear listas de control y analizar datos.</td>
+                  <td class="p-3 border">Operación y control directo de fabricación, energía y logística.</td>
+                </tr>
+                <tr>
+                  <td class="p-3 border font-bold">2. Tecnologías</td>
+                  <td class="p-3 border">Software, redes, bases de datos y aplicaciones informáticas.</td>
+                  <td class="p-3 border">Sensores, controladores industriales (PLC) y automatización.</td>
+                </tr>
+                <tr class="bg-subcard">
+                  <td class="p-3 border font-bold">3. Seguridad</td>
+                  <td class="p-3 border">Proteger datos y sistemas contra amenazas cibernéticas.</td>
+                  <td class="p-3 border">Proteger sistemas industriales físicos contra ataques.</td>
+                </tr>
+                <tr>
+                  <td class="p-3 border font-bold">4. Ciclo de vida</td>
+                  <td class="p-3 border">Ciclos de vida más cortos debido a continuas actualizaciones.</td>
+                  <td class="p-3 border">Ciclos de vida más largos para estabilizar producción y por coste.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- TABLA 2: SEMEJANZAS Y RELACIONES -->
+          <h3 class="text-lg font-bold text-indigo-400 mt-6 mb-2">Semejanzas y Relaciones</h3>
+          <div class="overflow-x-auto my-4">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="bg-indigo-900 text-white">
+                  <th class="p-3 border">Criterio</th>
+                  <th class="p-3 border">IT (Tecnologías de la Información)</th>
+                  <th class="p-3 border">OT (Tecnologías de la Operación)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="bg-subcard">
+                  <td class="p-3 border font-bold">1. Interconexión</td>
+                  <td class="p-3 border">Los dos entornos requieren una interconexión entre dispositivos y sistemas para conseguir sus objetivos.</td>
+                  <td class="p-3 border">La convergencia entre IT y OT permite una gestión más eficiente de la empresa.</td>
+                </tr>
+                <tr>
+                  <td class="p-3 border font-bold">2. Gestión de datos</td>
+                  <td class="p-3 border">IT gestiona datos de la empresa y operaciones.</td>
+                  <td class="p-3 border">OT gestiona datos de producción y rendimiento. (Tanto IT como OT gestionan datos, aunque en contextos diferentes).</td>
+                </tr>
+                <tr class="bg-subcard">
+                  <td class="p-3 border font-bold">3. Mejora de eficiencia</td>
+                  <td class="p-3 border">Busca mejorar la eficiencia en la gestión de datos y procesos.</td>
+                  <td class="p-3 border">Busca mejorar la eficiencia en la producción y la operación.</td>
+                </tr>
+                <tr>
+                  <td class="p-3 border font-bold">4. Colaboración</td>
+                  <td class="p-3 border">La colaboración entre los equipos de IT y OT es esencial para garantizar una implementación efectiva y segura.</td>
+                  <td class="p-3 border">Garantiza una implementación efectiva y segura de la tecnología en toda la organización.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+      <!-- PAGINATION CONTROLS (BOTTOM) -->
+      <div class="bg-card p-4 rounded-xl shadow-md flex justify-between items-center">
+        <button onclick="prevTemarioPage()" id="btn-prev-bottom" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-lg shadow">⬅️ Anterior</button>
+        <span id="page-indicator-bottom" class="font-bold text-sm">Página 1 de 5</span>
+        <button onclick="nextTemarioPage()" id="btn-next-bottom" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-lg shadow">Siguiente ➡️</button>
+      </div>
+
+    </section>
+
+    <!-- TAB 2: TARJETAS INTELIGENTES (FLASHCARDS) -->
+    <section id="sec-tarjetas" class="hidden space-y-6">
+      <div class="text-center">
+        <h2 class="text-xl font-bold">Tarjetas de Repaso Interactivo</h2>
+        <p class="text-sm opacity-80">Haz clic sobre la tarjeta para girarla y comprobar la respuesta basada en el PDF.</p>
+      </div>
+
+      <div class="flex justify-center my-6">
+        <div class="w-full max-w-lg h-72 perspective cursor-pointer" onclick="flipCard()">
+          <div id="flashcard-inner" class="card-inner relative w-full h-full rounded-2xl shadow-xl bg-card border p-6 flex flex-col justify-between text-center">
+            
+            <!-- FRONT -->
+            <div class="card-front p-6 flex flex-col justify-between items-center">
+              <span id="fc-category" class="text-xs uppercase font-bold text-indigo-500 tracking-wider">Categoría</span>
+              <p id="fc-question" class="text-lg font-semibold my-auto">Pregunta de la tarjeta...</p>
+              <span class="text-xs text-slate-400">🔄 Toca o haz clic para girar</span>
+            </div>
+
+            <!-- BACK -->
+            <div class="card-back p-6 flex flex-col justify-between items-center bg-indigo-900 text-white rounded-2xl">
+              <span class="text-xs uppercase font-bold text-indigo-300 tracking-wider">Respuesta Oficial</span>
+              <p id="fc-answer" class="text-base my-auto">Explicación detallada extraída directamente del PDF...</p>
+              <button onclick="event.stopPropagation(); speakText('fc-answer');" class="text-xs bg-indigo-700 px-3 py-1 rounded hover:bg-indigo-600">🔊 Escuchar</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-center items-center gap-4">
+        <button onclick="prevCard()" class="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 font-semibold">⬅️ Anterior</button>
+        <span id="fc-counter" class="font-bold">1 / 10</span>
+        <button onclick="nextCard()" class="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 font-semibold">Siguiente ➡️</button>
+      </div>
+
+      <div class="flex justify-center gap-4 pt-2">
+        <button onclick="markMastered(true)" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-500 font-semibold">✅ Dominada</button>
+        <button onclick="markMastered(false)" class="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-500 font-semibold">📌 Repasar</button>
+      </div>
+    </section>
+
+    <!-- TAB 3: CUESTIONARIO (ANTI-REPETICIÓN) -->
+    <section id="sec-cuestionario" class="hidden space-y-6">
+      <div class="bg-card p-6 rounded-xl shadow-md space-y-4">
+        <div class="flex justify-between items-center border-b pb-3">
+          <div>
+            <h2 class="text-xl font-bold">Cuestionario Evaluativo</h2>
+            <p class="text-xs text-slate-500">Garantía Anti-Repetición: Extracción de preguntas sin reemplazo hasta completar la bolsa de examen.</p>
+          </div>
+          <div class="text-right">
+            <span id="quiz-score" class="text-lg font-bold text-indigo-500">Puntos: 0</span>
+            <div id="quiz-remaining" class="text-xs text-slate-400">Restantes: 6</div>
+          </div>
+        </div>
+
+        <div id="quiz-box" class="space-y-4">
+          <p id="quiz-question" class="text-lg font-medium">Cargando pregunta...</p>
+          <div id="quiz-options" class="space-y-2">
+            <!-- Dynamic Options -->
+          </div>
+          <div id="quiz-feedback" class="hidden p-4 rounded-lg text-sm"></div>
+          <button id="btn-next-quiz" onclick="loadNextQuestion()" class="hidden px-5 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-500">Siguiente Pregunta ➡️</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: CLASIFICADOR IT / OT -->
+    <section id="sec-clasificador" class="hidden space-y-6">
+      <div class="bg-card p-6 rounded-xl shadow-md text-center space-y-4">
+        <h2 class="text-xl font-bold">Simulador Clasificador: IT vs OT</h2>
+        <p class="text-sm">Determina si la tecnología mostrada corresponde a Tecnologías de la Información (IT / Negocio) o Tecnologías de la Operación (OT / Planta):</p>
+        
+        <div class="p-6 bg-slate-800 text-white rounded-xl shadow-inner max-w-md mx-auto my-4 border border-slate-700">
+          <span id="sorting-item" class="text-2xl font-bold tracking-wide">Cargando...</span>
+          <p id="sorting-desc" class="text-xs text-slate-300 mt-2">Descripción del elemento...</p>
+        </div>
+
+        <div class="flex justify-center gap-4 flex-wrap">
+          <button onclick="checkClassification('IT')" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-lg transition">
+            💻 Entorno IT (Datos/Negocio)
+          </button>
+          <button onclick="checkClassification('OT')" class="px-6 py-3 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl shadow-lg transition">
+            ⚙️ Entorno OT (Planta/Operaciones)
+          </button>
+        </div>
+
+        <div id="sorting-feedback" class="hidden p-4 rounded-lg font-medium text-sm"></div>
+      </div>
+    </section>
+
+    <!-- TAB 5: ASISTENTE DE CONCEPTOS Y ANALOGÍAS -->
+    <section id="sec-asistente" class="hidden space-y-6">
+      <div class="bg-card p-6 rounded-xl shadow-md space-y-4">
+        <h2 class="text-xl font-bold">Asistente de Conceptos, Analogías y Ejemplos Prácticos</h2>
+        <p class="text-sm">Selecciona cualquier concepto técnico del tema para obtener su explicación adaptada, analogía y aplicación directa en Administración y Finanzas:</p>
+
+        <select id="conceptSelect" onchange="showConceptDetails()" class="w-full p-3 rounded-lg border bg-slate-800 text-white font-medium">
+          <option value="">-- Selecciona un concepto --</option>
+          <option value="digitalis">Etimología: Digitalis</option>
+          <option value="it_ot">Relación IT vs OT (El Robot de Cocina)</option>
+          <option value="gemelo">Gemelo Digital (Digital Twin)</option>
+          <option value="edge">Computación en el Borde (Edge Computing)</option>
+          <option value="erp">Sistemas ERP en Finanzas</option>
+          <option value="crm">Sistemas CRM en Ventas</option>
+          <option value="hris">Sistemas HRIS en Recursos Humanos</option>
+          <option value="ciberseguridad">Ciberseguridad y Autenticación 2FA</option>
+        </select>
+
+        <div id="conceptCard" class="hidden space-y-4 border p-5 rounded-xl bg-slate-900/40">
+          <h3 id="conceptTitle" class="text-lg font-bold text-indigo-400"></h3>
+          
+          <div class="p-3 bg-indigo-950/40 border border-indigo-800/50 rounded-lg">
+            <h4 class="text-xs uppercase font-bold text-indigo-300">📚 Definición Oficial del PDF</h4>
+            <p id="conceptDef" class="text-sm mt-1"></p>
+          </div>
+
+          <div class="p-3 bg-amber-950/40 border border-amber-800/50 rounded-lg">
+            <h4 class="text-xs uppercase font-bold text-amber-300">💡 Analogía Sencilla</h4>
+            <p id="conceptAnalogy" class="text-sm mt-1"></p>
+          </div>
+
+          <div class="p-3 bg-emerald-950/40 border border-emerald-800/50 rounded-lg">
+            <h4 class="text-xs uppercase font-bold text-emerald-300">📊 Aplicación en Administración y Finanzas</h4>
+            <p id="conceptApp" class="text-sm mt-1"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="bg-slate-900 text-slate-400 text-center text-xs p-4 border-t border-slate-800 mt-auto">
+    Módulo: Digitalización Aplicada a los Sectores Productivos | CFGS Administración y Finanzas
+  </footer>
+
+  <script>
+    // --- APP STATE ---
+    let currentTheme = 'light';
+    let isDyslexic = false;
+    let currentTemarioPage = 1;
+    const totalTemarioPages = 5;
+
+    // --- TEMARIO PAGINATION LOGIC ---
+    function showTemarioPage(pageNum) {
+      if (pageNum < 1 || pageNum > totalTemarioPages) return;
+      currentTemarioPage = pageNum;
+
+      for (let i = 1; i <= totalTemarioPages; i++) {
+        const pageEl = document.getElementById(`temario-page-${i}`);
+        if (pageEl) {
+          if (i === pageNum) pageEl.classList.remove('hidden');
+          else pageEl.classList.add('hidden');
+        }
+      }
+
+      // Update indicators
+      document.getElementById('page-indicator-top').innerText = `Página ${pageNum} de ${totalTemarioPages}`;
+      document.getElementById('page-indicator-bottom').innerText = `Página ${pageNum} de ${totalTemarioPages}`;
+      document.getElementById('pageSelect').value = pageNum.toString();
+
+      // Enable/Disable Nav buttons
+      document.getElementById('btn-prev-top').disabled = (pageNum === 1);
+      document.getElementById('btn-prev-bottom').disabled = (pageNum === 1);
+      document.getElementById('btn-next-top').disabled = (pageNum === totalTemarioPages);
+      document.getElementById('btn-next-bottom').disabled = (pageNum === totalTemarioPages);
+
+      // Scroll smoothly to top of main content
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function nextTemarioPage() {
+      if (currentTemarioPage < totalTemarioPages) {
+        showTemarioPage(currentTemarioPage + 1);
+      }
+    }
+
+    function prevTemarioPage() {
+      if (currentTemarioPage > 1) {
+        showTemarioPage(currentTemarioPage - 1);
+      }
+    }
+
+    function readCurrentPage() {
+      stopAudio();
+      const pageEl = document.getElementById(`temario-page-${currentTemarioPage}`);
+      if (pageEl) {
+        const text = pageEl.innerText;
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'es-ES';
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    // --- ACCESSIBILITY CONTROLS ---
+    function setTheme(theme) {
+      currentTheme = theme;
+      document.body.className = `theme-${theme} ${isDyslexic ? 'dyslexic-font' : ''} transition-colors duration-200 min-h-screen flex flex-col font-sans`;
+    }
+
+    function toggleDyslexiaFont() {
+      isDyslexic = !isDyslexic;
+      const btn = document.getElementById('dyslexiaBtn');
+      btn.innerText = `Texto expandido: ${isDyslexic ? 'ON' : 'OFF'}`;
+      setTheme(currentTheme);
+    }
+
+    // Direct root font scaling (A-, A, A+, A++)
+    function setFontSize(size) {
+      const root = document.documentElement;
+      const btnSm = document.getElementById('btn-font-sm');
+      const btnMd = document.getElementById('btn-font-md');
+      const btnLg = document.getElementById('btn-font-lg');
+      const btnXl = document.getElementById('btn-font-xl');
+
+      [btnSm, btnMd, btnLg, btnXl].forEach(b => {
+        if (b) {
+          b.classList.remove('bg-indigo-600', 'text-white', 'ring-2', 'ring-white');
+          b.classList.add('bg-slate-700', 'text-slate-200');
+        }
+      });
+
+      if (size === 'sm') {
+        root.style.fontSize = '13px';
+        if (btnSm) btnSm.classList.add('bg-indigo-600', 'text-white', 'ring-2', 'ring-white');
+      } else if (size === 'md') {
+        root.style.fontSize = '16px';
+        if (btnMd) btnMd.classList.add('bg-indigo-600', 'text-white', 'ring-2', 'ring-white');
+      } else if (size === 'lg') {
+        root.style.fontSize = '19px';
+        if (btnLg) btnLg.classList.add('bg-indigo-600', 'text-white', 'ring-2', 'ring-white');
+      } else if (size === 'xl') {
+        root.style.fontSize = '22px';
+        if (btnXl) btnXl.classList.add('bg-indigo-600', 'text-white', 'ring-2', 'ring-white');
+      }
+    }
+
+    function speakText(elementId) {
+      stopAudio();
+      const text = document.getElementById(elementId).innerText;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'es-ES';
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function stopAudio() {
+      window.speechSynthesis.cancel();
+    }
+
+    // --- MAIN TABS SWITCHER ---
+    function switchTab(tabId) {
+      stopAudio();
+      ['temario', 'tarjetas', 'cuestionario', 'clasificador', 'asistente'].forEach(t => {
+        document.getElementById(`sec-${t}`).classList.add('hidden');
+        document.getElementById(`tab-${t}`).classList.remove('bg-indigo-600', 'text-white');
+        document.getElementById(`tab-${t}`).classList.add('hover:bg-slate-700');
+      });
+
+      document.getElementById(`sec-${tabId}`).classList.remove('hidden');
+      document.getElementById(`tab-${tabId}`).classList.add('bg-indigo-600', 'text-white');
+    }
+
+    // --- FLASHCARDS DATA & LOGIC ---
+    const flashcards = [
+      { cat: 'Origen Etimológico', q: '¿De dónde proviene la palabra "digitalización"?', a: 'Del término latino "digitalis" (relativo al dedo), ya que los humanos contaban con 10 dedos, dando lugar al sistema decimal y a la palabra dígito.' },
+      { cat: 'Historia', q: '¿Qué invento de los años 50 inició la electrónica moderna?', a: 'La invención del transistor en la década de 1950.' },
+      { cat: 'Concepto IT', q: '¿Cómo define el tema las Tecnologías de la Información (IT)?', a: 'Herramientas enfocas en el procesamiento de datos y la gestión de la información. Son el "cerebro" de la empresa (ej. ERP, CRM, HRIS).' },
+      { cat: 'Concepto OT', q: '¿Cómo define el tema las Tecnologías de la Operación (OT)?', a: 'Herramientas enfocadas en el control y automatización de procesos físicos en planta. Son los "brazos y piernas" de la compañía (ej. sensores, robots, PLCs).' },
+      { cat: 'Nuevos Modelos', q: '¿Qué ejemplos de economía colaborativa menciona el PDF?', a: 'Wallapop, Uber y Airbnb.' },
+      { cat: 'Casos de Éxito', q: '¿Cómo innovó IKEA en la venta minorista?', a: 'Integró realidad aumentada en su app IKEA Place para visualizar muebles en el hogar antes de comprar.' },
+      { cat: 'Casos de Éxito', q: '¿Qué tecnología destaca en la transformación digital de BBVA?', a: 'Blockchain, Inteligencia Artificial y banca móvil.' },
+      { cat: 'Sistemas IT', q: '¿Qué es un sistema ERP y qué departamento lo utiliza principalmente?', a: 'Enterprise Resource Planning. Lo utiliza Finanzas para contabilidad, presupuestos y proyecciones del flujo de efectivo.' },
+      { cat: 'Convergencia IT-OT', q: '¿Qué es un Gemelo Digital (Digital Twin)?', a: 'Una réplica virtual de una operación física para simular y optimizar procesos en tiempo real.' },
+      { cat: 'Ciberseguridad', q: 'Menciona 3 medidas de ciberseguridad clave del tema:', a: 'Actualizar software/firmware, activar autenticación de dos factores (2FA) y no abrir enlaces o adjuntos desconocidos.' }
+    ];
+
+    let currentFC = 0;
+    let isFlipped = false;
+
+    function renderCard() {
+      const card = flashcards[currentFC];
+      document.getElementById('fc-category').innerText = card.cat;
+      document.getElementById('fc-question').innerText = card.q;
+      document.getElementById('fc-answer').innerText = card.a;
+      document.getElementById('fc-counter').innerText = `${currentFC + 1} / ${flashcards.length}`;
+      
+      const inner = document.getElementById('flashcard-inner');
+      inner.classList.remove('card-flipped');
+      isFlipped = false;
+    }
+
+    function flipCard() {
+      const inner = document.getElementById('flashcard-inner');
+      isFlipped = !isFlipped;
+      if (isFlipped) inner.classList.add('card-flipped');
+      else inner.classList.remove('card-flipped');
+    }
+
+    function nextCard() {
+      currentFC = (currentFC + 1) % flashcards.length;
+      renderCard();
+    }
+
+    function prevCard() {
+      currentFC = (currentFC - 1 + flashcards.length) % flashcards.length;
+      renderCard();
+    }
+
+    function markMastered(mastered) {
+      alert(mastered ? "¡Genial! Tarjeta marcada como dominada." : "Registrada para repasar en la siguiente ronda.");
+      nextCard();
+    }
+
+    // --- ANTI-REPETITION QUIZ LOGIC ---
+    const quizQuestions = [
+      {
+        q: '¿Por qué la palabra "digitalización" guarda relación con los dedos de las manos?',
+        options: ['Porque los ordenadores antiguos se escribían con un solo dedo.', 'Porque los humanos contaban con 10 dedos, originando el sistema decimal y la palabra dígito.', 'Porque se refiere al escaneo de huellas dactilares.', 'Porque los teléfonos móviles utilizan pantallas táctiles.'],
+        correct: 1,
+        exp: 'Proviene del latín digitalis ("relativo al dedo"). Como los humanos contaban con 10 dedos, nació el sistema decimal y posteriormente la palabra dígito.'
+      },
+      {
+        q: 'En la metáfora del robot de cocina presentada en el tema, ¿qué elemento representa las tecnologías OT?',
+        options: [
+          'El vídeo de la receta en YouTube.',
+          'La conexión Wi-Fi de la vivienda.',
+          'El robot de cocina físico que ejecuta la preparación.',
+          'La pantalla del smartphone donde buscas la receta.'
+        ],
+        correct: 2,
+        exp: 'La IT es la información y la receta en la pantalla del móvil, mientras que la OT es el robot de cocina físico que ejecuta la cocción.'
+      },
+      {
+        q: '¿Qué departamento utiliza habitualmente los sistemas HRIS según el texto oficial?',
+        options: ['Investigación y Desarrollo (I+D)', 'Finanzas y Tesorería', 'Recursos Humanos', 'Marketing y Ventas'],
+        correct: 2,
+        exp: 'El departamento de Recursos Humanos utiliza sistemas HRIS (Human Resource Information System) para reclutamiento, nómina y evaluación.'
+      },
+      {
+        q: '¿Cuál es una diferencia clave en el ciclo de vida entre sistemas IT y OT?',
+        options: [
+          'Los sistemas IT duran 30 años sin cambiarse.',
+          'Las tecnologías OT tienen ciclos de vida más largos para estabilizar la producción y por el coste de equipos.',
+          'No existen diferencias de ciclo de vida.',
+          'Las tecnologías OT se actualizan semanalmente mediante software.'
+        ],
+        correct: 1,
+        exp: 'Las tecnologías OT tienden a tener ciclos de vida más largos para estabilizar las líneas de producción y amortizar grandes inversiones físicas.'
+      },
+      {
+        q: '¿En qué etapa histórica de la convergencia IT-OT surgieron los Gemelos Digitales?',
+        options: ['1970-1990', '1990-2000', '2000-2010', 'Integración completa (Actualidad)'],
+        correct: 3,
+        exp: 'En la actualidad se crean "gemelos digitales" para simular y optimizar procesos en tiempo real antes de aplicarlos en planta.'
+      },
+      {
+        q: '¿Qué caso de éxito empresarial destaca por el uso de realidad aumentada en su aplicación móvil?',
+        options: ['BBVA', 'Nike', 'IKEA', 'Amazon'],
+        correct: 2,
+        exp: 'IKEA integró realidad aumentada en su aplicación IKEA Place para visualizar muebles en las casas antes de la compra.'
+      }
+    ];
+
+    let quizQueue = [];
+    let quizScore = 0;
+
+    function initQuizQueue() {
+      quizQueue = Array.from({ length: quizQuestions.length }, (_, i) => i);
+      // Shuffle anti-repetition queue
+      for (let i = quizQueue.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [quizQueue[i], quizQueue[j]] = [quizQueue[j], quizQueue[i]];
+      }
+    }
+
+    function loadNextQuestion() {
+      document.getElementById('quiz-feedback').classList.add('hidden');
+      document.getElementById('btn-next-quiz').classList.add('hidden');
+
+      if (quizQueue.length === 0) {
+        document.getElementById('quiz-box').innerHTML = `
+          <div class="text-center space-y-4 py-8">
+            <h3 class="text-2xl font-bold text-emerald-500">🎉 ¡Enhorabuena! Cuestionario Finalizado</h3>
+            <p>Has completado todas las preguntas del banco evaluativo sin repeticiones.</p>
+            <p class="text-xl font-bold">Puntuación Obtenida: ${quizScore} / ${quizQuestions.length * 10} Puntos</p>
+            <button onclick="location.reload()" class="px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-500">Volver a Empezar</button>
+          </div>
+        `;
+        return;
+      }
+
+      const qIndex = quizQueue.pop();
+      const qData = quizQuestions[qIndex];
+
+      document.getElementById('quiz-remaining').innerText = `Restantes: ${quizQueue.length}`;
+      document.getElementById('quiz-question').innerText = qData.q;
+
+      const optsContainer = document.getElementById('quiz-options');
+      optsContainer.innerHTML = '';
+
+      qData.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'w-full text-left p-3.5 rounded-lg border bg-slate-800/80 hover:bg-slate-700 transition font-medium text-white';
+        btn.innerText = `${String.fromCharCode(65 + idx)}) ${opt}`;
+        btn.onclick = () => answerQuiz(idx, qData.correct, qData.exp, btn);
+        optsContainer.appendChild(btn);
+      });
+    }
+
+    function answerQuiz(selected, correct, exp, btnElement) {
+      const buttons = document.querySelectorAll('#quiz-options button');
+      buttons.forEach(b => b.disabled = true);
+
+      const feedback = document.getElementById('quiz-feedback');
+      feedback.classList.remove('hidden');
+
+      if (selected === correct) {
+        quizScore += 10;
+        btnElement.classList.add('bg-emerald-700', 'text-white', 'border-emerald-500');
+        feedback.className = 'p-4 rounded-lg text-sm bg-emerald-950/80 border border-emerald-500 text-emerald-200';
+        feedback.innerHTML = `<strong>✅ ¡Respuesta Correcta!</strong><br>${exp}`;
+      } else {
+        btnElement.classList.add('bg-red-700', 'text-white', 'border-red-500');
+        buttons[correct].classList.add('bg-emerald-700', 'text-white');
+        feedback.className = 'p-4 rounded-lg text-sm bg-red-950/80 border border-red-500 text-red-200';
+        feedback.innerHTML = `<strong>❌ Respuesta Incorrecta.</strong><br>${exp}`;
+      }
+
+      document.getElementById('quiz-score').innerText = `Puntos: ${quizScore}`;
+      document.getElementById('btn-next-quiz').classList.remove('hidden');
+    }
+
+    // --- SORTING GAME DATA & LOGIC ---
+    const sortItems = [
+      { name: 'Sistema ERP Contable', type: 'IT', desc: 'Gestión de libros de contabilidad, facturación y tesorería' },
+      { name: 'Brazo Robótico Ensamblador', type: 'OT', desc: 'Maquinaria en la línea física de producción industrial' },
+      { name: 'Sistema CRM de Clientes', type: 'IT', desc: 'Base de datos para el seguimiento comercial de ventas' },
+      { name: 'Sensor de Temperatura Industrial', type: 'OT', desc: 'Dispositivo en planta para supervisión de procesos de calor' },
+      { name: 'Software HRIS de Nóminas', type: 'IT', desc: 'Gestión de datos de empleados y contratos' },
+      { name: 'Controlador PLC / SCADA', type: 'OT', desc: 'Automatización física de motores y válvulas de fábrica' }
+    ];
+
+    let currentSortIdx = 0;
+
+    function renderSortItem() {
+      const item = sortItems[currentSortIdx];
+      document.getElementById('sorting-item').innerText = item.name;
+      document.getElementById('sorting-desc').innerText = item.desc;
+      document.getElementById('sorting-feedback').classList.add('hidden');
+    }
+
+    function checkClassification(selectedType) {
+      const item = sortItems[currentSortIdx];
+      const feedback = document.getElementById('sorting-feedback');
+      feedback.classList.remove('hidden');
+
+      if (selectedType === item.type) {
+        feedback.className = 'p-4 rounded-lg font-medium text-sm bg-emerald-900/60 text-emerald-200 border border-emerald-500';
+        feedback.innerText = `¡Correcto! ${item.name} corresponde a ${item.type}.`;
+      } else {
+        feedback.className = 'p-4 rounded-lg font-medium text-sm bg-red-900/60 text-red-200 border border-red-500';
+        feedback.innerText = `Incorrecto. ${item.name} pertenece a ${item.type}.`;
+      }
+
+      setTimeout(() => {
+        currentSortIdx = (currentSortIdx + 1) % sortItems.length;
+        renderSortItem();
+      }, 1800);
+    }
+
+    // --- CONCEPT ASSISTANT DATA ---
+    const conceptData = {
+      digitalis: {
+        title: 'Etimología: Digitalis',
+        def: 'Proviene del término latino digitalis, relativo al dedo. Al contar con los 10 dedos de las manos surgió el sistema decimal y posteriormente la palabra dígito para cualquier número.',
+        analogy: 'Contar con los dedos de la mano al iniciarse en la aritmética para luego pasar a utilizar números en pantalla.',
+        app: 'En Administración y Finanzas: Convertir los datos de una factura física en papel a números procesables en una hoja de cálculo Excel o ERP.'
+      },
+      it_ot: {
+        title: 'Diferencia IT vs OT',
+        def: 'IT procesa datos e información (cerebro). OT controla procesos y máquinas físicas (brazos y piernas).',
+        analogy: 'En una cocina: la receta digital en el teléfono móvil es la IT; la batidora o el horno programado es la OT.',
+        app: 'Un administrativo emite una orden de pedido en el ERP (IT) que activa el robot de embalaje en el almacén de expediciones (OT).'
+      },
+      gemelo: {
+        title: 'Gemelo Digital (Digital Twin)',
+        def: 'Réplica virtual de una operación física para simular y optimizar procesos en tiempo real.',
+        analogy: 'Probar un itinerario en un simulador virtual antes de realizar un viaje real con un camión de reparto.',
+        app: 'Simular numéricamente en finanzas los costes de producción antes de autorizar la compra masiva de materias primas.'
+      },
+      edge: {
+        title: 'Computación en el Borde (Edge Computing)',
+        def: 'Procesar los datos directamente cerca de la fuente de origen en lugar de enviarlos a un servidor central en la nube.',
+        analogy: 'Llevar una pequeña calculadora de mano en la tienda para saber el total al instante, sin tener que llamar por teléfono a un contable remoto.',
+        app: 'Terminales de cobro automático que verifican la validez del pago inmediatamente sin sufrir demoras en la red empresarial.'
+      },
+      erp: {
+        title: 'Sistema ERP (Enterprise Resource Planning)',
+        def: 'Software que integra y automatiza la gestión de contabilidad, presupuestos, flujo de caja y proyecciones financieras.',
+        analogy: 'El cuadro de mandos unificado de un vehículo que muestra velocidad, combustible y presión de aceite al mismo tiempo.',
+        app: 'Al registrar una venta, el ERP descuenta automáticamente el stock en almacén, genera la factura y actualiza la cuenta contable de clientes.'
+      },
+      crm: {
+        title: 'Sistema CRM (Customer Relationship Management)',
+        def: 'Software diseñado para la segmentación de mercados, personalización de campañas y gestión integral de clientes.',
+        analogy: 'La libreta personal donde un comerciante anotaba las preferencias de cada cliente habitual para ofrecerle lo que le gusta.',
+        app: 'Identificar a los clientes con mayor volumen de compra para ofrecerles descuentos especiales o mejores condiciones de pago.'
+      },
+      hris: {
+        title: 'Sistema HRIS (Human Resource Information System)',
+        def: 'Herramienta para automatizar la selección de personal, la nómina y la evaluación del rendimiento.',
+        analogy: 'Un expediente académico digitalizado que registra todas las calificaciones y asistencias de un alumno.',
+        app: 'Cálculo automático de retenciones de IRPF, cuotas de Seguridad Social y emisión mensual de nóminas.'
+      },
+      ciberseguridad: {
+        title: 'Ciberseguridad y Autenticación 2FA',
+        def: 'Conjunto de medidas para proteger datos e infraestructuras, como parches de firmware, antivirus y doble factor de verificación.',
+        analogy: 'Cerrar con llave la puerta de casa y requerir además un código numérico temporal enviado a tu teléfono para poder abrirla.',
+        app: 'Proteger las claves de la banca electrónica de la empresa requiriendo confirmación desde el móvil autorizado antes de emitir transferencias.'
+      }
+    };
+
+    function showConceptDetails() {
+      const key = document.getElementById('conceptSelect').value;
+      const card = document.getElementById('conceptCard');
+
+      if (!key || !conceptData[key]) {
+        card.classList.add('hidden');
+        return;
+      }
+
+      const data = conceptData[key];
+      document.getElementById('conceptTitle').innerText = data.title;
+      document.getElementById('conceptDef').innerText = data.def;
+      document.getElementById('conceptAnalogy').innerText = data.analogy;
+      document.getElementById('conceptApp').innerText = data.app;
+      card.classList.remove('hidden');
+    }
+
+    // --- INITIALIZATION ---
+    window.onload = () => {
+      showTemarioPage(1);
+      renderCard();
+      initQuizQueue();
+      loadNextQuestion();
+      renderSortItem();
+    };
+  </script>
+</body>
+</html>
