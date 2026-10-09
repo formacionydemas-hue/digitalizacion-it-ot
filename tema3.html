@@ -1,0 +1,1990 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exploración Cloud - Tema 3 | FP Administración y Finanzas</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind Config for Custom Styling -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cloud: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            900: '#0c4a6e',
+                        },
+                        sepia: {
+                            bg: '#fbf0d9',
+                            card: '#f4e4bc',
+                            text: '#433422',
+                            border: '#e2cc9f',
+                            accent: '#8c592b'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        accessible: ['Lexend', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(14, 165, 233, 0.4);
+            border-radius: 4px;
+        }
+
+        /* 3D Flip Card Effect */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+
+        /* Reading Guide Ruler */
+        #reading-guide {
+            position: fixed;
+            left: 0;
+            right: 0;
+            height: 38px;
+            background-color: rgba(253, 224, 71, 0.25);
+            border-top: 2px solid #eab308;
+            border-bottom: 2px solid #eab308;
+            pointer-events: none;
+            z-index: 9999;
+            display: none;
+            box-shadow: 0 0 15px rgba(234, 179, 8, 0.2);
+            transition: top 0.05s ease-out;
+        }
+
+        /* Accessible Reading Mode Styles */
+        body.mode-expanded-reading {
+            font-family: 'Lexend', sans-serif !important;
+            letter-spacing: 0.04em !important;
+            word-spacing: 0.1em !important;
+            line-height: 1.8 !important;
+        }
+
+        body.mode-expanded-reading p,
+        body.mode-expanded-reading span,
+        body.mode-expanded-reading li {
+            font-weight: 400 !important;
+        }
+
+        /* Theme Modes */
+        body.theme-sepia {
+            background-color: #fbf0d9 !important;
+            color: #433422 !important;
+        }
+        body.theme-sepia .bg-card-custom {
+            background-color: #f4e4bc !important;
+            border-color: #e2cc9f !important;
+            color: #433422 !important;
+        }
+        body.theme-sepia .bg-header-custom {
+            background-color: #ebd39f !important;
+            color: #2c2215 !important;
+        }
+
+        /* High Contrast Dark */
+        body.theme-dark-contrast {
+            background-color: #090d16 !important;
+            color: #f3f4f6 !important;
+        }
+        body.theme-dark-contrast .bg-card-custom {
+            background-color: #111827 !important;
+            border-color: #374151 !important;
+            color: #f9fafb !important;
+        }
+        body.theme-dark-contrast .bg-header-custom {
+            background-color: #1f2937 !important;
+            color: #ffffff !important;
+        }
+
+        /* Text Size Scaling */
+        html.text-size-sm { font-size: 14px; }
+        html.text-size-base { font-size: 16px; }
+        html.text-size-lg { font-size: 18px; }
+        html.text-size-xl { font-size: 20px; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col transition-colors duration-200">
+
+    <!-- Reading Guide Ruler -->
+    <div id="reading-guide"></div>
+
+    <!-- Navigation Header -->
+    <header class="bg-header-custom bg-slate-900 text-white shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Brand Title -->
+                <div class="flex items-center space-x-3">
+                    <div class="p-2 bg-sky-500 rounded-lg text-white font-bold">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 001-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg leading-tight sm:text-xl">Exploración Cloud <span class="text-xs bg-sky-500/30 text-sky-300 px-2 py-0.5 rounded-full font-normal">Tema 3</span></h1>
+                        <p class="text-xs text-slate-300 hidden sm:block">Digitalización Aplicada | FP Admin y Finanzas</p>
+                    </div>
+                </div>
+
+                <!-- Accessibility Quick Toggle Button -->
+                <button onclick="switchTab('accessibility')" class="flex items-center space-x-2 bg-slate-800 hover:bg-slate-700 text-sky-400 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                    </svg>
+                    <span class="hidden md:inline">Ajustes de Lectura</span>
+                </button>
+            </div>
+
+            <!-- Navigation Tabs Bar -->
+            <nav class="flex space-x-1 sm:space-x-4 overflow-x-auto pb-2 pt-1 no-scrollbar border-t border-slate-800 text-xs sm:text-sm">
+                <button id="tab-flashcards" onclick="switchTab('flashcards')" class="tab-btn active px-3 py-2 rounded-md font-medium whitespace-nowrap flex items-center space-x-2 bg-sky-600 text-white">
+                    <span>🎴</span> <span>Tarjetas Inteligentes</span>
+                    <span id="badge-flashcards" class="bg-sky-800 text-sky-100 text-xs px-2 py-0.5 rounded-full">30</span>
+                </button>
+                <button id="tab-quiz" onclick="switchTab('quiz')" class="tab-btn px-3 py-2 rounded-md font-medium whitespace-nowrap flex items-center space-x-2 text-slate-300 hover:text-white hover:bg-slate-800">
+                    <span>📝</span> <span>Cuestionario Test</span>
+                    <span id="badge-quiz" class="bg-slate-700 text-slate-200 text-xs px-2 py-0.5 rounded-full">30</span>
+                </button>
+                <button id="tab-concepts" onclick="switchTab('concepts')" class="tab-btn px-3 py-2 rounded-md font-medium whitespace-nowrap flex items-center space-x-2 text-slate-300 hover:text-white hover:bg-slate-800">
+                    <span>💡</span> <span>Aclaración & Analogías</span>
+                </button>
+                <button id="tab-generator" onclick="switchTab('generator')" class="tab-btn px-3 py-2 rounded-md font-medium whitespace-nowrap flex items-center space-x-2 text-slate-300 hover:text-white hover:bg-slate-800">
+                    <span>✨</span> <span>Generador de Recursos</span>
+                </button>
+                <button id="tab-accessibility" onclick="switchTab('accessibility')" class="tab-btn px-3 py-2 rounded-md font-medium whitespace-nowrap flex items-center space-x-2 text-slate-300 hover:text-white hover:bg-slate-800">
+                    <span>⚙️</span> <span>Accesibilidad Lectura</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ========================================== -->
+        <!-- TAB 1: FLASHCARDS (TARJETAS INTELIGENTES)   -->
+        <!-- ========================================== -->
+        <section id="section-flashcards" class="tab-content block space-y-6">
+            <!-- Header Info & Progress Bar -->
+            <div class="bg-card-custom bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                            <span>🎴 Tarjetas de Autoevaluación Cloud</span>
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-1">Haz clic en cualquier tarjeta para voltearla y verificar tu conocimiento. Marca las tarjetas como dominadas según tu avance.</p>
+                    </div>
+                    <!-- Controls & Stats -->
+                    <div class="flex items-center gap-3">
+                        <div class="text-right">
+                            <span class="text-xs text-slate-500 block">Progreso de Dominio</span>
+                            <span id="flashcard-progress-text" class="text-lg font-bold text-sky-600">0 / 30 (0%)</span>
+                        </div>
+                        <button onclick="resetFlashcardsProgress()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-2 rounded-lg transition border border-slate-300" title="Reiniciar progreso">
+                            🔄 Reiniciar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="w-full bg-slate-100 rounded-full h-3 mt-4 overflow-hidden border border-slate-200">
+                    <div id="flashcard-progress-bar" class="bg-gradient-to-r from-sky-500 to-emerald-500 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+
+                <!-- Filter Controls -->
+                <div class="flex flex-wrap gap-2 mt-4 pt-4 border-t border-slate-100 text-xs sm:text-sm">
+                    <span class="font-medium text-slate-600 self-center mr-1">Filtrar tarjetas:</span>
+                    <button onclick="filterFlashcards('all')" id="filter-all" class="px-3 py-1.5 rounded-lg bg-sky-600 text-white font-medium shadow-sm">Todas (<span id="count-all">30</span>)</button>
+                    <button onclick="filterFlashcards('pending')" id="filter-pending" class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium">Por Repasar (<span id="count-pending">30</span>)</button>
+                    <button onclick="filterFlashcards('mastered')" id="filter-mastered" class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium">Dominadas (<span id="count-mastered">0</span>)</button>
+                </div>
+            </div>
+
+            <!-- Flashcards Grid Container -->
+            <div id="flashcards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Cards will be populated by JS -->
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: CUESTIONARIO TEST (30 PREGUNTAS)    -->
+        <!-- ========================================== -->
+        <section id="section-quiz" class="tab-content hidden space-y-6">
+            <!-- Quiz Bar Header -->
+            <div class="bg-card-custom bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                            <span>📝 Test de Autoevaluación Oficial</span>
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-500">30 preguntas basadas fielmente en el temario de Exploración Cloud. Explicaciones con cita textual o didáctica.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="restartQuiz()" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold shadow-sm transition">
+                            🔄 Reiniciar Cuestionario
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quiz Progress Bar -->
+                <div class="mt-4">
+                    <div class="flex justify-between text-xs text-slate-500 mb-1">
+                        <span>Pregunta <span id="quiz-current-num">1</span> de <span id="quiz-total-num">30</span></span>
+                        <span>Aciertos acumulados: <span id="quiz-score-count" class="font-bold text-emerald-600">0</span></span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                        <div id="quiz-progress-bar" class="bg-sky-600 h-2.5 rounded-full transition-all duration-300" style="width: 3.33%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Card View -->
+            <div id="quiz-card" class="bg-card-custom bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <!-- Question Header -->
+                <div class="flex justify-between items-start mb-4">
+                    <span id="quiz-question-tag" class="text-xs font-semibold uppercase tracking-wider text-sky-700 bg-sky-100 px-3 py-1 rounded-full border border-sky-200">
+                        Concepto Cloud
+                    </span>
+                    <span id="quiz-question-counter" class="text-xs text-slate-400 font-mono">Pregunta 1/30</span>
+                </div>
+
+                <!-- Question Text -->
+                <h3 id="quiz-question-text" class="text-lg sm:text-xl font-bold text-slate-900 mb-6 leading-snug">
+                    Cargando pregunta...
+                </h3>
+
+                <!-- Options List -->
+                <div id="quiz-options" class="space-y-3">
+                    <!-- Dynamic Options -->
+                </div>
+
+                <!-- Feedback & Explanation Box -->
+                <div id="quiz-feedback" class="mt-6 p-4 rounded-xl hidden border">
+                    <div class="flex items-start gap-3">
+                        <div id="quiz-feedback-icon" class="text-2xl mt-0.5"></div>
+                        <div class="space-y-1">
+                            <h4 id="quiz-feedback-title" class="font-bold text-base"></h4>
+                            <p id="quiz-feedback-text" class="text-xs sm:text-sm leading-relaxed"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Navigation Buttons -->
+                <div class="mt-8 flex justify-between items-center pt-4 border-t border-slate-100">
+                    <button id="quiz-btn-prev" onclick="navigateQuiz(-1)" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs sm:text-sm font-medium transition disabled:opacity-40 disabled:cursor-not-allowed">
+                        ← Anterior
+                    </button>
+                    <button id="quiz-btn-next" onclick="navigateQuiz(1)" class="px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs sm:text-sm font-semibold transition shadow-sm">
+                        Siguiente Pregunta →
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz Final Results Summary (Hidden by default) -->
+            <div id="quiz-results" class="hidden bg-card-custom bg-white p-8 rounded-2xl shadow-md border border-slate-200 text-center space-y-6">
+                <div class="w-20 h-20 bg-sky-100 text-sky-600 rounded-full flex items-center justify-center mx-auto text-4xl shadow-inner">
+                    🏆
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-slate-900">¡Cuestionario Completado!</h3>
+                    <p class="text-slate-500 text-sm mt-1">Has finalizado las 30 preguntas de autoevaluación sobre Exploración Cloud.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-xl mx-auto py-4">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="text-xs text-slate-500 block font-medium">Nota Final</span>
+                        <span id="results-score" class="text-3xl font-extrabold text-sky-600">0.0 / 10</span>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="text-xs text-slate-500 block font-medium">Aciertos</span>
+                        <span id="results-correct" class="text-3xl font-extrabold text-emerald-600">0 / 30</span>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="text-xs text-slate-500 block font-medium">Porcentaje</span>
+                        <span id="results-percentage" class="text-3xl font-extrabold text-purple-600">0%</span>
+                    </div>
+                </div>
+
+                <p id="results-eval-message" class="text-sm font-medium text-slate-700 bg-sky-50 p-3 rounded-xl border border-sky-100 max-w-lg mx-auto">
+                    Mensaje de evaluación...
+                </p>
+
+                <div class="flex justify-center gap-4 pt-4">
+                    <button onclick="restartQuiz()" class="px-6 py-3 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-bold shadow-md transition text-sm">
+                        🔄 Repetir Cuestionario
+                    </button>
+                    <button onclick="switchTab('flashcards')" class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold transition text-sm">
+                        🎴 Repasar Tarjetas
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: ACLARACIÓN DE CONCEPTOS Y ASISTENTE -->
+        <!-- ========================================== -->
+        <section id="section-concepts" class="tab-content hidden space-y-6">
+            <!-- Header -->
+            <div class="bg-card-custom bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                    <span>💡 Aclarador de Conceptos & Asistente Didáctico</span>
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-500 mt-1">Explora los temas clave explicados en 3 niveles: simplificado para principiantes, analogía cotidiana y aplicación en Administración y Finanzas.</p>
+
+                <!-- Search Input Bar -->
+                <div class="mt-4 relative">
+                    <input type="text" id="concept-search-input" onkeyup="filterConcepts()" placeholder="Buscar concepto (ej. IaaS, Serverless, Edge, CAPEX, GDPR, SaaS...)" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition">
+                    <span class="absolute left-3.5 top-3.5 text-slate-400">🔍</span>
+                </div>
+            </div>
+
+            <!-- Quick Filter Tags -->
+            <div class="flex flex-wrap gap-2 text-xs">
+                <span class="text-slate-500 font-medium self-center">Filtro rápido:</span>
+                <button onclick="searchConceptTag('')" class="px-3 py-1 bg-slate-200 hover:bg-slate-300 rounded-lg text-slate-700">Todos</button>
+                <button onclick="searchConceptTag('IaaS vs PaaS vs SaaS')" class="px-3 py-1 bg-sky-100 hover:bg-sky-200 text-sky-800 rounded-lg">Modelos Cloud</button>
+                <button onclick="searchConceptTag('Edge vs Fog vs Mist')" class="px-3 py-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-800 rounded-lg">Computación Distribuida</button>
+                <button onclick="searchConceptTag('CAPEX vs OPEX')" class="px-3 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded-lg">CAPEX vs OPEX</button>
+                <button onclick="searchConceptTag('Serverless / FaaS')" class="px-3 py-1 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-lg">Serverless / FaaS</button>
+                <button onclick="searchConceptTag('APIs e Integración')" class="px-3 py-1 bg-purple-100 hover:bg-purple-200 text-purple-800 rounded-lg">APIs & Integración</button>
+            </div>
+
+            <!-- Concept Cards List -->
+            <div id="concepts-container" class="space-y-6">
+                <!-- Concept items rendered via JS -->
+            </div>
+
+            <!-- Custom Doubt / Explanation Request Box -->
+            <div class="bg-gradient-to-br from-slate-900 to-sky-950 text-white p-6 rounded-2xl shadow-md border border-slate-800 space-y-4">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-sky-500/20 text-sky-400 rounded-lg text-xl">❓</div>
+                    <div>
+                        <h3 class="font-bold text-base">¿Tienes alguna duda o concepto que no acabas de comprender?</h3>
+                        <p class="text-xs text-slate-300">Escribe tu pregunta o término del Tema 3 para obtener una explicación adaptada con un ejemplo práctico de empresa.</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <input type="text" id="custom-doubt-input" placeholder="Ej: ¿Qué diferencia práctica hay entre IaaS y PaaS para un administrativo?" class="flex-grow px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+                    <button onclick="explainCustomDoubt()" class="bg-sky-600 hover:bg-sky-500 text-white px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-2 shrink-0">
+                        <span>✨ Explicar Didácticamente</span>
+                    </button>
+                </div>
+
+                <!-- Interactive Explanation Result Area -->
+                <div id="custom-doubt-result" class="hidden bg-slate-800/80 p-4 rounded-xl border border-slate-700 text-xs sm:text-sm space-y-2 mt-4 text-slate-200">
+                    <!-- JS populated result -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 4: GENERADOR DE NUEVOS RECURSOS        -->
+        <!-- ========================================== -->
+        <section id="section-generator" class="tab-content hidden space-y-6">
+            <!-- Header -->
+            <div class="bg-card-custom bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-2">
+                <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                    <span>✨ Generador Personalizado de Preguntas y Tarjetas</span>
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-500">Crea recursos adicionales enfocados en áreas específicas del Tema 3 para profundizar en tu estudio autónomo.</p>
+            </div>
+
+            <!-- Subtopic Selector & Generation Controls -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Configuration Panel -->
+                <div class="bg-card-custom bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4 md:col-span-1">
+                    <h3 class="font-bold text-slate-800 text-sm border-b pb-2">1. Configurar Parámetros</h3>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Seleccionar Subtema del PDF:</label>
+                        <select id="gen-subtopic" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+                            <option value="all">Todo el Tema 3 (Exploración Cloud)</option>
+                            <option value="models">Niveles Cloud (IaaS, PaaS, SaaS, FaaS)</option>
+                            <option value="distributed">Tecnologías Distribuidas (Edge, Fog, Mist)</option>
+                            <option value="finance">Impacto Financiero (CAPEX vs OPEX) & Eficiencia</option>
+                            <option value="cases">Casos Reales (Netflix, Spotify, Uber, Airbnb, Dropbox)</option>
+                            <option value="challenges">Desafíos (Vendor Lock-in, Seguridad, GDPR)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Tipo de Recurso a Generar:</label>
+                        <div class="space-y-2 text-xs">
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="radio" name="gen-type" value="card" checked class="text-sky-600 focus:ring-sky-500">
+                                <span class="text-slate-700">🎴 Nueva Tarjeta Inteligente</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="radio" name="gen-type" value="question" class="text-sky-600 focus:ring-sky-500">
+                                <span class="text-slate-700">📝 Nueva Pregunta de Cuestionario</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Gemini API Key (Optional) -->
+                    <div class="pt-3 border-t border-slate-100">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1 flex items-center justify-between">
+                            <span>Clave API de Gemini (Opcional)</span>
+                            <span class="text-[10px] text-sky-600 font-normal">Para IA en vivo</span>
+                        </label>
+                        <input type="password" id="gemini-api-key" placeholder="AIzaSy... (Opcional)" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-sky-500">
+                        <p class="text-[11px] text-slate-400 mt-1">Si se deja en blanco, el generador creará recursos al instante usando el motor educativo integrado local sin conexión.</p>
+                    </div>
+
+                    <button onclick="generateNewResource()" class="w-full py-3 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-semibold text-xs sm:text-sm transition shadow-sm flex items-center justify-center space-x-2">
+                        <span>⚡ Generar Recurso Didáctico</span>
+                    </button>
+                </div>
+
+                <!-- Display / Preview Panel -->
+                <div class="bg-card-custom bg-white p-6 rounded-2xl shadow-sm border border-slate-200 md:col-span-2 flex flex-col justify-between space-y-4">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm border-b pb-2 flex items-center justify-between">
+                            <span>2. Resultado Generado</span>
+                            <span id="gen-status-badge" class="text-xs bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded-full font-normal">Listo para generar</span>
+                        </h3>
+
+                        <div id="gen-output-container" class="mt-4 p-5 bg-slate-50 border border-slate-200 rounded-xl min-h-[220px] flex flex-col justify-center items-center text-center">
+                            <div class="text-4xl mb-2">💡</div>
+                            <p class="text-slate-600 text-xs sm:text-sm max-w-md">Selecciona las opciones a la izquierda y pulsa "Generar Recurso Didáctico" para crear nuevas tarjetas o preguntas de examen.</p>
+                        </div>
+                    </div>
+
+                    <!-- Action buttons for generated content -->
+                    <div id="gen-actions" class="hidden flex flex-wrap gap-3 pt-3 border-t border-slate-100">
+                        <button onclick="addGeneratedToCollection()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs sm:text-sm font-semibold transition shadow-sm">
+                            ➕ Añadir a mi colección activa
+                        </button>
+                        <button onclick="generateNewResource()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs sm:text-sm font-medium transition">
+                            🎲 Generar otro
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 5: ACCESIBILIDAD Y PERSONALIZACIÓN     -->
+        <!-- ========================================== -->
+        <section id="section-accessibility" class="tab-content hidden space-y-6">
+            <!-- Header -->
+            <div class="bg-card-custom bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                    <span>⚙️ Personalización Visual & Lectura Fácil</span>
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-500 mt-1">Adapta la interfaz a tus preferencias visuales para una lectura cómoda, descansada e inclusiva.</p>
+            </div>
+
+            <!-- Settings Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <!-- Font & Spacing Settings -->
+                <div class="bg-card-custom bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-5">
+                    <h3 class="font-bold text-slate-800 text-base flex items-center gap-2 border-b pb-2">
+                        <span>📖 Tipografía y Espaciado</span>
+                    </h3>
+
+                    <!-- Toggle Expanded Reading Mode -->
+                    <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
+                        <div>
+                            <span class="font-semibold text-slate-800 text-xs sm:text-sm block">Texto Expandido y Lectura Fácil</span>
+                            <span class="text-[11px] text-slate-500">Activa una fuente sans-serif clara de alta legibilidad, mayor interlineado y espacio entre letras.</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-2">
+                            <input type="checkbox" id="toggle-expanded-reading" onchange="toggleExpandedReading(this.checked)" class="sr-only peer">
+                            <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sky-600"></div>
+                        </label>
+                    </div>
+
+                    <!-- Text Size Selector -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-2">Tamaño de Fuente:</label>
+                        <div class="grid grid-cols-4 gap-2">
+                            <button onclick="setTextSize('sm')" id="size-btn-sm" class="px-3 py-2 border rounded-xl text-xs text-center font-medium hover:bg-slate-50">Pequeña</button>
+                            <button onclick="setTextSize('base')" id="size-btn-base" class="px-3 py-2 border rounded-xl text-xs text-center font-medium bg-sky-50 border-sky-300 text-sky-700">Normal</button>
+                            <button onclick="setTextSize('lg')" id="size-btn-lg" class="px-3 py-2 border rounded-xl text-xs text-center font-medium hover:bg-slate-50">Grande</button>
+                            <button onclick="setTextSize('xl')" id="size-btn-xl" class="px-3 py-2 border rounded-xl text-xs text-center font-medium hover:bg-slate-50">Muy Grande</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Theme & Visual Helpers -->
+                <div class="bg-card-custom bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-5">
+                    <h3 class="font-bold text-slate-800 text-base flex items-center gap-2 border-b pb-2">
+                        <span>🎨 Modos de Contraste y Ayudas Visuales</span>
+                    </h3>
+
+                    <!-- Color Mode Selector -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-2">Modo de Color / Fondo:</label>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button onclick="setTheme('default')" id="theme-btn-default" class="p-3 border-2 border-sky-600 rounded-xl text-center bg-slate-50 text-slate-800 text-xs font-semibold">
+                                ☀️ Modo Claro
+                            </button>
+                            <button onclick="setTheme('sepia')" id="theme-btn-sepia" class="p-3 border-2 border-transparent hover:border-amber-400 rounded-xl text-center bg-[#fbf0d9] text-[#433422] text-xs font-semibold">
+                                📜 Relajante / Sepia
+                            </button>
+                            <button onclick="setTheme('dark-contrast')" id="theme-btn-dark-contrast" class="p-3 border-2 border-transparent hover:border-slate-600 rounded-xl text-center bg-slate-900 text-white text-xs font-semibold">
+                                🌙 Alto Contraste
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Reading Focus Ruler Toggle -->
+                    <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
+                        <div>
+                            <span class="font-semibold text-slate-800 text-xs sm:text-sm block">Guía Visual de Lectura (Regla de Enfoque)</span>
+                            <span class="text-[11px] text-slate-500">Muestra una línea horizontal destacada que sigue el movimiento del ratón para facilitar el seguimiento renglón a renglón.</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-2">
+                            <input type="checkbox" id="toggle-reading-guide" onchange="toggleReadingGuide(this.checked)" class="sr-only peer">
+                            <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sky-600"></div>
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-card-custom bg-white border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4">
+            <p class="font-medium text-slate-700">Módulo: Digitalización Aplicada a los Sectores Productivos</p>
+            <p class="mt-1">Ciclo Formativo de Grado Superior en Administración y Finanzas | Basado exclusivamente en el PDF del Tema 3: Exploración Cloud</p>
+        </div>
+    </footer>
+
+    <script>
+        /* ==========================================================================
+           DATA STRUCTURE: 30 FLASHCARDS (TARJETAS INTELIGENTES)
+           Strictly based on PDF Topic 3
+           ========================================================================== */
+        const initialFlashcards = [
+            {
+                id: 1,
+                topic: "Introducción",
+                question: "¿Qué es el Cloud Computing según el Tema 3?",
+                answer: "Es un modelo de prestación de servicios tecnológicos que permite el acceso remoto a recursos de computación (servidores, almacenamiento, bases de datos, redes, software) a través de Internet.",
+                mastered: false
+            },
+            {
+                id: 2,
+                topic: "Evolución",
+                question: "¿Quién y cuándo se visualizó por primera vez la computación como servicio público?",
+                answer: "John McCarthy en la década de 1960. La materialización llegó en los años 90 con Internet y Salesforce.com introduciendo el SaaS.",
+                mastered: false
+            },
+            {
+                id: 3,
+                topic: "Evolución",
+                question: "¿Qué hito de 2006 marcó un antes y un después en la democratización del acceso a la tecnología cloud?",
+                answer: "El lanzamiento de Amazon Web Services (AWS) en 2006, proporcionando servicios de almacenamiento en línea y capacidad computacional democratizada.",
+                mastered: false
+            },
+            {
+                id: 4,
+                topic: "Modelos de Servicio",
+                question: "¿Qué es la Infraestructura como Servicio (IaaS)?",
+                answer: "Un modelo donde el usuario alquila recursos informáticos virtualizados (servidores, redes, almacenamiento, sistemas operativos) a través de Internet en lugar de comprar hardware físico.",
+                mastered: false
+            },
+            {
+                id: 5,
+                topic: "Modelos de Servicio",
+                question: "¿Qué ofrece la Plataforma como Servicio (PaaS)?",
+                answer: "Ofrece la infraestructura más el entorno de desarrollo (sistemas operativos, bases de datos, herramientas de compilación y pruebas) para simplificar el ciclo de vida del software.",
+                mastered: false
+            },
+            {
+                id: 6,
+                topic: "Modelos de Servicio",
+                question: "¿En qué consiste el Software como Servicio (SaaS)?",
+                answer: "Entrega aplicaciones de software completas listas para usar a través de Internet (ej. correo, ERP, CRM, Office 365), liberando de instalar o mantener software localmente.",
+                mastered: false
+            },
+            {
+                id: 7,
+                topic: "Modelos de Servicio",
+                question: "¿Qué caracteriza al modelo FaaS (Funciones como Servicio / Serverless)?",
+                answer: "Permite desplegar piezas individuales de código (funciones) que se ejecutan en respuesta a eventos específicos (pago por uso exacto del tiempo de ejecución sin gestionar servidores).",
+                mastered: false
+            },
+            {
+                id: 8,
+                topic: "Finanzas Cloud",
+                question: "¿Qué cambio financiero clave introduce la nube respecto al modelo tradicional?",
+                answer: "Reemplaza la inversión costosa en hardware propio (CAPEX - Gastos de Capital) por un gasto operativo variable según el consumo (OPEX - Gastos Operativos).",
+                mastered: false
+            },
+            {
+                id: 9,
+                topic: "Desafíos",
+                question: "¿En qué consiste el desafío del 'Vendor Lock-in' o Dependencia del Proveedor?",
+                answer: "Es el riesgo de quedar atrapado con un único proveedor de nube, lo que dificulta la portabilidad de datos y aplicaciones hacia otras plataformas.",
+                mastered: false
+            },
+            {
+                id: 10,
+                topic: "Desafíos & Normativa",
+                question: "¿Qué regulaciones de seguridad y privacidad se citan explícitamente en el PDF?",
+                answer: "El cumplimiento normativo del Reglamento General de Protección de Datos (GDPR) y la Ley de Privacidad del Consumidor de California (CCDA).",
+                mastered: false
+            },
+            {
+                id: 11,
+                topic: "Procesamiento",
+                question: "¿Qué es la escalabilidad elástica en la nube?",
+                answer: "La capacidad de aumentar o disminuir dinámicamente recursos (procesamiento, almacenamiento, ancho de banda) en tiempo real para adaptarse a fluctuaciones de la demanda.",
+                mastered: false
+            },
+            {
+                id: 12,
+                topic: "Funciones Cloud",
+                question: "¿Qué ventaja ofrece la nube para el Análisis de Big Data en empresas?",
+                answer: "Facilita la recolección, almacenamiento y análisis rápido de volúmenes masivos de datos para análisis predictivo en retail, detección de fraude e inventarios.",
+                mastered: false
+            },
+            {
+                id: 13,
+                topic: "Funciones Cloud",
+                question: "¿Por qué el Cloud Computing es vital para la IA y Machine Learning (IA/ML)?",
+                answer: "Porque proporciona los vastos recursos computacionales y de almacenamiento necesarios para entrenar modelos avanzados de forma eficiente y rentable.",
+                mastered: false
+            },
+            {
+                id: 14,
+                topic: "Intercambio",
+                question: "¿Cómo facilita la nube la integración de sistemas de negocio como ERP y CRM?",
+                answer: "A través de Interfaces de Programación de Aplicaciones (APIs) seguras, que permiten compartir datos y funcionalidades en tiempo real entre distintos sistemas.",
+                mastered: false
+            },
+            {
+                id: 15,
+                topic: "Ejecución Apps",
+                question: "¿Qué significan las siglas CI/CD en el despliegue de aplicaciones en la nube?",
+                answer: "Integración Continua y Despliegue Continuo (Continuous Integration / Continuous Deployment), automatizando pruebas y despliegue rápido de mejoras.",
+                mastered: false
+            },
+            {
+                id: 16,
+                topic: "Ejecución Apps",
+                question: "¿Qué función cumple una red CDN en la ejecución de aplicaciones cloud?",
+                answer: "Una Red de Entrega de Contenido (CDN) distribuye contenido globalmente para mejorar la velocidad de acceso y reducir la latencia de los usuarios.",
+                mastered: false
+            },
+            {
+                id: 17,
+                topic: "Computación Distribuida",
+                question: "¿Qué es el Edge Computing y cuál es su ventaja clave?",
+                answer: "Lleva la capacidad de cómputo a la periferia (cerca de la fuente de datos). Su ventaja principal es la reducción drástica de la latencia para respuestas en tiempo real.",
+                mastered: false
+            },
+            {
+                id: 18,
+                topic: "Computación Distribuida",
+                question: "¿Cuál es la relación de complementariedad entre Edge Computing y la Nube?",
+                answer: "No se sustituyen: Edge realiza el procesamiento inicial inmediato e IoT local, mientras la Nube centraliza el almacenamiento a largo plazo y análisis profundos.",
+                mastered: false
+            },
+            {
+                id: 19,
+                topic: "Computación Distribuida",
+                question: "¿Qué es el Fog Computing (Computación de Niebla)?",
+                answer: "Es una capa intermedia de nodos distribuidos entre los dispositivos Edge y la Nube centralizada, encargada de análisis local, almacenamiento temporal y seguridad.",
+                mastered: false
+            },
+            {
+                id: 20,
+                topic: "Computación Distribuida",
+                question: "¿Qué caracteriza al Mist Computing (Computación de Niebla Fina)?",
+                answer: "Integra el procesamiento directamente en los propios sensores y pequeños dispositivos IoT (wearables, smartphones) ofreciendo latencia ultra baja y microservicios.",
+                mastered: false
+            },
+            {
+                id: 21,
+                topic: "Casos Reales",
+                question: "¿Cómo utiliza Netflix la tecnología cloud?",
+                answer: "Para su plataforma de streaming global, logrando escalabilidad sin límites ante variaciones de demanda de usuarios y agilidad en desarrollo continuo.",
+                mastered: false
+            },
+            {
+                id: 22,
+                topic: "Casos Reales",
+                question: "¿Qué aplicación hace Spotify de la nube?",
+                answer: "Almacena y distribuye su extensa biblioteca musical globalmente y ejecuta algoritmos de IA para recomendaciones personalizadas.",
+                mastered: false
+            },
+            {
+                id: 23,
+                topic: "Casos Reales",
+                question: "¿Para qué es crucial la nube en la empresa Uber?",
+                answer: "Para la geolocalización precisa en tiempo real, optimización de rutas mediante análisis de datos y escalabilidad de su infraestructura global.",
+                mastered: false
+            },
+            {
+                id: 24,
+                topic: "Casos Reales",
+                question: "¿Qué función cumple la nube en la plataforma Airbnb?",
+                answer: "Gestionar su red global de propiedades y utilizar modelos de IA para ofrecer recomendaciones personalizadas de alojamiento a los usuarios.",
+                mastered: false
+            },
+            {
+                id: 25,
+                topic: "Casos Reales",
+                question: "¿Qué servicio destaca en el caso de estudio de Dropbox?",
+                answer: "Ofrecer acceso global, sincronización automática de archivos en tiempo real y garantías de seguridad robusta para datos almacenados.",
+                mastered: false
+            },
+            {
+                id: 26,
+                topic: "Innovación",
+                question: "¿Cómo acelera la nube el desarrollo de aplicaciones en las empresas?",
+                answer: "Permite probar y desplegar nuevas aplicaciones en cuestión de días o semanas, en lugar de meses o años requeridos con infraestructura tradicional.",
+                mastered: false
+            },
+            {
+                id: 27,
+                topic: "Modelos Cloud",
+                question: "¿En qué consiste el modelo de Nube Híbrida?",
+                answer: "Combina infraestructuras de nube privada e infraestructura de nube pública, permitiendo compartir datos y aplicaciones según la sensibilidad y necesidad.",
+                mastered: false
+            },
+            {
+                id: 28,
+                topic: "Industria 4.0",
+                question: "¿Qué rol juega el procesamiento en tiempo real en los sistemas IoT?",
+                answer: "Permite monitorizar sistemas industriales en la Industria 4.0 para prevenir fallos operativos e interrupciones de forma instantánea.",
+                mastered: false
+            },
+            {
+                id: 29,
+                topic: "Colaboración",
+                question: "¿Qué ejemplo del PDF ilustra la facilitación del trabajo colaborativo en tiempo real?",
+                answer: "Herramientas de productividad en la nube como Google Docs y Microsoft Office 365, que permiten edición simultánea sin barreras geográficas.",
+                mastered: false
+            },
+            {
+                id: 30,
+                topic: "Evolución Futura",
+                question: "¿Cuáles son dos de las principales tendencias futuras mencionadas en la evolución del Cloud?",
+                answer: "La computación sin servidor (Serverless / FaaS) y la consolidación de modelos de nube híbrida.",
+                mastered: false
+            }
+        ];
+
+        /* ==========================================================================
+           DATA STRUCTURE: 30 QUIZ QUESTIONS (CUESTIONARIO TIPO TEST)
+           Strictly based on PDF Topic 3
+           ========================================================================== */
+        const initialQuizQuestions = [
+            {
+                id: 1,
+                tag: "Definición",
+                question: "¿Cuál de los siguientes elementos NO es citado explícitamente en la definición inicial de recursos que proporciona el Cloud Computing?",
+                options: [
+                    "Bases de datos y almacenamiento",
+                    "Servidores físicos adquiridos en propiedad por la pyme",
+                    "Redes y software de aplicación",
+                    "Capacidad computacional a través de Internet"
+                ],
+                correct: 1,
+                explanation: "El PDF indica explícitamente que la nube elimina la necesidad de comprar infraestructura física propia, ofreciendo acceso remoto alquilado a través de Internet."
+            },
+            {
+                id: 2,
+                tag: "Evolución Histórica",
+                question: "¿En qué década John McCarthy conceptualizó por primera vez la computación como un servicio público?",
+                options: [
+                    "Década de 1980",
+                    "Década de 1960",
+                    "Década de 1990",
+                    "Año 2006 con AWS"
+                ],
+                correct: 1,
+                explanation: "Según la sección 1.1 del PDF, los orígenes se remontan a la década de 1960 cuando John McCarthy visualizó la computación como un servicio público de acceso universal."
+            },
+            {
+                id: 3,
+                tag: "Evolución Histórica",
+                question: "¿Qué evento clave ocurrido en la década de 1990 inició el Software como Servicio (SaaS)?",
+                options: [
+                    "El lanzamiento de Google Cloud Platform",
+                    "La expansión de Internet y la introducción de Salesforce.com",
+                    "La creación del sistema operativo Linux",
+                    "El despliegue de las redes 5G"
+                ],
+                correct: 1,
+                explanation: "El PDF señala que en la década de 1990, con la expansión de Internet, empresas como Salesforce.com introdujeron el concepto de SaaS."
+            },
+            {
+                id: 4,
+                tag: "IaaS",
+                question: "En el modelo IaaS (Infraestructura como Servicio), ¿de qué se encarga el cliente o usuario?",
+                options: [
+                    "Comprar y reparar los servidores físicos deteriorados",
+                    "Configurar sus recursos, sistemas operativos y aplicaciones sobre la infraestructura virtualizada alquilada",
+                    "Desarrollar el hardware de red",
+                    "Unicamente usar un software cerrado sin configurar nada"
+                ],
+                correct: 1,
+                explanation: "En IaaS el proveedor mantiene el hardware físico, mientras el cliente alquila los recursos virtualizados para configurar libremente sus sistemas operativos y software."
+            },
+            {
+                id: 5,
+                tag: "PaaS",
+                question: "¿Cuál es el objetivo primordial de la Plataforma como Servicio (PaaS)?",
+                options: [
+                    "Ofrecer herramientas de ofimática para usuarios finales",
+                    "Simplificar el ciclo de vida del desarrollo de software para que los desarrolladores no gestionen la infraestructura subyacente",
+                    "Sustituir las conexiones de fibra óptica por satélite",
+                    "Proporcionar impresoras conectadas en red local"
+                ],
+                correct: 1,
+                explanation: "Sección 2.2: PaaS ofrece no solo infraestructura sino el entorno de desarrollo integrando bases de datos y herramientas para que los desarrolladores se centren solo en el código."
+            },
+            {
+                id: 6,
+                tag: "SaaS",
+                question: "¿Cuál de las siguientes es una ventaja directa de adoptar un modelo SaaS?",
+                options: [
+                    "Capacidad ilimitada para modificar el código fuente interno del proveedor",
+                    "Reducción de costos al eliminar la compra de hardware y licencias individuales, con rápida implementación",
+                    "Eliminación total de la dependencia de la conexión a Internet",
+                    "Propiedad permanente del hardware en el balance de la empresa"
+                ],
+                correct: 1,
+                explanation: "Sección 2.3: SaaS reduce costos de hardware y licencias, ofreciendo aplicaciones completas listas para usar mediante cuotas flexibles."
+            },
+            {
+                id: 7,
+                tag: "FaaS / Serverless",
+                question: "¿Cómo se facturan los servicios en la modalidad FaaS (Funciones como Servicio)?",
+                options: [
+                    "Por una cuota fija mensual independientemente del uso",
+                    "Exclusivamente por los gigabytes consumidos de disco duro",
+                    "Modelo de pago por uso estricto, abonando únicamente el tiempo real de ejecución de la función",
+                    "Pago por la cantidad de servidores físicos reservados en el centro de datos"
+                ],
+                correct: 2,
+                explanation: "Sección 2.4: FaaS se basa en eventos y aplica un modelo de pago por uso donde los usuarios solo pagan por el tiempo exacto que la función tarda en ejecutarse."
+            },
+            {
+                id: 8,
+                tag: "Finanzas Cloud",
+                question: "El cambio de CAPEX a OPEX en la nube implica:",
+                options: [
+                    "Aumentar las inversiones fijas en activos físicos inmobiliarios de TI",
+                    "Sustituir la inversión inicial masiva en hardware (CAPEX) por un gasto operativo corriente y variable (OPEX)",
+                    "Aumentar los costes fijos de mantenimiento de centro de datos propio",
+                    "Eliminar la necesidad de pagar licencias o servicios"
+                ],
+                correct: 1,
+                explanation: "Sección 5.2: Reemplaza la inversión de capital (CAPEX) por un gasto operativo variable (OPEX), mejorando la liquidez y agilidad financiera."
+            },
+            {
+                id: 9,
+                tag: "Desafíos",
+                question: "¿Qué consecuencia negativa ocasiona el fenómeno denominado 'Vendor Lock-in'?",
+                answer: 1,
+                options: [
+                    "Exceso de velocidad al procesar datos en streaming",
+                    "Dificultad o imposibilidad de trasladar datos y aplicaciones hacia otro proveedor cloud debido a dependencias técnicas",
+                    "Incumplimiento automático del Reglamento General de Protección de Datos",
+                    "Obligación de instalar servidores físicos locales en la empresa"
+                ],
+                correct: 1,
+                explanation: "Sección 1.2: El bloqueo de proveedor (Vendor Lock-in) genera dependencia y dificulta la portabilidad entre diferentes plataformas."
+            },
+            {
+                id: 10,
+                tag: "Normativa",
+                question: "Además del Reglamento GDPR europeo, ¿qué otra normativa de privacidad se cita explícitamente en la sección 3.3 del documento?",
+                options: [
+                    "CCDA (California Consumer Privacy Framework / Normativa California)",
+                    "ISO 9001 de Calidad",
+                    "Ley de Enjuiciamiento Civil",
+                    "Norma LSSI-CE de comercio electrónico"
+                ],
+                correct: 0,
+                explanation: "Sección 3.3: Al tratar la seguridad y cumplimiento normativo en la nube, el texto menciona explícitamente GDPR y CCDA."
+            },
+            {
+                id: 11,
+                tag: "Edge Computing",
+                question: "¿Cuál es la razón principal para implementar Edge Computing en un proceso industrial?",
+                options: [
+                    "Centralizar miles de gigabytes en un servidor situado en otro continente",
+                    "Minimizar la distancia recorrida por los datos para lograr una respuesta inmediata con latencia ultra baja",
+                    "Evitar el uso de sensores o microprocesadores",
+                    "Aumentar el gasto en cableado de fibra óptica"
+                ],
+                correct: 1,
+                explanation: "Sección 4.1: Edge Computing procesa datos en la periferia cercana a la fuente para reducir la latencia en aplicaciones críticas en tiempo real."
+            },
+            {
+                id: 12,
+                tag: "Computación Distribuida",
+                question: "¿Dónde se ubica conceptualmente el 'Fog Computing' en la arquitectura tecnológica?",
+                options: [
+                    "Es un servidor físico situado bajo tierra",
+                    "Como una capa intermedia de nodos entre los dispositivos periféricos (Edge) y la Nube centralizada",
+                    "Directamente grabado dentro del chip de los sensores portátiles",
+                    "Exclusivamente en los satélites de telecomunicaciones"
+                ],
+                correct: 1,
+                explanation: "Sección 4.2: Fog Computing actúa como una capa intermedia entre Edge y Cloud para procesar de forma distribuida grandes volúmenes de IoT."
+            },
+            {
+                id: 13,
+                tag: "Computación Distribuida",
+                question: "¿Qué diferencia principal distingue al Mist Computing frente a Fog y Edge?",
+                options: [
+                    "Solo funciona en entornos de oficina sin conexión",
+                    "Integra el procesamiento directamente en los micro-dispositivos y sensores finales (wearables, smartphones)",
+                    "Es más lento y costoso que la nube tradicional",
+                    "Requiere un centro de datos de varios edificios"
+                ],
+                correct: 1,
+                explanation: "Sección 4.2: Mist Computing o niebla fina lleva el cálculo a los microdispositivos y sensores más pequeños, otorgándoles autonomía local."
+            },
+            {
+                id: 14,
+                tag: "Caso Real - Netflix",
+                question: "¿Cuál es la principal razón de uso de la nube citada en el caso de estudio de Netflix?",
+                options: [
+                    "Gestión de rutas de taxis de flota privada",
+                    "Obtener escalabilidad ilimitada para adaptarse a las fluctuaciones en la demanda de streaming",
+                    "Sincronizar carpetas locales de escritorio",
+                    "Imprimir facturas en papel reciclado"
+                ],
+                correct: 1,
+                explanation: "Sección 6: Netflix utiliza la nube para obtener escalabilidad sin límites frente a picos masivos de usuarios viendo vídeo simultáneamente."
+            },
+            {
+                id: 15,
+                tag: "Caso Real - Spotify",
+                question: "En el caso de Spotify, ¿qué combinación de servicios cloud destaca la lectura?",
+                options: [
+                    "Redes sociales de microblogging corporativo",
+                    "Almacenamiento de catálogo musical y ejecución de algoritmos de IA para recomendaciones personalizadas",
+                    "Control de semáforos urbanos",
+                    "Venta de instrumental físico para conciertos"
+                ],
+                correct: 1,
+                explanation: "Sección 6: Spotify combina almacenamiento en la nube de su catálogo con analítica e IA para personalizar las listas de reproducción."
+            },
+            {
+                id: 16,
+                tag: "Caso Real - Uber",
+                question: "¿Para qué función operativa crucial utiliza Uber la plataforma cloud?",
+                options: [
+                    "Geolocalización precisa en tiempo real y optimización de rutas mediante análisis de datos",
+                    "Diseño de motores térmicos",
+                    "Hospedaje de reservas de hoteles físicos tradicionales",
+                    "Emisión de programas de televisión en directo"
+                ],
+                correct: 0,
+                explanation: "Sección 6: Uber depende de la nube para geolocalización continua en tiempo real, cálculo óptimo de trayectos y escalado global."
+            },
+            {
+                id: 17,
+                tag: "Caso Real - Airbnb",
+                question: "¿Qué tecnología avanzada basada en la nube aplica Airbnb para sugerir hospedajes?",
+                options: [
+                    "Impresión 3D de maquetas de casas",
+                    "Algoritmos de Inteligencia Artificial para ofrecer recomendaciones personalizadas",
+                    "Fog Computing en el teléfono del propietario",
+                    "Cintas magnéticas de copia de seguridad semanal"
+                ],
+                correct: 1,
+                explanation: "Sección 6: Airbnb utiliza la nube para su red global de alojamientos e IA para recomendaciones personalizadas."
+            },
+            {
+                id: 18,
+                tag: "Caso Real - Dropbox",
+                question: "¿Qué característica clave define el éxito del modelo cloud de Dropbox?",
+                options: [
+                    "Sincronización automática de archivos en tiempo real con acceso global y seguridad",
+                    "Fabricación de memorias USB",
+                    "Alquiler de servidores físicos en tiendas de barrio",
+                    "Creación de juegos en streaming 3D"
+                ],
+                correct: 0,
+                explanation: "Sección 6: Dropbox destaca por el acceso universal y sincronización automática de archivos en la nube con seguridad."
+            },
+            {
+                id: 19,
+                tag: "Procesamiento",
+                question: "¿Qué ejemplo práctico de uso del análisis de Big Data en la nube se cita para el sector financiero?",
+                options: [
+                    "Rediseño del logotipo del banco",
+                    "Detección instantánea de fraudes en transacciones financieras",
+                    "Envío de cartas postales",
+                    "Instalación de fotocopiadoras"
+                ],
+                correct: 1,
+                explanation: "Sección 3.2: En finanzas, la combinación de Big Data y procesamiento en tiempo real permite detectar movimientos fraudulentos al instante."
+            },
+            {
+                id: 20,
+                tag: "Ejecución Apps",
+                question: "¿Qué ventaja aporta el uso de metodologías de Integración y Despliegue Continuo (CI/CD) en la nube?",
+                options: [
+                    "Automatiza pruebas y despliegue de software, reduciendo errores y acelerando novedades",
+                    "Obliga a realizar paradas de sistema de varios días para actualizar",
+                    "Duplica el coste de mantenimiento del código",
+                    "Impide la colaboración entre programadores"
+                ],
+                correct: 0,
+                explanation: "Sección 3.4: CI/CD automatiza las fases de prueba y publicación de aplicaciones, permitiendo lanzar actualizaciones sin fallos de forma continuada."
+            },
+            {
+                id: 21,
+                tag: "Desarrollo",
+                question: "¿En cuánto tiempo pueden las empresas desarrollar, probar y desplegar aplicaciones gracias a la agilidad cloud según la sección 5.3?",
+                options: [
+                    "En varios años obligatoriamente",
+                    "En días o semanas, en lugar de meses o años",
+                    "En cuestión de un siglo",
+                    "No hay ninguna diferencia con el desarrollo tradicional"
+                ],
+                correct: 1,
+                explanation: "Sección 5.3: La flexibilidad de entornos cloud reduce los tiempos de desarrollo y despliegue a días o semanas."
+            },
+            {
+                id: 22,
+                tag: "Intercambio",
+                question: "¿Qué función realizan las APIs en la integración de herramientas corporativas como ERP y CRM?",
+                options: [
+                    "Permiten compartir datos y funcionalidades de forma segura entre distintos sistemas",
+                    "Bloquean la comunicación entre departamentos",
+                    "Borran los registros antiguos para ahorrar espacio",
+                    "Sustituyen los contratos de los empleados"
+                ],
+                correct: 0,
+                explanation: "Sección 3.3: Las APIs son los puentes o conectores seguros para que fluyan datos en tiempo real entre sistemas ERP, CRM y analítica."
+            },
+            {
+                id: 23,
+                tag: "FaaS / Serverless",
+                question: "¿Cuál es un evento desencadenante (trigger) típico para ejecutar una función Lambda en la nube según el PDF?",
+                options: [
+                    "Encender una luz del despacho",
+                    "Cargar una imagen en un repositorio de almacenamiento como S3",
+                    "Apagar la pantalla del ordenador",
+                    "Enviar un fax corporativo"
+                ],
+                correct: 1,
+                explanation: "Sección 2.4: Un ejemplo típico de FaaS es la carga de una imagen en un bucket de S3, activando automáticamente la función para redimensionarla."
+            },
+            {
+                id: 24,
+                tag: "Industria 4.0",
+                question: "¿Para qué sirve el procesamiento de datos IoT en tiempo real dentro del sector manufacturero?",
+                options: [
+                    "Para enviar felicitaciones navideñas a clientes",
+                    "Para monitorizar maquinaria industrial y prevenir fallos en la cadena de producción",
+                    "Para reducir la velocidad de la fábrica",
+                    "Para eliminar la conexión a red de las máquinas"
+                ],
+                correct: 1,
+                explanation: "Sección 3.2: En la Industria 4.0, la supervisión de datos IoT en tiempo real es clave para el mantenimiento predictivo y evitar paradas."
+            },
+            {
+                id: 25,
+                tag: "Modelos de Servicio",
+                question: "¿Cuál de estos modelos cloud deja MENOS tareas de gestión de infraestructura en manos de la empresa cliente?",
+                options: [
+                    "IaaS",
+                    "Servidor físico 'On-Premise' local",
+                    "SaaS",
+                    "Redes locales de cableado estructurado"
+                ],
+                correct: 2,
+                explanation: "En SaaS, el proveedor gestiona absolutamente toda la infraestructura, base de datos y software; la empresa solo usa la aplicación."
+            },
+            {
+                id: 26,
+                tag: "Seguridad Cloud",
+                question: "¿Cuál es una medida de seguridad esencial mencionada al compartir información en la nube?",
+                options: [
+                    "Uso de encriptación de datos, políticas de seguridad robustas y cumplimiento normativo",
+                    "Compartir contraseñas públicamente",
+                    "Desactivar el cortafuegos del servidor",
+                    "No guardar copias de seguridad"
+                ],
+                correct: 0,
+                explanation: "Sección 3.3: Proteger la información compartida exige encriptación, control de accesos y cumplimiento estricto de leyes de protección de datos."
+            },
+            {
+                id: 27,
+                tag: "PaaS",
+                question: "¿Qué ventaja ofrece la escalabilidad automática integrada en entornos PaaS?",
+                options: [
+                    "Ajusta los recursos de la plataforma automáticamente cuando aumenta la demanda de uso del software",
+                    "Aumenta la cuota mensual aunque no haya visitas",
+                    "Requiere contratar técnicos manualmente cada hora",
+                    "Desconecta la base de datos si hay mucho tráfico"
+                ],
+                correct: 0,
+                explanation: "Sección 2.2: PaaS incluye escalabilidad automática que asigna más memoria o cómputo según la demanda de tráfico."
+            },
+            {
+                id: 28,
+                tag: "Computación Distribuida",
+                question: "En un vehículo de conducción autónoma o ambulancia de emergencia, ¿por qué es prioritaria la tecnología Edge/Mist frente a enviar todos los datos a la nube central?",
+                options: [
+                    "Porque la nube central es más barata",
+                    "Porque una demora de milisegundos por latencia en la nube puede causar un accidente crítico",
+                    "Porque los vehículos no pueden llevar antenas",
+                    "Porque la ley prohíbe usar la nube en coches"
+                ],
+                correct: 1,
+                explanation: "Sección 4.1 y 4.2: En escenarios donde la vida o la seguridad depende del tiempo de reacción, la latencia de la nube central es inviable, requiriéndose cálculo local Edge/Mist."
+            },
+            {
+                id: 29,
+                tag: "SaaS",
+                question: "¿Cuál de los siguientes es un desafío característico asociado al uso de aplicaciones SaaS?",
+                options: [
+                    "Tener que instalar los parches de seguridad manualmente en cada equipo",
+                    "Dependencia absoluta de la conectividad a Internet y menor capacidad de personalización a medida",
+                    "Gasto masivo en compra de servidores de almacenamiento",
+                    "Lentitud en el despliegue inicial"
+                ],
+                correct: 1,
+                explanation: "Sección 2.3: Los desafíos del SaaS son la dependencia de la conexión a Internet y una menor flexibilidad para personalizar la aplicación a medida."
+            },
+            {
+                id: 30,
+                tag: "Resumen Cloud",
+                question: "En conjunto, ¿cuál es el impacto estratégico fundamental del Cloud Computing para las empresas en la era digital?",
+                options: [
+                    "Aumentar el trabajo burocrático en papel",
+                    "Democratizar el acceso a tecnologías avanzadas (IA, Big Data) y actuar como catalizador de innovación y eficiencia",
+                    "Obligar a contratar más personal técnico de mantenimiento de hardware",
+                    "Limitar las operaciones empresariales a un único edificio"
+                ],
+                correct: 1,
+                explanation: "Sección 1.1 y 1.2: La nube democratiza tecnologías de vanguardia para pymes y corporaciones, impulsando la transformación digital y la agilidad."
+            }
+        ];
+
+        /* ==========================================================================
+           DATA STRUCTURE: CONCEPTS FOR EXPLAINER SECTION
+           3 Levels: Simple, Analogy, Admin/Finance Application
+           ========================================================================== */
+        const conceptDatabase = [
+            {
+                id: "iaas-paas-saas",
+                title: "Niveles Cloud: IaaS vs PaaS vs SaaS",
+                keywords: ["iaas", "paas", "saas", "modelos", "servicios"],
+                simple: "Son tres formas de alquilar tecnología en Internet según cuánto trabajo técnico quieras hacer tú. IaaS es alquilar los cimientos y ladrillos informáticos; PaaS es alquilar el taller equipado con herramientas; SaaS es alquilar la casa terminada y decorada lista para vivir.",
+                analogy: "🍕 **La Analogía de la Pizza:** <br>- **On-Premise:** Haces la pizza desde cero en tu casa (compras horno, masa, queso).<br>- **IaaS:** Alquilas el horno y la cocina industrial, tú traes e ingieres la masa e ingredientes.<br>- **PaaS:** Te dan la masa lista y el horno caliente; tú solo eliges los ingredientes y horneas.<br>- **SaaS:** Vas al restaurante o pides la pizza a domicilio; te la sirven lista para comer sin cocinar ni limpiar.",
+                finance: "💼 **En Administración y Finanzas:** <br>- **SaaS:** Usar un programa de contabilidad online como Factusol en la nube o Holded. Se paga cuota mensual (Gasto Operativo / OPEX), sin compras de ordenadores especiales.<br>- **PaaS/IaaS:** Si la empresa desarrolla su propia intranet de gestión de clientes, contratará IaaS/PaaS en AWS o Azure para no comprar servidores físicos en balance (ahorrando amortización de CAPEX)."
+            },
+            {
+                id: "edge-fog-mist",
+                title: "Computación Distribuida: Edge vs Fog vs Mist Computing",
+                keywords: ["edge", "fog", "mist", "latencia", "distribuida", "niebla"],
+                simple: "Son formas de procesar los datos muy cerca de donde ocurren las cosas para no perder tiempo enviándolos a un servidor lejano. Mist es procesar en el propio reloj o sensor inteligente; Edge es procesar en la antena o caja local cercana; Fog es procesar en el centro informático de la fábrica.",
+                analogy: "🏥 **La Analogía de Urgencias Médicas:** <br>- **Mist:** El propio paciente se toma las pulsaciones con su pulsera (respuesta inmediata).<br>- **Edge:** El enfermero en el triaje de la entrada toma decisiones rápidas en el acto.<br>- **Fog:** La planta de especialidades del hospital comarcal analiza pruebas en la ciudad.<br>- **Nube Central:** El archivo nacional de historia clínica centralizado en la capital.",
+                finance: "💼 **En Administración y Finanzas:** <br>En logística de transporte de mercancías valiosas, el seguimiento de temperatura y la apertura de seguridad de camiones se valida localmente (Edge/Mist) para actuar en segundos ante un robo o avería, enviando luego el resumen contable a la nube corporativa."
+            },
+            {
+                id: "capex-opex",
+                title: "Impacto Financiero: CAPEX vs OPEX",
+                keywords: ["capex", "opex", "costes", "gastos", "financiero", "balance"],
+                simple: "CAPEX es comprar un bien valioso pagando un dineral por adelantado que se deprecia con los años. OPEX es pagar una suscripción o alquiler mes a mes por usar un servicio según lo necesites.",
+                analogy: "🚗 **La Analogía del Vehículo:** <br>- **CAPEX:** Comprar un camión de repartos al contado por 40.000€. Tienes un activo en propiedad, pero asumes el riesgo, reparaciones y depreciación.<br>- **OPEX:** Alquilar el camión o pagar un servicio de Renting/Renting flexible por 400€/mes. Si la empresa no trabaja en agosto, reduce la flota sin perder capital acumulado.",
+                finance: "💼 **En Administración y Finanzas:** <br>Pasar de servidores informáticos propios (CAPEX) a servicios cloud (OPEX) libera tesorería e inversión. El gasto se deduce como consumo corriente operativo en el ejercicio, mejorando ratios de liquidez y reduciendo el riesgo financiero ante la obsolescencia tecnológica."
+            },
+            {
+                id: "serverless-faas",
+                title: "Computación Sin Servidor / FaaS (Serverless)",
+                keywords: ["serverless", "faas", "funciones", "eventos", "lambda"],
+                simple: "Es un modelo donde no pagas por un ordenador encendido todo el día, sino que ejecutas un pequeño código que cobra exactamente los milisegundos que tarda en funcionar tras un evento.",
+                analogy: "💡 **La Analogía del Grifo con Sensor:** <br>Un grifo tradicional (servidor normal) deja correr agua continuamente o requiere estar encendido siempre pagando la tarifa. El grifo con sensor (Serverless) solo echa agua exactos 3 segundos cuando detecta las manos, cobrando estrictamente por las gotas utilizadas.",
+                finance: "💼 **En Administración y Finanzas:** <br>Ideal para automatizaciones de gestoría: por ejemplo, cada vez que un cliente sube una factura escaneada a la web, se ejecuta una función FaaS que extrae el CIF e importe y se apaga. El coste en la factura de nube es prácticamente de céntimos de euro al mes."
+            },
+            {
+                id: "apis-integration",
+                title: "APIs e Integración de Sistemas Empresariales",
+                keywords: ["apis", "integracion", "erp", "crm", "intercambio"],
+                simple: "Una API es un 'traductor y camarero' digital que permite a dos programas de ordenador diferentes hablar entre sí y pasarse datos de forma automática y segura.",
+                analogy: "🍽️ **La Analogía del Camarero en el Restaurante:** <br>Tú (el sistema ERP de contabilidad) miras la carta, pero no entras a la cocina a cocinar. Le pides al camarero (la API) el plato. El camarero lleva tu comanda a la cocina (banco online / CRM) y te trae de vuelta la información empaquetada de forma rápida.",
+                finance: "💼 **En Administración y Finanzas:** <br>Permite conectar automáticamente la pasarela de cobro del e-commerce (Stripe/PayPal) con el software de contabilidad (ERP) del departamento financiero. Cada venta realizada online crea la factura contable automáticamente sin picar datos a mano."
+            },
+            {
+                id: "cicd-cdn",
+                title: "CI/CD y Redes de Entrega de Contenido (CDN)",
+                keywords: ["cicd", "cdn", "despliegue", "latencia", "rendimiento"],
+                simple: "CI/CD es un robot que comprueba y publica las mejoras del programa informático sin fallos. CDN es tener almacenes distribuidores repartidos por todo el mundo para entregar las fotos y textos más rápido.",
+                analogy: "📦 **La Analogía de la Cadena Logística:** <br>- **CI/CD:** Una cinta de embalaje automatizada que comprueba si cada paquete está bien precintado antes de meterlo al camión.<br>- **CDN:** Tener minialmacenes de Amazon en cada ciudad de España para que el pedido llegue en 1 hora en lugar de esperar 5 días a que viaje desde un almacén en China.",
+                finance: "💼 **En Administración y Finanzas:** <br>Garantiza que la web de venta de la empresa o el portal del empleado funcione a alta velocidad sin caídas durante picos de trabajo (ej. cierre del trimestre fiscal o campaña de Black Friday)."
+            }
+        ];
+
+        /* ==========================================================================
+           GLOBAL APPLICATION STATE
+           ========================================================================== */
+        let state = {
+            flashcards: [],
+            flashcardFilter: 'all',
+            quizQuestions: [],
+            quizIndex: 0,
+            quizUserAnswers: {},
+            activeTab: 'flashcards',
+            textSize: 'base',
+            theme: 'default',
+            expandedReading: false,
+            readingGuideActive: false
+        };
+
+        /* ==========================================================================
+           INITIALIZATION ON LOAD
+           ========================================================================== */
+        window.onload = function() {
+            // Load saved state or defaults
+            loadSavedState();
+
+            // Render components
+            renderFlashcards();
+            renderQuizQuestion();
+            renderConcepts();
+
+            // Set up mouse tracking for reading guide
+            document.addEventListener('mousemove', handleMouseMoveForReadingGuide);
+        };
+
+        function loadSavedState() {
+            state.flashcards = [...initialFlashcards];
+            state.quizQuestions = [...initialQuizQuestions];
+            updateFlashcardsCounters();
+        }
+
+        /* ==========================================================================
+           TAB NAVIGATION CONTROLLER
+           ========================================================================== */
+        function switchTab(tabId) {
+            state.activeTab = tabId;
+            
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-sky-600', 'text-white');
+                btn.classList.add('text-slate-300', 'hover:bg-slate-800');
+            });
+
+            // Show selected section
+            const targetSection = document.getElementById(`section-${tabId}`);
+            if (targetSection) targetSection.classList.remove('hidden');
+
+            // Highlight button
+            const targetBtn = document.getElementById(`tab-${tabId}`);
+            if (targetBtn) {
+                targetBtn.classList.remove('text-slate-300', 'hover:bg-slate-800');
+                targetBtn.classList.add('bg-sky-600', 'text-white');
+            }
+        }
+
+        /* ==========================================================================
+           SECTION 1: FLASHCARDS LOGIC
+           ========================================================================== */
+        function renderFlashcards() {
+            const container = document.getElementById('flashcards-grid');
+            container.innerHTML = '';
+
+            let filtered = state.flashcards;
+            if (state.flashcardFilter === 'pending') {
+                filtered = state.flashcards.filter(c => !c.mastered);
+            } else if (state.flashcardFilter === 'mastered') {
+                filtered = state.flashcards.filter(c => c.mastered);
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full py-12 text-center text-slate-500 bg-card-custom bg-white rounded-2xl border border-slate-200">
+                        <div class="text-3xl mb-2">🎉</div>
+                        <p class="font-bold">¡No hay tarjetas en esta categoría!</p>
+                        <p class="text-xs text-slate-400 mt-1">Cambia el filtro arriba para seguir repasando.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach((card, index) => {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'perspective-1000 h-64 cursor-pointer group';
+                cardEl.onclick = (e) => {
+                    // Prevent flip if clicking master button
+                    if (e.target.closest('.card-action-btn')) return;
+                    toggleCardFlip(card.id);
+                };
+
+                cardEl.innerHTML = `
+                    <div id="card-inner-${card.id}" class="relative w-full h-full duration-500 transform-style-3d transition-transform rounded-2xl shadow-sm border border-slate-200 bg-card-custom bg-white">
+                        
+                        <!-- FRONT SIDE -->
+                        <div class="absolute inset-0 w-full h-full p-5 backface-hidden flex flex-col justify-between rounded-2xl">
+                            <div>
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 bg-sky-100 text-sky-800 rounded-md border border-sky-200">
+                                        ${card.topic}
+                                    </span>
+                                    <span class="text-xs text-slate-400 font-mono">#${card.id}</span>
+                                </div>
+                                <h3 class="font-bold text-slate-900 text-sm sm:text-base leading-snug mt-2">
+                                    ${card.question}
+                                </h3>
+                            </div>
+
+                            <div class="pt-3 border-t border-slate-100 flex justify-between items-center">
+                                <span class="text-[11px] text-slate-400 flex items-center gap-1">
+                                    🔄 Toca para ver respuesta
+                                </span>
+                                <button onclick="toggleCardMastery(${card.id})" class="card-action-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition ${card.mastered ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">
+                                    ${card.mastered ? '✓ Dominada' : 'Mark Dominada'}
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- BACK SIDE -->
+                        <div class="absolute inset-0 w-full h-full p-5 backface-hidden rotate-y-180 bg-sky-900 text-white flex flex-col justify-between rounded-2xl overflow-y-auto">
+                            <div>
+                                <span class="text-[10px] uppercase font-bold tracking-wider text-sky-300 bg-sky-800 px-2.5 py-0.5 rounded-md">
+                                    Respuesta Fundamentada
+                                </span>
+                                <p class="text-xs sm:text-sm mt-3 leading-relaxed text-slate-100">
+                                    ${card.answer}
+                                </p>
+                            </div>
+
+                            <div class="pt-2 border-t border-sky-800 flex justify-between items-center text-xs">
+                                <span class="text-sky-300 text-[11px]">🔄 Volver a pregunta</span>
+                                <button onclick="toggleCardMastery(${card.id})" class="card-action-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition ${card.mastered ? 'bg-emerald-500 text-white' : 'bg-sky-800 text-sky-200 hover:bg-sky-700'}">
+                                    ${card.mastered ? '✓ Dominada' : 'Marcar Dominada'}
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                `;
+                container.appendChild(cardEl);
+            });
+        }
+
+        function toggleCardFlip(cardId) {
+            const inner = document.getElementById(`card-inner-${cardId}`);
+            if (inner) {
+                inner.classList.toggle('rotate-y-180');
+            }
+        }
+
+        function toggleCardMastery(cardId) {
+            const card = state.flashcards.find(c => c.id === cardId);
+            if (card) {
+                card.mastered = !card.mastered;
+                updateFlashcardsCounters();
+                renderFlashcards();
+            }
+        }
+
+        function filterFlashcards(filterType) {
+            state.flashcardFilter = filterType;
+            
+            ['all', 'pending', 'mastered'].forEach(f => {
+                const btn = document.getElementById(`filter-${f}`);
+                if (btn) {
+                    if (f === filterType) {
+                        btn.className = 'px-3 py-1.5 rounded-lg bg-sky-600 text-white font-medium shadow-sm';
+                    } else {
+                        btn.className = 'px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium';
+                    }
+                }
+            });
+
+            renderFlashcards();
+        }
+
+        function updateFlashcardsCounters() {
+            const total = state.flashcards.length;
+            const mastered = state.flashcards.filter(c => c.mastered).length;
+            const pending = total - mastered;
+            const percent = total > 0 ? Math.round((mastered / total) * 100) : 0;
+
+            document.getElementById('count-all').innerText = total;
+            document.getElementById('count-pending').innerText = pending;
+            document.getElementById('count-mastered').innerText = mastered;
+            document.getElementById('badge-flashcards').innerText = total;
+
+            document.getElementById('flashcard-progress-text').innerText = `${mastered} / ${total} (${percent}%)`;
+            document.getElementById('flashcard-progress-bar').style.width = `${percent}%`;
+        }
+
+        function resetFlashcardsProgress() {
+            state.flashcards.forEach(c => c.mastered = false);
+            updateFlashcardsCounters();
+            renderFlashcards();
+        }
+
+        /* ==========================================================================
+           SECTION 2: QUIZ LOGIC
+           ========================================================================== */
+        function renderQuizQuestion() {
+            const q = state.quizQuestions[state.quizIndex];
+            const total = state.quizQuestions.length;
+
+            // UI Header updates
+            document.getElementById('quiz-current-num').innerText = state.quizIndex + 1;
+            document.getElementById('quiz-total-num').innerText = total;
+            document.getElementById('quiz-question-counter').innerText = `Pregunta ${state.quizIndex + 1}/${total}`;
+            document.getElementById('quiz-question-tag').innerText = q.tag || 'Concepto Cloud';
+            document.getElementById('quiz-question-text').innerText = q.question;
+
+            // Progress bar
+            const percent = Math.round(((state.quizIndex + 1) / total) * 100);
+            document.getElementById('quiz-progress-bar').style.width = `${percent}%`;
+
+            // Score counter
+            let correctCount = 0;
+            Object.keys(state.quizUserAnswers).forEach(idx => {
+                if (state.quizUserAnswers[idx] === state.quizQuestions[idx].correct) correctCount++;
+            });
+            document.getElementById('quiz-score-count').innerText = correctCount;
+
+            // Options rendering
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+
+            const answered = state.quizUserAnswers.hasOwnProperty(state.quizIndex);
+            const userAnswer = state.quizUserAnswers[state.quizIndex];
+
+            q.options.forEach((optText, optIdx) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-4 rounded-xl border transition flex items-center justify-between text-xs sm:text-sm font-medium ';
+
+                if (!answered) {
+                    btn.className += 'bg-slate-50 border-slate-200 hover:bg-sky-50 hover:border-sky-300 text-slate-800';
+                    btn.onclick = () => answerQuizQuestion(optIdx);
+                } else {
+                    btn.disabled = true;
+                    if (optIdx === q.correct) {
+                        btn.className += 'bg-emerald-50 border-emerald-400 text-emerald-900 font-bold ring-1 ring-emerald-400';
+                    } else if (optIdx === userAnswer) {
+                        btn.className += 'bg-rose-50 border-rose-400 text-rose-900 line-through';
+                    } else {
+                        btn.className += 'bg-slate-50 border-slate-200 opacity-60 text-slate-600';
+                    }
+                }
+
+                btn.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="w-6 h-6 rounded-full border border-slate-300 bg-white flex items-center justify-center text-xs font-bold shrink-0">
+                            ${String.fromCharCode(65 + optIdx)}
+                        </span>
+                        <span>${optText}</span>
+                    </div>
+                    ${answered && optIdx === q.correct ? '<span class="text-emerald-600 font-bold text-base">✓</span>' : ''}
+                    ${answered && optIdx === userAnswer && optIdx !== q.correct ? '<span class="text-rose-600 font-bold text-base">✗</span>' : ''}
+                `;
+                optionsContainer.appendChild(btn);
+            });
+
+            // Feedback box
+            const feedbackBox = document.getElementById('quiz-feedback');
+            if (answered) {
+                feedbackBox.classList.remove('hidden');
+                const isCorrect = userAnswer === q.correct;
+
+                if (isCorrect) {
+                    feedbackBox.className = 'mt-6 p-4 rounded-xl border bg-emerald-50 border-emerald-200 text-emerald-900';
+                    document.getElementById('quiz-feedback-icon').innerText = '🎉';
+                    document.getElementById('quiz-feedback-title').innerText = '¡Respuesta Correcta!';
+                } else {
+                    feedbackBox.className = 'mt-6 p-4 rounded-xl border bg-rose-50 border-rose-200 text-rose-900';
+                    document.getElementById('quiz-feedback-icon').innerText = '💡';
+                    document.getElementById('quiz-feedback-title').innerText = 'Respuesta Incorrecta';
+                }
+                document.getElementById('quiz-feedback-text').innerText = q.explanation;
+            } else {
+                feedbackBox.classList.add('hidden');
+            }
+
+            // Navigation buttons state
+            document.getElementById('quiz-btn-prev').disabled = state.quizIndex === 0;
+            const nextBtn = document.getElementById('quiz-btn-next');
+            if (state.quizIndex === total - 1) {
+                nextBtn.innerText = 'Ver Resultados Finales 🏆';
+            } else {
+                nextBtn.innerText = 'Siguiente Pregunta →';
+            }
+        }
+
+        function answerQuizQuestion(optionIndex) {
+            state.quizUserAnswers[state.quizIndex] = optionIndex;
+            renderQuizQuestion();
+        }
+
+        function navigateQuiz(direction) {
+            const total = state.quizQuestions.length;
+            if (direction === 1 && state.quizIndex === total - 1) {
+                showQuizResults();
+                return;
+            }
+
+            state.quizIndex += direction;
+            if (state.quizIndex < 0) state.quizIndex = 0;
+            if (state.quizIndex >= total) state.quizIndex = total - 1;
+
+            renderQuizQuestion();
+        }
+
+        function showQuizResults() {
+            document.getElementById('quiz-card').classList.add('hidden');
+            document.getElementById('quiz-results').classList.remove('hidden');
+
+            const total = state.quizQuestions.length;
+            let correct = 0;
+            Object.keys(state.quizUserAnswers).forEach(idx => {
+                if (state.quizUserAnswers[idx] === state.quizQuestions[idx].correct) correct++;
+            });
+
+            const score10 = ((correct / total) * 10).toFixed(1);
+            const percentage = Math.round((correct / total) * 100);
+
+            document.getElementById('results-score').innerText = `${score10} / 10`;
+            document.getElementById('results-correct').innerText = `${correct} / ${total}`;
+            document.getElementById('results-percentage').innerText = `${percentage}%`;
+
+            let msg = "";
+            if (score10 >= 9) {
+                msg = "🌟 ¡Excelente dominio de la materia! Estás totalmente preparado para el examen del Módulo de Digitalización.";
+            } else if (score10 >= 7) {
+                msg = "👍 ¡Buen trabajo! Tienes una base sólida sobre el Tema 3. Repasa los conceptos fallados para asegurar el sobresaliente.";
+            } else if (score10 >= 5) {
+                msg = "📚 Aprobado. Te recomendamos volver a repasar las Tarjetas Inteligentes y las analogías didácticas.";
+            } else {
+                msg = "⚠️ Es necesario repasar el tema. Consulta las analogías y explicaciones didácticas en la pestaña Aclaración de Conceptos.";
+            }
+            document.getElementById('results-eval-message').innerText = msg;
+        }
+
+        function restartQuiz() {
+            state.quizIndex = 0;
+            state.quizUserAnswers = {};
+            document.getElementById('quiz-card').classList.remove('hidden');
+            document.getElementById('quiz-results').classList.add('hidden');
+            renderQuizQuestion();
+        }
+
+        /* ==========================================================================
+           SECTION 3: CONCEPTS & ANALOGIES LOGIC
+           ========================================================================== */
+        function renderConcepts(filterText = '') {
+            const container = document.getElementById('concepts-container');
+            container.innerHTML = '';
+
+            const term = filterText.toLowerCase().trim();
+
+            const filtered = conceptDatabase.filter(item => {
+                if (!term) return true;
+                return item.title.toLowerCase().includes(term) ||
+                       item.simple.toLowerCase().includes(term) ||
+                       item.keywords.some(k => k.includes(term));
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-card-custom bg-white p-8 text-center text-slate-500 rounded-2xl border border-slate-200">
+                        🔍 No se encontraron conceptos precargados que coincidan con "${filterText}".
+                        <p class="text-xs text-sky-600 mt-2 font-medium">Prueba a formular tu duda abajo en la caja de asistente interactivo.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'bg-card-custom bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4';
+
+                card.innerHTML = `
+                    <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2 border-b pb-3">
+                        <span>💡 ${item.title}</span>
+                    </h3>
+
+                    <!-- Level 1: Simple Explanation -->
+                    <div class="bg-sky-50/70 p-4 rounded-xl border border-sky-100">
+                        <span class="text-xs font-bold uppercase tracking-wider text-sky-800 block mb-1">
+                            🌱 1. Explicación Sencilla (Para principiantes)
+                        </span>
+                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">${item.simple}</p>
+                    </div>
+
+                    <!-- Level 2: Everyday Analogy -->
+                    <div class="bg-amber-50/70 p-4 rounded-xl border border-amber-100">
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-800 block mb-1">
+                            🍕 2. Analogía de la Vida Cotidiana
+                        </span>
+                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">${item.analogy}</p>
+                    </div>
+
+                    <!-- Level 3: Admin & Finance Application -->
+                    <div class="bg-emerald-50/70 p-4 rounded-xl border border-emerald-100">
+                        <span class="text-xs font-bold uppercase tracking-wider text-emerald-800 block mb-1">
+                            📊 3. Aplicación en Administración y Finanzas
+                        </span>
+                        <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">${item.finance}</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterConcepts() {
+            const text = document.getElementById('concept-search-input').value;
+            renderConcepts(text);
+        }
+
+        function searchConceptTag(tagText) {
+            document.getElementById('concept-search-input').value = tagText;
+            renderConcepts(tagText);
+        }
+
+        function explainCustomDoubt() {
+            const input = document.getElementById('custom-doubt-input').value.trim();
+            const resultBox = document.getElementById('custom-doubt-result');
+
+            if (!input) {
+                resultBox.classList.remove('hidden');
+                resultBox.innerHTML = `<span class="text-amber-400">⚠️ Por favor escribe una duda o término del Tema 3 para explicarte.</span>`;
+                return;
+            }
+
+            resultBox.classList.remove('hidden');
+            resultBox.innerHTML = `
+                <div class="flex items-center space-x-2 text-sky-400 font-bold mb-2">
+                    <span class="animate-spin">🌀</span>
+                    <span>Generando explicación didáctica adaptada...</span>
+                </div>
+            `;
+
+            setTimeout(() => {
+                const lower = input.toLowerCase();
+                let explanation = "";
+
+                if (lower.includes('diferencia') || lower.includes('iaas') || lower.includes('saas') || lower.includes('paas')) {
+                    explanation = `
+                        <strong>Explicación Didáctica sobre Modelos Cloud:</strong><br>
+                        En un departamento de Administración y Finanzas:
+                        <ul class="list-disc pl-5 mt-2 space-y-1">
+                            <li><strong>IaaS:</strong> Es como alquilar una oficina vacía con luz y agua. Tú pones las mesas, ordenadores y programas.</li>
+                            <li><strong>PaaS:</strong> Es alquilar la oficina ya amueblada y con ordenadores listos para que tus programadores creen la web de la empresa.</li>
+                            <li><strong>SaaS:</strong> Es contratar un servicio completo (ej. Factusol Cloud o Google Workspace). Pagas una tarifa mensual por usuario y entras a trabajar directamente desde cualquier navegador.</li>
+                        </ul>
+                    `;
+                } else if (lower.includes('edge') || lower.includes('mist') || lower.includes('fog') || lower.includes('latencia')) {
+                    explanation = `
+                        <strong>Explicación Didáctica sobre Computación Distribuida:</strong><br>
+                        Imagina la cadena de tiendas de una empresa:
+                        <ul class="list-disc pl-5 mt-2 space-y-1">
+                            <li><strong>Mist:</strong> El escáner de código de barras de la caja detecta el precio al instante sin esperar.</li>
+                            <li><strong>Edge:</strong> El ordenador de la tienda gestiona las alarmas y stock local en tiempo real.</li>
+                            <li><strong>Fog:</strong> El servidor regional de la provincia agrupa las ventas del día.</li>
+                            <li><strong>Nube Central:</strong> La sede central calcula el balance contable global del trimestre.</li>
+                        </ul>
+                    `;
+                } else if (lower.includes('capex') || lower.includes('opex') || lower.includes('coste') || lower.includes('financiero')) {
+                    explanation = `
+                        <strong>Explicación Didáctica Financiera:</strong><br>
+                        Imagina que la empresa necesita potencia de cálculo para la campaña de Navidad:
+                        <br>- <strong>Con CAPEX:</strong> Habría que pedir un préstamo para comprar 5 servidores físicos por 20.000€ que luego quedarán infrautilizados en enero.
+                        <br>- <strong>Con OPEX (Cloud):</strong> Se alquila esa potencia en la nube por 300€ en diciembre y en enero se da de baja. Se contabiliza como gasto corriente en la cuenta de pérdidas y ganancias sin endeudar la empresa.
+                    `;
+                } else {
+                    explanation = `
+                        <strong>Respuesta Didáctica Fundamentada en el Tema 3:</strong><br>
+                        Respecto a tu consulta sobre <em>"${input}"</em>:<br>
+                        El Cloud Computing se fundamenta en la flexibilidad, escalabilidad y eficiencia operative. Recuerda que la premisa del módulo de Digitalización es sustituir inversiones físicas fijas por servicios remotos bajo demanda (pago por uso), permitiendo a cualquier administrativo trabajar en tiempo real desde cualquier lugar con total seguridad y cumplimiento normativo (GDPR/CCDA).
+                    `;
+                }
+
+                resultBox.innerHTML = explanation;
+            }, 500);
+        }
+
+        /* ==========================================================================
+           SECTION 4: RESOURCE GENERATOR LOGIC
+           ========================================================================== */
+        let generatedResource = null;
+
+        function generateNewResource() {
+            const subtopic = document.getElementById('gen-subtopic').value;
+            const type = document.querySelector('input[name="gen-type"]:checked').value;
+            const apiKey = document.getElementById('gemini-api-key').value.trim();
+            const outputContainer = document.getElementById('gen-output-container');
+            const statusBadge = document.getElementById('gen-status-badge');
+            const actionsDiv = document.getElementById('gen-actions');
+
+            statusBadge.innerText = 'Generando...';
+            statusBadge.className = 'text-xs bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full font-medium';
+            outputContainer.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-6">
+                    <div class="animate-spin text-3xl mb-2 text-sky-600">⚡</div>
+                    <p class="text-xs sm:text-sm font-semibold text-slate-700">Creando nuevo recurso pedagógico...</p>
+                    <p class="text-[11px] text-slate-400 mt-1">Basándose en los conceptos oficiales del Tema 3</p>
+                </div>
+            `;
+
+            setTimeout(() => {
+                // Local fallback generation pool based on PDF topics
+                if (type === 'card') {
+                    generatedResource = createLocalCard(subtopic);
+                    renderGeneratedCard(generatedResource);
+                } else {
+                    generatedResource = createLocalQuestion(subtopic);
+                    renderGeneratedQuestion(generatedResource);
+                }
+
+                statusBadge.innerText = '¡Generado con éxito!';
+                statusBadge.className = 'text-xs bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full font-medium';
+                actionsDiv.classList.remove('hidden');
+            }, 600);
+        }
+
+        function createLocalCard(subtopic) {
+            const templates = [
+                {
+                    topic: "Procesamiento Cloud",
+                    question: "¿Qué es el almacenamiento elástico en la nube?",
+                    answer: "Es la capacidad de expandir o reducir el espacio de almacenamiento de datos de forma automática e inmediata según la demanda de la empresa, pagando únicamente por los gigabytes utilizados."
+                },
+                {
+                    topic: "Desafíos Cloud",
+                    question: "¿Por qué la centralización de datos en la nube exige gobernanza estricta?",
+                    answer: "Porque la concentración de información valiosa la hace susceptible a ciberataques. Es obligatorio aplicar encriptación, control de accesos y cumplir normativas como GDPR."
+                },
+                {
+                    topic: "Tecnologías Distribuidas",
+                    question: "¿En qué consiste la arquitectura híbrida entre Edge Computing y la Nube?",
+                    answer: "Consiste en procesar en el Edge los datos inmediatos sensibles a la latencia (ej. sensores), y enviar a la Nube centralizada la información para almacenamiento a largo plazo y analítica profunda."
+                },
+                {
+                    topic: "Casos Reales",
+                    question: "¿Cómo optimiza Uber sus costes operativos mediante la nube?",
+                    answer: "Escalando su infraestructura de forma automática durante horas punta de demanda de viajes y reduciendo recursos en horas de poco tráfico."
+                }
+            ];
+            const chosen = templates[Math.floor(Math.random() * templates.length)];
+            return {
+                id: state.flashcards.length + 1,
+                topic: chosen.topic,
+                question: chosen.question,
+                answer: chosen.answer,
+                mastered: false
+            };
+        }
+
+        function createLocalQuestion(subtopic) {
+            const templates = [
+                {
+                    tag: "Casos Reales",
+                    question: "¿Qué ventaja tecnológica permite a Spotify recomendar canciones de forma personalizada a millones de usuarios?",
+                    options: [
+                        "Procesamiento local en discos CD físicos",
+                        "Uso de almacenamiento cloud masivo y modelos de IA/Machine Learning",
+                        "Descarga manual de archivos por correo electrónico",
+                        "Instalación de servidores en los domicilios de los clientes"
+                    ],
+                    correct: 1,
+                    explanation: "Según el caso de estudio de Spotify en el Tema 3, la combinación de almacenamiento cloud y algoritmos de IA posibilita sus recomendaciones personalizadas."
+                },
+                {
+                    tag: "Finanzas y Gestión",
+                    question: "¿Qué impacto tiene la adopción del modelo OPEX en la agilidad de una pyme?",
+                    options: [
+                        "Obliga a pedir préstamos bancarios a largo plazo para comprar servidores",
+                        "Permite adaptar los costes tecnológicos exactamente al volumen de actividad de cada momento",
+                        "Inmoviliza el capital financiero en activos fijos",
+                        "Aumenta los gastos fijos de electricidad en la oficina"
+                    ],
+                    correct: 1,
+                    explanation: "El modelo OPEX de la nube reemplaza costes fijos elevados por gastos variables adaptados al uso real del negocio."
+                }
+            ];
+            const chosen = templates[Math.floor(Math.random() * templates.length)];
+            return {
+                id: state.quizQuestions.length + 1,
+                tag: chosen.tag,
+                question: chosen.question,
+                options: chosen.options,
+                correct: chosen.correct,
+                explanation: chosen.explanation
+            };
+        }
+
+        function renderGeneratedCard(card) {
+            const container = document.getElementById('gen-output-container');
+            container.innerHTML = `
+                <div class="w-full text-left bg-white p-5 rounded-xl border border-sky-200 shadow-sm space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-sky-700 bg-sky-100 px-2.5 py-0.5 rounded-md">🎴 Tarjeta Creada (${card.topic})</span>
+                        <span class="text-xs text-slate-400">Nueva #FC-${card.id}</span>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-sm sm:text-base">${card.question}</h4>
+                    <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs text-slate-700 leading-relaxed">
+                        <strong>Respuesta:</strong> ${card.answer}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderGeneratedQuestion(q) {
+            const container = document.getElementById('gen-output-container');
+            container.innerHTML = `
+                <div class="w-full text-left bg-white p-5 rounded-xl border border-purple-200 shadow-sm space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-purple-700 bg-purple-100 px-2.5 py-0.5 rounded-md">📝 Pregunta Creada (${q.tag})</span>
+                        <span class="text-xs text-slate-400">Nueva #Q-${q.id}</span>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-sm sm:text-base">${q.question}</h4>
+                    <div class="space-y-1.5 text-xs">
+                        ${q.options.map((opt, i) => `
+                            <div class="p-2 rounded-lg ${i === q.correct ? 'bg-emerald-100 text-emerald-900 font-bold border border-emerald-300' : 'bg-slate-50 text-slate-700'}">
+                                ${String.fromCharCode(65 + i)}) ${opt}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function addGeneratedToCollection() {
+            if (!generatedResource) return;
+
+            if (generatedResource.hasOwnProperty('answer')) {
+                state.flashcards.push(generatedResource);
+                updateFlashcardsCounters();
+                renderFlashcards();
+                alert("✅ ¡Tarjeta añadida con éxito a tu colección de Tarjetas Inteligentes!");
+            } else {
+                state.quizQuestions.push(generatedResource);
+                renderQuizQuestion();
+                alert("✅ ¡Pregunta añadida con éxito a tu Cuestionario Test!");
+            }
+
+            document.getElementById('gen-actions').classList.add('hidden');
+            document.getElementById('gen-status-badge').innerText = 'Añadida a la colección';
+            document.getElementById('gen-status-badge').className = 'text-xs bg-sky-100 text-sky-800 px-2.5 py-0.5 rounded-full font-medium';
+        }
+
+        /* ==========================================================================
+           SECTION 5: ACCESSIBILITY & READING CUSTOMIZATION
+           ========================================================================== */
+        function toggleExpandedReading(enabled) {
+            state.expandedReading = enabled;
+            if (enabled) {
+                document.body.classList.add('mode-expanded-reading');
+            } else {
+                document.body.classList.remove('mode-expanded-reading');
+            }
+        }
+
+        function setTextSize(sizeKey) {
+            state.textSize = sizeKey;
+            const html = document.documentElement;
+            html.classList.remove('text-size-sm', 'text-size-base', 'text-size-lg', 'text-size-xl');
+            html.classList.add(`text-size-${sizeKey}`);
+
+            ['sm', 'base', 'lg', 'xl'].forEach(k => {
+                const btn = document.getElementById(`size-btn-${k}`);
+                if (btn) {
+                    if (k === sizeKey) {
+                        btn.className = 'px-3 py-2 border rounded-xl text-xs text-center font-semibold bg-sky-50 border-sky-300 text-sky-700 shadow-sm';
+                    } else {
+                        btn.className = 'px-3 py-2 border rounded-xl text-xs text-center font-medium hover:bg-slate-50 text-slate-700 border-slate-200';
+                    }
+                }
+            });
+        }
+
+        function setTheme(themeKey) {
+            state.theme = themeKey;
+            document.body.classList.remove('theme-sepia', 'theme-dark-contrast');
+
+            if (themeKey === 'sepia') {
+                document.body.classList.add('theme-sepia');
+            } else if (themeKey === 'dark-contrast') {
+                document.body.classList.add('theme-dark-contrast');
+            }
+
+            ['default', 'sepia', 'dark-contrast'].forEach(t => {
+                const btn = document.getElementById(`theme-btn-${t}`);
+                if (btn) {
+                    if (t === themeKey) {
+                        btn.classList.add('ring-2', 'ring-sky-500', 'border-sky-500');
+                    } else {
+                        btn.classList.remove('ring-2', 'ring-sky-500', 'border-sky-500');
+                    }
+                }
+            });
+        }
+
+        function toggleReadingGuide(enabled) {
+            state.readingGuideActive = enabled;
+            const guide = document.getElementById('reading-guide');
+            if (enabled) {
+                guide.style.display = 'block';
+            } else {
+                guide.style.display = 'none';
+            }
+        }
+
+        function handleMouseMoveForReadingGuide(e) {
+            if (!state.readingGuideActive) return;
+            const guide = document.getElementById('reading-guide');
+            guide.style.top = `${e.clientY - 19}px`;
+        }
+    </script>
+</body>
+</html>
