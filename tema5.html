@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DASP 5.1 - Gestión de Datos y Transformación Digital</title>
+  <style>
+    /* VARIABLES DE ESTILO Y TEMAS */
+    :root {
+      --bg-color: #f1f5f9;
+      --card-bg: #ffffff;
+      --text-color: #1e293b;
+      --text-muted: #64748b;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --secondary: #0284c7;
+      --accent: #8b5cf6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --border-color: #cbd5e1;
+      --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-size-base: 16px;
+      --line-height: 1.6;
+      --letter-spacing: normal;
+      --word-spacing: normal;
+      --box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    /* MODO OSCURO */
+    body.dark-theme {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --text-color: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      --box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    }
+
+    /* MODO TEXTO EXPANDIDO / LECTURA FÁCIL (Accesibilidad visual/lectura) */
+    body.expanded-text-mode {
+      --font-family: Verdana, Geneva, Tahoma, sans-serif;
+      --line-height: 2.0;
+      --letter-spacing: 0.08em;
+      --word-spacing: 0.18em;
+      --bg-color: #fefce8; /* Fondo crema suave para disminuir fatiga visual */
+      --card-bg: #ffffff;
+      --text-color: #0f172a;
+      --border-color: #fde047;
+    }
+    body.expanded-text-mode.dark-theme {
+      --bg-color: #1c1917;
+      --card-bg: #292524;
+      --text-color: #fef08a;
+      --border-color: #44403c;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-family);
+      font-size: var(--font-size-base);
+      line-height: var(--line-height);
+      letter-spacing: var(--letter-spacing);
+      word-spacing: var(--word-spacing);
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s, color 0.3s;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background-color: var(--card-bg);
+      border-bottom: 2px solid var(--border-color);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .brand-logo {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+      font-weight: bold;
+      padding: 0.5rem 0.8rem;
+      border-radius: 8px;
+      font-size: 1.2rem;
+    }
+    .brand-title h1 { font-size: 1.25rem; font-weight: 700; }
+    .brand-title p { font-size: 0.85rem; color: var(--text-muted); }
+
+    /* BARRA DE ACCESIBILIDAD Y PERSONALIZACIÓN */
+    .accessibility-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bg-color);
+      padding: 0.4rem 0.8rem;
+      border-radius: 30px;
+      border: 1px solid var(--border-color);
+    }
+    .btn-acc {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      padding: 0.3rem 0.6rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .btn-acc:hover, .btn-acc.active {
+      background-color: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* NAVEGACIÓN PRINCIPAL */
+    nav {
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      overflow-x: auto;
+    }
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-color);
+      padding: 0.7rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .nav-btn:hover { background-color: var(--bg-color); }
+    .nav-btn.active {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    main {
+      flex: 1;
+      max-width: 1000px;
+      width: 100%;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ESTILOS DE TARJETAS INTELIGENTES (FLASHCARDS) */
+    .flashcard-container {
+      perspective: 1000px;
+      margin: 2rem 0;
+    }
+    .flashcard {
+      width: 100%;
+      min-height: 320px;
+      background-color: var(--card-bg);
+      border: 2px solid var(--border-color);
+      border-radius: 16px;
+      box-shadow: var(--box-shadow);
+      cursor: pointer;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2.5rem;
+      text-align: center;
+    }
+    .flashcard.flipped { transform: rotateY(180deg); }
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2rem;
+      border-radius: 16px;
+      box-sizing: border-box;
+    }
+    .card-back { transform: rotateY(180deg); background-color: var(--card-bg); }
+    .card-badge {
+      background-color: var(--primary);
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .card-body {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: auto 0;
+    }
+    .card-hint {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+    .btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+    .btn:hover { background-color: var(--primary-hover); }
+    .btn:active { transform: scale(0.98); }
+    .btn-secondary { background-color: var(--text-muted); }
+    .btn-success { background-color: var(--success); }
+    .btn-danger { background-color: var(--danger); }
+    .btn-outline {
+      background-color: transparent;
+      border: 2px solid var(--border-color);
+      color: var(--text-color);
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      background-color: var(--border-color);
+      height: 10px;
+      border-radius: 5px;
+      overflow: hidden;
+      margin: 1rem 0;
+    }
+    .progress-bar {
+      height: 100%;
+      background-color: var(--primary);
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    /* ESTILOS CUESTIONARIO (QUIZ) */
+    .quiz-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: var(--box-shadow);
+      margin-bottom: 1.5rem;
+    }
+    .question-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .question-text {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+    }
+    .options-grid {
+      display: grid;
+      gap: 0.75rem;
+    }
+    .option-btn {
+      text-align: left;
+      padding: 1rem 1.2rem;
+      border: 2px solid var(--border-color);
+      background-color: var(--card-bg);
+      color: var(--text-color);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .option-btn:hover:not([disabled]) {
+      border-color: var(--primary);
+      background-color: rgba(37, 99, 235, 0.05);
+    }
+    .option-btn.correct {
+      border-color: var(--success);
+      background-color: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      font-weight: bold;
+    }
+    .option-btn.incorrect {
+      border-color: var(--danger);
+      background-color: rgba(239, 68, 68, 0.15);
+      color: var(--danger);
+    }
+
+    .explanation-box {
+      margin-top: 1.5rem;
+      padding: 1.25rem;
+      border-radius: 8px;
+      background-color: rgba(2, 132, 199, 0.1);
+      border-left: 4px solid var(--secondary);
+      font-size: 0.95rem;
+      display: none;
+    }
+
+    /* ESTILOS TUTOR INTERACTIVO Y EXPLICACIONES */
+    .tutor-section {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: var(--box-shadow);
+    }
+    .search-box {
+      width: 100%;
+      padding: 0.8rem 1.2rem;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 1rem;
+      background-color: var(--card-bg);
+      color: var(--text-color);
+      margin-bottom: 1.5rem;
+    }
+    .concept-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .concept-chip {
+      padding: 0.8rem 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      cursor: pointer;
+      background-color: var(--card-bg);
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .concept-chip:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .explanation-card {
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1rem;
+    }
+    .explanation-card h3 {
+      color: var(--primary);
+      margin-bottom: 0.75rem;
+    }
+    .analogy-tag {
+      display: inline-block;
+      background-color: var(--accent);
+      color: white;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    /* GENERADOR DE RECURSOS */
+    .generator-box {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: var(--box-shadow);
+    }
+    select, input[type="text"] {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background-color: var(--card-bg);
+      color: var(--text-color);
+      margin-top: 0.5rem;
+      margin-bottom: 1.25rem;
+      font-size: 1rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-color);
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CABECERA PRINCIPAL Y HERRAMIENTAS DE ACCESIBILIDAD -->
+  <header>
+    <div class="brand">
+      <div class="brand-logo">DASP</div>
+      <div class="brand-title">
+        <h1>Gestión de Datos y Transformación Digital</h1>
+        <p>Administración y Finanzas | Módulo DASP - Tema 5</p>
+      </div>
+    </div>
+
+    <!-- PANEL DE LECTURA Y ADAPTACIÓN DE TEXTO -->
+    <div class="accessibility-bar">
+      <button class="btn-acc" id="btnExpandedText" title="Alternar formato de texto expandido y espacio holgado">
+        📖 Texto Expandido
+      </button>
+      <button class="btn-acc" id="btnFontSizeDec" title="Disminuir tamaño de letra">A-</button>
+      <button class="btn-acc" id="btnFontSizeInc" title="Aumentar tamaño de letra">A+</button>
+      <button class="btn-acc" id="btnThemeToggle" title="Cambiar modo oscuro/claro">🌓</button>
+    </div>
+  </header>
+
+  <!-- BARRA DE NAVEGACIÓN -->
+  <nav>
+    <button class="nav-btn active" onclick="switchTab('flashcards')">🎴 Tarjetas Inteligentes (<span id="flashcardCount">30</span>)</button>
+    <button class="nav-btn" onclick="switchTab('quiz')">📝 Cuestionario (<span id="quizCount">30</span>)</button>
+    <button class="nav-btn" onclick="switchTab('tutor')">💡 Explicador Didáctico</button>
+    <button class="nav-btn" onclick="switchTab('generator')">➕ Generar Nuevos Recursos</button>
+  </nav>
+
+  <main>
+    <!-- PESTAÑA 1: TARJETAS INTELIGENTES (FLASHCARDS) -->
+    <section id="tab-flashcards" class="tab-content active">
+      <div class="controls-row">
+        <h2>Tarjetas de Estudio y Memoria Activa</h2>
+        <div>
+          <span id="cardProgressText">Tarjeta 1 de 30</span>
+        </div>
+      </div>
+
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="flashcardProgressBar"></div>
+      </div>
+
+      <div class="flashcard-container">
+        <div class="flashcard" id="activeFlashcard" onclick="flipCard()">
+          <div class="card-face card-front">
+            <span class="card-badge" id="cardCategory">Fundamentos de Datos</span>
+            <div class="card-body" id="cardQuestion">Cargando tarjeta...</div>
+            <div class="card-hint">💡 Haz clic o pulsa espacio para girar la tarjeta</div>
+          </div>
+          <div class="card-face card-back">
+            <span class="card-badge" style="background-color: var(--success)">Respuesta / Concepto</span>
+            <div class="card-body" id="cardAnswer">Respuesta...</div>
+            <div class="card-hint" id="cardContextNote">Fuente: Tema 5 DASP</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls-row">
+        <button class="btn btn-outline" onclick="prevCard()">⬅️ Anterior</button>
+        <div>
+          <button class="btn btn-danger" onclick="markCardStatus(false)">🔴 Repasar después</button>
+          <button class="btn btn-success" onclick="markCardStatus(true)">🟢 Dominada</button>
+        </div>
+        <button class="btn btn-outline" onclick="nextCard()">Siguiente ➡️</button>
+      </div>
+    </section>
+
+    <!-- PESTAÑA 2: CUESTIONARIO DE OPCIÓN MÚLTIPLE -->
+    <section id="tab-quiz" class="tab-content">
+      <div class="controls-row" style="margin-bottom: 1.5rem;">
+        <h2>Cuestionario de Autoevaluación</h2>
+        <div id="quizScoreTracker" style="font-weight: bold; color: var(--primary);">
+          Puntuación: <span id="currentScore">0</span> / <span id="totalAnswered">0</span>
+        </div>
+      </div>
+
+      <div id="quizContainer">
+        <!-- Las preguntas se cargarán dinámicamente mediante JS -->
+      </div>
+
+      <div class="controls-row">
+        <button class="btn btn-outline" onclick="prevQuestion()" id="btnPrevQ" disabled>⬅️ Anterior Pregunta</button>
+        <button class="btn btn-secondary" onclick="resetQuiz()">🔄 Reiniciar Cuestionario</button>
+        <button class="btn" onclick="nextQuestion()" id="btnNextQ">Siguiente Pregunta ➡️</button>
+      </div>
+    </section>
+
+    <!-- PESTAÑA 3: TUTOR INTERACTIVO Y EXPLICADOR DIDÁCTICO -->
+    <section id="tab-tutor" class="tab-content">
+      <div class="tutor-section">
+        <h2>Explicador Didáctico de Conceptos</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">
+          Haz clic en cualquier concepto clave o busca un término para obtener explicaciones claras con analogías sencillas y ejemplos aplicados a la administración de empresas.
+        </p>
+
+        <input type="text" id="tutorSearchInput" class="search-box" placeholder="🔍 Buscar concepto (ej. OPEX, GDPR, Big Data, Bloques, Ciclo del dato)..." oninput="filterTutorConcepts()">
+
+        <div class="concept-grid" id="conceptGrid">
+          <!-- Botones de conceptos precargados -->
+        </div>
+
+        <div id="tutorExplanationDisplay" class="explanation-card" style="display: none;">
+          <span class="analogy-tag">💡 Explicación Adaptada</span>
+          <h3 id="tutorTitle">Título del Concepto</h3>
+          <p><strong>Definición Técnica:</strong> <span id="tutorDefinition"></span></p>
+          <hr style="margin: 1rem 0; border: 0; border-top: 1px solid var(--border-color);">
+          <p><strong>Analogía Sencilla:</strong> <span id="tutorAnalogy"></span></p>
+          <hr style="margin: 1rem 0; border: 0; border-top: 1px solid var(--border-color);">
+          <p><strong>Ejemplo en Administración y Finanzas:</strong> <span id="tutorExample"></span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PESTAÑA 4: GENERADOR DE NUEVOS RECURSOS DE ESTUDIO -->
+    <section id="tab-generator" class="tab-content">
+      <div class="generator-box">
+        <h2>Generar Nuevos Recursos de Estudio</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          Crea tarjetas adicionales o preguntas de opción múltiple basadas en los apartados oficiales del Tema 5.
+        </p>
+
+        <label for="genType"><strong>Tipo de recurso a generar:</strong></label>
+        <select id="genType">
+          <option value="flashcard">🎴 Nueva Tarjeta Inteligente</option>
+          <option value="quiz">📝 Nueva Pregunta de Opción Múltiple</option>
+        </select>
+
+        <label for="genTopic"><strong>Selecciona el apartado del Tema 5:</strong></label>
+        <select id="genTopic">
+          <option value="1">1. Fundamentos de los Datos (Dato vs Información / Ciclo de vida)</option>
+          <option value="2">2. Big Data y Analítica (4 V, Analogía Coche, Ciencia de Datos)</option>
+          <option value="3">3. Cloud Computing (OPEX/CAPEX, Tipos almacenamiento)</option>
+          <option value="4">4. Alcance de la Transformación Digital (Servitización)</option>
+          <option value="5">5. Hoja de Ruta TD (Pasos SMART y Factor Humano)</option>
+          <option value="6">6. Seguridad y Cumplimiento Normativo (GDPR, MFA, Cifrado)</option>
+        </select>
+
+        <button class="btn btn-success" style="width: 100%; margin-top: 1rem;" onclick="generateCustomResource()">
+          ✨ Generar e Integrar en la Aplicación
+        </button>
+
+        <div id="generatorResult" style="margin-top: 1.5rem;"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Aplicación Educativa de Autoevaluación - Módulo DASP (Administración y Finanzas)</p>
+    <p>Material de estudio exclusivo basado en el Tema 5: Gestión de Datos y Transformación Digital</p>
+  </footer>
+
+  <script>
+    /* ==========================================================================
+       BASE DE DATOS COMPLETA OFICIAL (30 TARJETAS Y 30 PREGUNTAS DEL PDF)
+       ========================================================================== */
+
+    const INITIAL_FLASHCARDS = [
+      { id: 1, topic: "Fundamentos de Datos", question: "¿Qué diferencia principal existe entre un DATO y la INFORMACIÓN?", answer: "El dato es una unidad básica u hecho objetivo sin significado intrínseco. La información es el resultado de procesar y analizar los datos dentro de un contexto para tomar decisiones.", note: "Página 1 del PDF" },
+      { id: 2, topic: "Fundamentos de Datos", question: "Pon un ejemplo práctico de Dato vs. Información expresado en el tema.", answer: "Dato: '22 grados Celsius'. Información: 'La temperatura ha subido 5 grados en 2 horas; hay riesgo de tormenta'.", note: "Página 1 del PDF" },
+      { id: 3, topic: "Ciclo del Dato", question: "¿En qué consiste la fase 1 (Recolección) del ciclo de vida del dato y por qué es vital?", answer: "Es la captura del dato desde fuentes como sensores o transacciones. La precisión es vital porque cualquier error inicial invalidará las estrategias futuras.", note: "Página 2 del PDF" },
+      { id: 4, topic: "Ciclo del Dato", question: "¿Cuál es el objetivo de la fase 2 (Almacenamiento) en la gestión administrativa?", answer: "Depositar el dato en infraestructuras seguras (físicas o nube) para que el histórico sea accesible y no sufra degradación ni accesos no autorizados.", note: "Página 2 del PDF" },
+      { id: 5, topic: "Ciclo del Dato", question: "¿Qué función cumple la fase 3 (Procesamiento) del dato?", answer: "Limpia, transforma y prepara los datos, higienizando las bases de datos para eliminar duplicados o valores erróneos antes del análisis.", note: "Página 2 del PDF" },
+      { id: 6, topic: "Ciclo del Dato", question: "¿Qué se busca en la fase 4 (Análisis) del dato?", answer: "Extraer 'insights' o hallazgos útiles mediante métodos matemáticos/tecnológicos para explicar la salud del negocio.", note: "Página 2 del PDF" },
+      { id: 7, topic: "Ciclo del Dato", question: "¿Por qué es crucial la 'oportunidad' en la fase 5 (Distribución) del dato?", answer: "Porque la información debe llegar a la persona adecuada en el momento justo para poder ejecutar acciones correctivas.", note: "Página 2 del PDF" },
+      { id: 8, topic: "Ciclo del Dato", question: "¿Por qué razones legales y operativas se ejecuta la fase 6 (Eliminación)?", answer: "Porque el dato pierde vigencia o para cumplir con el derecho al olvido y normativas como GDPR, además de optimizar costes de almacenamiento.", note: "Página 2 del PDF" },
+      { id: 9, topic: "Big Data", question: "¿Cómo se define técnicamente el término Big Data?", answer: "Conjunto de datos cuya magnitud, complejidad y velocidad de crecimiento hacen imposible su gestión con bases de datos convencionales.", note: "Página 2 del PDF" },
+      { id: 10, topic: "Big Data", question: "¿Qué significan las '4 V' del Big Data?", answer: "Volumen (escala masiva), Variedad (fuentes heterogéneas), Velocidad (tiempo real) y Veracidad (calidad y fiabilidad de la fuente).", note: "Página 2-3 del PDF" },
+      { id: 11, topic: "Big Data", question: "En la analogía del coche, ¿qué representa el Big Data, el Análisis y la IA/ML/DL?", answer: "Big Data = El combustible. Análisis de Datos = Proceso de combustión. IA/ML/DL = El motor.", note: "Página 3 del PDF" },
+      { id: 12, topic: "Inteligencia Artificial", question: "¿Qué diferencia existe entre Machine Learning (ML) y Deep Learning (DL)?", answer: "El ML es el método de aprendizaje sin programación explícita; el DL es un subconjunto de ML que usa redes neuronales complejas imitando el cerebro humano.", note: "Página 3 del PDF" },
+      { id: 13, topic: "Ciencia de Datos", question: "¿Cómo ayuda la Ciencia de Datos en la toma de decisiones basada en evidencia?", answer: "Sustituye la intuición por datos sólidos, analizando históricos y datos en tiempo real para predecir tendencias y evaluar riesgos antes de invertir.", note: "Página 4 del PDF" },
+      { id: 14, topic: "Ciencia de Datos", question: "¿Cómo se aplica la Ciencia de Datos a la gestión de riesgos financieros?", answer: "Mediante modelos predictivos para evaluar la probabilidad de impago o detectar patrones de fraude de forma automática.", note: "Página 4 del PDF" },
+      { id: 15, topic: "Cloud Computing", question: "¿Qué cambio de modelo supone la adopción del Cloud Computing?", answer: "Pasa de un modelo de propiedad de hardware a un modelo de servicio al que se accede a través de Internet.", note: "Página 4-5 del PDF" },
+      { id: 16, topic: "Cloud Computing", question: "¿Qué diferencia financiera hay entre el modelo CAPEX y el modelo OPEX en la nube?", answer: "Elimina la inversión inicial masiva en servidores físicos (CAPEX) sustituyéndola por pagos por uso (OPEX), optimizando el flujo de caja.", note: "Página 5 del PDF" },
+      { id: 17, topic: "Cloud Computing", question: "¿Qué es la Escalabilidad en la nube?", answer: "Capacidad de aumentar o disminuir el almacenamiento de forma instantánea según la demanda, evitando hardware infrautilizado.", note: "Página 5 del PDF" },
+      { id: 18, topic: "Almacenamiento Cloud", question: "¿Para qué uso es ideal el Almacenamiento de Archivos?", answer: "Para organizar datos en carpetas jerárquicas; ideal para documentos de oficina tradicionales e imágenes compartidas.", note: "Página 5 del PDF" },
+      { id: 19, topic: "Almacenamiento Cloud", question: "¿Qué es el Almacenamiento de Objetos y cuándo se utiliza?", answer: "Gestiona datos como unidades con identificadores únicos y metadatos. Es óptimo para datos no estructurados, multimedia y copias masivas.", note: "Página 5 del PDF" },
+      { id: 20, topic: "Almacenamiento Cloud", question: "¿Por qué el Almacenamiento en Bloques es clave en bases de datos críticas?", answer: "Porque divide los datos en bloques de tamaño fijo con dirección única, ofreciendo muy baja latencia y alto rendimiento.", note: "Página 5 del PDF" },
+      { id: 21, topic: "Desafíos Cloud", question: "¿Qué riesgo entraña la 'dependencia del proveedor' (lock-in) en la nube?", answer: "Dificulta la migración de datos y sistemas a otros proveedores en el futuro si cambian las condiciones o tarifas.", note: "Página 6 del PDF" },
+      { id: 22, topic: "Transformación Digital", question: "¿Qué es formalmente la Transformación Digital?", answer: "La integración estratégica de tecnologías digitales en todas las áreas de la empresa para cambiar fundamentalmente su forma de operar y entregar valor.", note: "Página 6 del PDF" },
+      { id: 23, topic: "Transformación Digital", question: "¿Qué es el concepto de 'Servitización'?", answer: "Un nuevo modelo de negocio derivado de la transformación digital que consiste en pasar de vender un producto a vender una suscripción.", note: "Página 6 del PDF" },
+      { id: 24, topic: "Tecnologías Habilitadoras", question: "¿Qué papel cumple el IoT en la transformación digital?", answer: "Captura datos de máquinas e infraestructuras físicas en tiempo real para ser procesados.", note: "Página 6 del PDF" },
+      { id: 25, topic: "Hoja de Ruta TD", question: "En el Paso 1 de la Hoja de Ruta, ¿qué criterio deben cumplir los objetivos?", answer: "Deben definirse bajo el criterio SMART (Específicos, Mensurables, Alcanzables, Relevantes y Temporales).", note: "Página 7 del PDF" },
+      { id: 26, topic: "Hoja de Ruta TD", question: "¿En qué consiste el 'Análisis de encaje' (Paso 4)?", answer: "En evaluar la compatibilidad técnica del nuevo software con la maquinaria/sistemas actuales para evitar disrupciones.", note: "Página 7 del PDF" },
+      { id: 27, topic: "Hoja de Ruta TD", question: "Menciona una tecnología clave de Big Data citada en el Paso 8 para análisis continuo.", answer: "Apache Spark.", note: "Página 7 del PDF" },
+      { id: 28, topic: "Factor Humano", question: "¿Por qué la Transformación Digital es ante todo una transformación de personas?", answer: "Porque la mejor tecnología falla si el equipo resiste el cambio o no se le capacita en competencias digitales mediante formación continua.", note: "Página 8 del PDF" },
+      { id: 29, topic: "Seguridad Digital", question: "¿Qué diferencia existe entre Cifrado (Encryption) y Autenticación Multifactor (MFA)?", answer: "El cifrado vuelve los datos ilegibles en reposo/tránsito. La MFA exige múltiples formas de verificar la identidad del usuario (biometría, códigos).", note: "Página 8 del PDF" },
+      { id: 30, topic: "Seguridad y Normativa", question: "¿Qué normativas de protección de datos se citan como cumplimiento legal obligatorio?", answer: "GDPR (Reglamento General de Protección de Datos en UE) y HIPAA (en el sector sanitario).", note: "Página 9 del PDF" }
+    ];
+
+    const INITIAL_QUIZ = [
+      {
+        id: 1,
+        question: "¿Cuál de las siguientes afirmaciones describe con precisión la diferencia técnica entre 'Dato' e 'Información'?",
+        options: [
+          "El dato tiene un significado intrínseco alto; la información es solo la representación primaria.",
+          "El dato es un hecho objetivo y medible sin significado intrínseco; la información surge de procesarlo en un contexto específico.",
+          "La información es la unidad mínima cualitativa y el dato es el conocimiento refinado.",
+          "Ambos términos son sinónimos exactos en la gestión de empresas."
+        ],
+        correct: 1,
+        explanation: "Según el tema (Pág. 1), el dato es un hecho objetivo y unidad mínima sin significado intrínseco. La información se obtiene tras procesar y contextualizar dicho dato."
+      },
+      {
+        id: 2,
+        question: "En la fase de Procesamiento del ciclo de vida del dato, ¿cuál es la tarea principal en el departamento administrativo?",
+        options: [
+          "Definir el borrado seguro en virtud del GDPR.",
+          "Limpiar, transformar y preparar las bases de datos eliminando duplicados o errores.",
+          "Capturar datos mediante sensores IoT.",
+          "Distribuir informes a la dirección en tiempo real."
+        ],
+        correct: 1,
+        explanation: "En la etapa 3 (Procesamiento), se limpian e higienizan las bases de datos para asegurar un análisis real sin ruido estadístico (Pág. 2)."
+      },
+      {
+        id: 3,
+        question: "¿Por qué es crucial ejecutar la fase de Eliminación del dato (fase 6)?",
+        options: [
+          "Para evitar pagar licencias de software de contabilidad.",
+          "Para cumplir con el derecho al olvido y GDPR, además de optimizar costes de almacenamiento.",
+          "Porque los datos pierden su valor tras 24 horas de ser generados.",
+          "Para reiniciar los servidores de la empresa diariamente."
+        ],
+        correct: 1,
+        explanation: "La eliminación (Pág. 2) garantiza el cumplimiento de leyes como el GDPR (derecho al olvido) y reduce costes de almacenamiento infrautilizado."
+      },
+      {
+        id: 4,
+        question: "¿Qué dimensión de las '4 V' del Big Data se refiere específicamente a la fiabilidad y calidad del dato procedente de fuentes no controladas?",
+        options: ["Volumen", "Variedad", "Velocidad", "Veracidad"],
+        correct: 3,
+        explanation: "La Veracidad (Pág. 3) representa el desafío de la calidad y fiabilidad para evitar tomar decisiones basadas en información falsa."
+      },
+      {
+        id: 5,
+        question: "En la analogía de la automoción presentada en el tema, ¿qué elemento representa el 'Combustible'?",
+        options: ["La Inteligencia Artificial", "El Análisis de Datos", "El Big Data", "El Deep Learning"],
+        correct: 2,
+        explanation: "Según el esquema del texto (Pág. 3), el Big Data es el combustible, el Análisis es la combustión y la IA/ML/DL forman el motor."
+      },
+      {
+        id: 6,
+        question: "¿Cómo se define el Deep Learning (DL) dentro de la jerarquía tecnológica?",
+        options: ["Un método básico de hojas de cálculo.", "Un subconjunto del ML que usa redes neuronales complejas para aprender de forma profunda.", "Un protocolo de transmisión por cable para sensores IoT.", "Un tipo de almacenamiento en bloques para la nube."],
+        correct: 1,
+        explanation: "El Deep Learning es un subconjunto del ML que utiliza redes neuronales artificiales emulando el cerebro humano (Pág. 3)."
+      },
+      {
+        id: 7,
+        question: "Financialmente, ¿qué ventaja aporta el modelo de pago por uso en el Cloud Computing (Modelo OPEX)?",
+        options: [
+          "Aumenta la inversión inicial en activo fijo (CAPEX).",
+          "Sustituye la inversión inicial masiva en servidores físicos por un gasto operativo, optimizando el flujo de caja.",
+          "Exime a la empresa de pagar impuestos sobre la renta.",
+          "Garantiza el almacenamiento infinito gratuito."
+        ],
+        correct: 1,
+        explanation: "El modelo OPEX elimina el gasto masivo en capital de trabajo inicial (CAPEX) sustituyéndolo por gastos operativos adaptados al uso real (Pág. 5)."
+      },
+      {
+        id: 8,
+        question: "¿Qué tipo de almacenamiento cloud gestiona los datos como unidades individuales con identificadores únicos y metadatos?",
+        options: ["Almacenamiento de Archivos", "Almacenamiento en Bloques", "Almacenamiento de Objetos", "Almacenamiento Local Físico"],
+        correct: 2,
+        explanation: "El Almacenamiento de Objetos (Pág. 5) utiliza identificadores y metadatos únicos para gestionar grandes volúmenes no estructurados."
+      },
+      {
+        id: 9,
+        question: "Para ejecutar bases de datos críticas que exigen bajísima latencia y máximo rendimiento, se requiere:",
+        options: ["Almacenamiento en Bloques", "Almacenamiento de Archivos", "Cintas magnéticas físicas", "Almacenamiento jerárquico de carpetas"],
+        correct: 0,
+        explanation: "El Almacenamiento en Bloques (Pág. 5) es esencial para aplicaciones críticas por sus bloques fijos de alto rendimiento y baja latencia."
+      },
+      {
+        id: 10,
+        question: "¿A qué se refiere el riesgo de 'dependencia del proveedor' (lock-in) en la nube?",
+        options: [
+          "A la imposibilidad de conectarse a Internet en fines de semana.",
+          "A las dificultades operativas o costes elevados para migrar datos a otro proveedor en el futuro.",
+          "A la pérdida del código fuente por ciberataques.",
+          "Al robo físico de discos duros en el centro de datos."
+        ],
+        correct: 1,
+        explanation: "El lock-in (Pág. 6) es la dependencia técnica y contractual que dificulta cambiar de proveedor cloud."
+      },
+      {
+        id: 11,
+        question: "¿Qué es la 'Servitización' como nuevo modelo de negocio digital?",
+        options: [
+          "La obligación de contratar a personal externo.",
+          "Pasar de vender un producto físico a comercializar un servicio bajo suscripción.",
+          "Instalar servidores en la planta de producción.",
+          "Eliminar la atención telefónica al cliente."
+        ],
+        correct: 1,
+        explanation: "La servitización (Pág. 6) es la transformación de un producto tradicional en un servicio continuo por suscripción."
+      },
+      {
+        id: 12,
+        question: "¿Qué tecnología habilitadora destaca por permitir la captura de datos de máquinas físicas en tiempo real?",
+        options: ["IoT (Internet de las Cosas)", "ERP tradicional", "GDPR", "Cifrado de clave pública"],
+        correct: 0,
+        explanation: "El IoT (Pág. 6) conecta dispositivos y sensores para capturar datos físicos continuamente."
+      },
+      {
+        id: 13,
+        question: "En la Hoja de Ruta de Transformación Digital (Paso 1), ¿bajo qué criterio se deben fijar las metas?", answer: "SMART",
+        options: ["Criterio SWOT / DAFO", "Criterio SMART", "Criterio OPEX", "Criterio ISO 9001"],
+        correct: 1,
+        explanation: "El Paso 1 establece que los objetivos deben seguir el criterio SMART (Específicos, Mensurables, Alcanzables, Relevantes y Temporales) (Pág. 7)."
+      },
+      {
+        id: 14,
+        question: "¿Cuál es el propósito del 'Análisis de encaje' (Paso 4 de la Hoja de Ruta)?",
+        options: [
+          "Determinar el sueldo de los directivos del área digital.",
+          "Evaluar la compatibilidad técnica entre el nuevo software y la maquinaria o sistemas preexistentes.",
+          "Calcular la amortización contable de los edificios.",
+          "Diseñar el logotipo de la página web."
+        ],
+        correct: 1,
+        explanation: "El análisis de encaje (Pág. 7) evalúa si la nueva tecnología puede comunicarse con la infraestructura previa sin provocar parones."
+      },
+      {
+        id: 15,
+        question: "En el Paso 8 de la Hoja de Ruta, ¿qué herramienta de Big Data se menciona expresamente para el procesamiento de datos?",
+        options: ["Microsoft Excel", "Apache Spark", "Adobe Photoshop", "Google Drive"],
+        correct: 1,
+        explanation: "El texto cita expresamente Apache Spark (Pág. 7) como motor de tratamiento de Big Data."
+      },
+      {
+        id: 16,
+        question: "¿Por qué el factor humano es considerado el pilar o motor en la transformación digital?",
+        options: [
+          "Porque los empleados deben fabricar los chips de los servidores.",
+          "Porque sin capacitación y gestión del cambio cultural, el personal ofrecerá resistencia y la tecnología no se aprovechará.",
+          "Porque el GDPR exige la presencia de al menos 100 trabajadores.",
+          "Porque sustituye a los sistemas informáticos en caso de apagón."
+        ],
+        correct: 1,
+        explanation: "La transformación digital es una metamorfosis de personas (Pág. 8); sin formación continua y alineación cultural, el proyecto fracasa."
+      },
+      {
+        id: 17,
+        question: "¿En qué consiste la medida de seguridad conocida como Autenticación Multifactor (MFA)?",
+        options: [
+          "En cambiar la contraseña una vez al año.",
+          "En exigir capas de verificación adicionales (como biometría o códigos temporales) más allá de la clave.",
+          "En instalar dos antivirus de marcas distintas.",
+          "En guardar los datos en dos ordenadores diferentes."
+        ],
+        correct: 1,
+        explanation: "La MFA (Pág. 8) añade capas de comprobación de identidad (biometría, tokens) reforzando el acceso."
+      },
+      {
+        id: 18,
+        question: "¿Qué normativa europea de protección de datos obliga a garantizar el tratamiento transparente y la privacidad?",
+        options: ["HIPAA", "GDPR (Reglamento General de Protección de Datos)", "LXI", "Cálculo OPEX"],
+        correct: 1,
+        explanation: "El GDPR es el marco regulatorio fundamental en Europa para el tratamiento transparente y seguro de datos de personas (Pág. 9)."
+      },
+      {
+        id: 19,
+        question: "Si la temperatura en un almacén registra '18°C', esto representa técnicamente:",
+        options: ["Información procesada", "Un Dato primario", "Un hallazgo de inteligencia de negocio", "Una estrategia de servitización"],
+        correct: 1,
+        explanation: "Es un dato: una unidad básica sin interpretación contextualizada (Pág. 1)."
+      },
+      {
+        id: 20,
+        question: "En la gestión logística digitalizada, ¿qué tecnología permite el control de inventarios en tiempo real citado en la Hoja de Ruta?",
+        options: ["Etiquetas RFID", "Hojas de cálculo manuales", "Correos electrónicos", "Fax corporativo"],
+        correct: 0,
+        explanation: "En la Hoja de Ruta (Pág. 7), se cita expresamente el uso de RFID para logística e inventarios en tiempo real."
+      },
+      {
+        id: 21,
+        question: "La característica de 'Velocidad' en Big Data exige:",
+        options: [
+          "Procesar datos a lo largo de varios meses.",
+          "Generar y analizar información casi instantáneamente para tomar decisiones en mercados volátiles.",
+          "Comprar ordenadores con cables más largos.",
+          "Eliminar el histórico de datos diariamente."
+        ],
+        correct: 1,
+        explanation: "La Velocidad (Pág. 3) requiere un procesamiento inmediato para actuar ante entornos de rápida fluctuación."
+      },
+      {
+        id: 22,
+        question: "¿En qué consiste el Cifrado (Encryption)?",
+        options: [
+          "En borrar los archivos obsoletos.",
+          "En volver la información ilegible durante su reposo o tránsito para quien no posea la clave de descifrado.",
+          "En comprimir fotos para que ocupen menos espacio.",
+          "En imprimir los documentos contables en papel de seguridad."
+        ],
+        correct: 1,
+        explanation: "El Cifrado (Pág. 8) protege la confidencialidad haciendo los datos incomprensibles para accesos no autorizados."
+      },
+      {
+        id: 23,
+        question: "¿Cómo ayuda la Ciencia de Datos en la 'Gestión de Riesgos' financieros?",
+        options: [
+          "Evitando tener que pagar seguros corporativos.",
+          "Utilizando modelos predictivos para detectar patrones de fraude y probabilidades de impago.",
+          "Garantizando que las acciones en bolsa nunca bajen.",
+          "Sustituyendo al departamento de contabilidad."
+        ],
+        correct: 1,
+        explanation: "Usa modelos predictivos (Pág. 4) para anticipar impagos y detectar estafas antes de sufrir pérdidas."
+      },
+      {
+        id: 24,
+        question: "En el ciclo de vida del dato, ¿cuál es el riesgo principal de un error en la fase 1 (Recolección)?",
+        options: [
+          "Que el servidor se apague.",
+          "Invalidar todas las decisiones y análisis futuros por basarse en un insumo erróneo.",
+          "Aumentar el consumo de energía eléctrica.",
+          "Ninguno, el procesamiento siempre corrige cualquier error inicial de forma automática."
+        ],
+        correct: 1,
+        explanation: "Cualquier fallo en la recolección inicial arrastra errores a lo largo de todo el flujo posterior (Pág. 2)."
+      },
+      {
+        id: 25,
+        question: "¿Qué ventaja tiene la Escalabilidad en la nube para un departamento financiero?",
+        options: [
+          "Evita compras de servidores costosos que queden obsoletos e infrautilizados.",
+          "Permite despedir a todo el personal informático.",
+          "Garantiza el 0% de impuestos.",
+          "Aumenta la velocidad de impresión."
+        ],
+        correct: 0,
+        explanation: "La escalabilidad (Pág. 5) adecua la capacidad al volumen de negocio en cada momento evitando inversiones innecesarias."
+      },
+      {
+        id: 26,
+        question: "¿Cuál es el objetivo del Paso 10 ('Documentación de cambios') en la Hoja de Ruta de Transformación Digital?",
+        options: [
+          "Registrar sistemáticamente cada modificación para evaluar el impacto y crear lecciones aprendidas.",
+          "Publicar el manual en redes sociales.",
+          "Cumplir con el archivo físico de correspondencia.",
+          "Evitar la capacitación del personal."
+        ],
+        correct: 0,
+        explanation: "Registrar los cambios (Pág. 8) facilita evaluar resultados y consolida un aprendizaje organizacional continuo."
+      },
+      {
+        id: 27,
+        question: "¿Qué medida de seguridad se recomienda especialmente para aislar los dispositivos IoT de la red principal de la empresa?",
+        options: ["Segmentación de Red", "Copias en papel", "Mantenimiento anual del aire acondicionado", "Uso de contraseñas de 4 dígitos"],
+        correct: 0,
+        explanation: "La Segmentación de Red (Pág. 9) limita el alcance de una posible intrusión a través de sensores IoT."
+      },
+      {
+        id: 28,
+        question: "En la analogía del motor, ¿cómo se posiciona la Inteligencia Artificial (IA) en general?",
+        options: [
+          "Como el combustible refinado.",
+          "Como la capacidad general del sistema para simular inteligencia.",
+          "Como las ruedas del coche.",
+          "Como la batería eléctrica secundaria."
+        ],
+        correct: 1,
+        explanation: "La IA (Pág. 3) es la capacidad general de la máquina para simular la inteligencia humana."
+      },
+      {
+        id: 29,
+        question: "¿Qué beneficio estratégico permite a las empresas digitales acceder a nuevos mercados eliminando barreras geográficas?",
+        options: ["Comercio electrónico y marketing digital", "Servidores físicos locales", "Cajas registradoras manuales", "Segmentación por carta postal"],
+        correct: 0,
+        explanation: "La digitalización (Pág. 6) abre el mercado global a través del e-commerce y canales digitales."
+      },
+      {
+        id: 30,
+        question: "¿Cuál es la responsabilidad de la empresa en la seguridad del almacenamiento en la nube?",
+        options: [
+          "Ninguna, es 100% responsabilidad exclusiva del proveedor de la nube.",
+          "Es una responsabilidad compartida entre la empresa y el proveedor.",
+          "Es responsabilidad del ministerio de industria.",
+          "La seguridad no se puede gestionar en la nube."
+        ],
+        correct: 1,
+        explanation: "En la gestión moderna (Pág. 8), la seguridad es una responsabilidad compartida entre la entidad y el proveedor de la nube."
+      }
+    ];
+
+    /* BASE DE CONCEPTOS EXPLICATIVOS PARA EL TUTOR */
+    const TUTOR_CONCEPTS = [
+      {
+        id: "dato-info",
+        title: "Dato vs. Información",
+        def: "Un dato es una cifra u hecho neutro sin contexto. La información es ese dato analizado e interpretado para tomar decisiones.",
+        analogy: "Un DATO es una harina cruda suelta. La INFORMACIÓN es el pastel ya horneado listo para comer.",
+        example: "Dato en Finanzas: 'Factura 402: 12.000€'. Información: 'El cliente X ha superado su límite de crédito en 12.000€ y debe pausarse su próximo pedido'."
+      },
+      {
+        id: "opex-capex",
+        title: "Modelo OPEX vs. CAPEX en Cloud",
+        def: "CAPEX implica comprar hardware propio (inversión inicial). OPEX implica alquilar servicios en la nube pagando según el uso.",
+        analogy: "CAPEX es comprar un coche al contado (pagas 30.000€ de golpe y asumes la avería). OPEX es viajar en taxi o alquilar por minutos (pagas solo lo que usas).",
+        example: "Una PyME antes necesitaba 15.000€ para comprar un servidor físico (CAPEX). Con el Cloud, paga 80€/mes (OPEX) ajustando el gasto al volumen mensual."
+      },
+      {
+        id: "almacenamiento-tipos",
+        title: "Archivos vs. Objetos vs. Bloques",
+        def: "Tres formas de guardar datos en la nube según la estructura y velocidad requeridas.",
+        analogy: "ARCHIVOS es una estantería con carpetas. OBJETOS es un almacén con contenedores etiquetados con código de barras. BLOQUES es un puzle ultra rápido.",
+        example: "Archivos para las nóminas en PDF. Objetos para copias de seguridad de vídeos corporativos. Bloques para la base de datos contable de facturación simultánea."
+      },
+      {
+        id: "bigdata-4v",
+        title: "Las 4 'V' del Big Data",
+        def: "Volumen, Variedad, Velocidad y Veracidad que caracterizan el tratamiento masivo de información.",
+        analogy: "Es como gestionar el tráfico de agua en una gran presa durante una tormenta: muchísima agua (Volumen), de ríos y lluvia (Variedad), entrando a toda prisa (Velocidad) y verificando que esté limpia (Veracidad).",
+        example: "Un banco analiza millones de operaciones con tarjeta (Volumen) de apps, webs y datáfonos (Variedad) en milisegundos (Velocidad) descartando fraudes (Veracidad)."
+      },
+      {
+        id: "servitizacion",
+        title: "Servitización de la Economía",
+        def: "Modelo donde las empresas dejan de vender bienes físicos para vender servicios recurrentes.",
+        analogy: "En lugar de comprar un DVD (producto), pagas una cuota mensual en Netflix (servicio).",
+        example: "Una empresa de fotocopiadoras ya no vende la máquina, sino que cobra 0,01€ por cada página impresa incluyendo tinta y mantenimiento."
+      },
+      {
+        id: "mfa-cifrado",
+        title: "Cifrado y Autenticación Multifactor (MFA)",
+        def: "Cifrado oculta los datos; MFA asegura la identidad de quien intenta acceder.",
+        analogy: "El cifrado es escribir un mensaje en un idioma secreto. El MFA es pedir la llave, la huella dactilar y un código al móvil para abrir la puerta.",
+        example: "Para acceder a la banca de empresas, el administrativo introduce contraseña + SMS con PIN al móvil (MFA), y los extractos descargados van encriptados."
+      }
+    ];
+
+    /* ==========================================================================
+       ESTADO Y LÓGICA DE LA APLICACIÓN
+       ========================================================================== */
+
+    let currentCards = [...INITIAL_FLASHCARDS];
+    let currentQuiz = [...INITIAL_QUIZ];
+
+    let currentCardIndex = 0;
+    let isFlipped = false;
+    let currentQuestionIndex = 0;
+    let userAnswers = {};
+    let score = 0;
+
+    // Inicialización al cargar la página
+    window.onload = () => {
+      renderFlashcard();
+      renderQuizQuestion();
+      loadTutorConcepts();
+      setupAccessibilityEvents();
+    };
+
+    /* --- CAMBIO DE PESTAÑAS --- */
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    /* --- LÓGICA DE TARJETAS INTELIGENTES (FLASHCARDS) --- */
+    function renderFlashcard() {
+      const card = currentCards[currentCardIndex];
+      const cardElem = document.getElementById('activeFlashcard');
+
+      cardElem.classList.remove('flipped');
+      isFlipped = false;
+
+      document.getElementById('cardCategory').innerText = card.topic;
+      document.getElementById('cardQuestion').innerText = card.question;
+      document.getElementById('cardAnswer').innerText = card.answer;
+      document.getElementById('cardContextNote').innerText = card.note;
+
+      document.getElementById('cardProgressText').innerText = `Tarjeta ${currentCardIndex + 1} de ${currentCards.length}`;
+      const pct = ((currentCardIndex + 1) / currentCards.length) * 100;
+      document.getElementById('flashcardProgressBar').style.width = `${pct}%`;
+    }
+
+    function flipCard() {
+      const cardElem = document.getElementById('activeFlashcard');
+      cardElem.classList.toggle('flipped');
+      isFlipped = !isFlipped;
+    }
+
+    function nextCard() {
+      if (currentCardIndex < currentCards.length - 1) {
+        currentCardIndex++;
+        renderFlashcard();
+      }
+    }
+
+    function prevCard() {
+      if (currentCardIndex > 0) {
+        currentCardIndex--;
+        renderFlashcard();
+      }
+    }
+
+    function markCardStatus(isMastered) {
+      alert(isMastered ? "🟢 Registrada como dominada" : "🔴 Añadida a lista de repaso prioritario");
+      nextCard();
+    }
+
+    /* --- LÓGICA DEL CUESTIONARIO (QUIZ) --- */
+    function renderQuizQuestion() {
+      const q = currentQuiz[currentQuestionIndex];
+      const container = document.getElementById('quizContainer');
+
+      let html = `
+        <div class="quiz-card">
+          <div class="question-header">
+            <span class="card-badge">Pregunta ${currentQuestionIndex + 1} de ${currentQuiz.length}</span>
+          </div>
+          <div class="question-text">${q.question}</div>
+          <div class="options-grid">
+      `;
+
+      q.options.forEach((opt, idx) => {
+        let btnClass = "option-btn";
+        if (userAnswers[currentQuestionIndex] !== undefined) {
+          if (idx === q.correct) btnClass += " correct";
+          else if (userAnswers[currentQuestionIndex] === idx) btnClass += " incorrect";
+        }
+
+        const isDisabled = userAnswers[currentQuestionIndex] !== undefined ? "disabled" : "";
+
+        html += `
+          <button class="${btnClass}" ${isDisabled} onclick="selectAnswer(${idx})">
+            <strong>${['A', 'B', 'C', 'D'][idx]}.</strong> ${opt}
+          </button>
+        `;
+      });
+
+      html += `</div>`;
+
+      // Explicación didáctica
+      if (userAnswers[currentQuestionIndex] !== undefined) {
+        html += `
+          <div class="explanation-box" style="display: block;">
+            <strong>💡 Explicación del Libro de Texto:</strong><br>${q.explanation}
+          </div>
+        `;
+      }
+
+      html += `</div>`;
+      container.innerHTML = html;
+
+      // Actualizar botones de navegación
+      document.getElementById('btnPrevQ').disabled = currentQuestionIndex === 0;
+      document.getElementById('btnNextQ').innerText = currentQuestionIndex === currentQuiz.length - 1 ? "Finalizar Cuestionario" : "Siguiente Pregunta ➡️";
+    }
+
+    function selectAnswer(optIdx) {
+      if (userAnswers[currentQuestionIndex] !== undefined) return;
+
+      userAnswers[currentQuestionIndex] = optIdx;
+      if (optIdx === currentQuiz[currentQuestionIndex].correct) {
+        score++;
+      }
+
+      document.getElementById('currentScore').innerText = score;
+      document.getElementById('totalAnswered').innerText = Object.keys(userAnswers).length;
+
+      renderQuizQuestion();
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIndex < currentQuiz.length - 1) {
+        currentQuestionIndex++;
+        renderQuizQuestion();
+      } else {
+        alert(`🎉 Cuestionario Finalizado.\nPuntuación final: ${score} de ${currentQuiz.length} aciertos (${Math.round((score/currentQuiz.length)*100)}%).`);
+      }
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        renderQuizQuestion();
+      }
+    }
+
+    function resetQuiz() {
+      if (confirm("¿Deseas reiniciar el cuestionario y borrar las respuestas actuales?")) {
+        userAnswers = {};
+        score = 0;
+        currentQuestionIndex = 0;
+        document.getElementById('currentScore').innerText = "0";
+        document.getElementById('totalAnswered').innerText = "0";
+        renderQuizQuestion();
+      }
+    }
+
+    /* --- LÓGICA DEL TUTOR Y EXPLICACIONES --- */
+    function loadTutorConcepts() {
+      const grid = document.getElementById('conceptGrid');
+      grid.innerHTML = "";
+
+      TUTOR_CONCEPTS.forEach(c => {
+        const btn = document.createElement('div');
+        btn.className = "concept-chip";
+        btn.innerText = c.title;
+        btn.onclick = () => showConceptDetail(c);
+        grid.appendChild(btn);
+      });
+    }
+
+    function showConceptDetail(concept) {
+      document.getElementById('tutorTitle').innerText = concept.title;
+      document.getElementById('tutorDefinition').innerText = concept.def;
+      document.getElementById('tutorAnalogy').innerText = concept.analogy;
+      document.getElementById('tutorExample').innerText = concept.example;
+      document.getElementById('tutorExplanationDisplay').style.display = "block";
+    }
+
+    function filterTutorConcepts() {
+      const query = document.getElementById('tutorSearchInput').value.toLowerCase();
+      const chips = document.querySelectorAll('.concept-chip');
+
+      chips.forEach((chip, idx) => {
+        const title = TUTOR_CONCEPTS[idx].title.toLowerCase();
+        const def = TUTOR_CONCEPTS[idx].def.toLowerCase();
+        if (title.includes(query) || def.includes(query)) {
+          chip.style.display = "block";
+        } else {
+          chip.style.display = "none";
+        }
+      });
+    }
+
+    /* --- GENERADOR DINÁMICO DE RECURSOS --- */
+    function generateCustomResource() {
+      const type = document.getElementById('genType').value;
+      const topicId = document.getElementById('genTopic').value;
+      const resContainer = document.getElementById('generatorResult');
+
+      if (type === "flashcard") {
+        const newCard = {
+          id: currentCards.length + 1,
+          topic: `Apartado ${topicId} (Generada)`,
+          question: `¿Qué importancia tiene la integración estratégica en la digitalización del bloque ${topicId}?`,
+          answer: `Garantiza que la adopción tecnológica responda a metas SMART de negocio y prevenga brechas de seguridad o silos de datos.`,
+          note: "Generada bajo demanda sobre el Tema 5"
+        };
+        currentCards.push(newCard);
+        document.getElementById('flashcardCount').innerText = currentCards.length;
+        resContainer.innerHTML = `
+          <div class="explanation-box" style="display:block; border-left-color: var(--success);">
+            ✅ <strong>¡Nueva Tarjeta Inteligente Generada!</strong><br>
+            Se ha añadido la tarjeta #${newCard.id} a la colección. Puedes consultar la lista actualizada en la pestaña "Tarjetas Inteligentes".
+          </div>
+        `;
+      } else {
+        const newQ = {
+          id: currentQuiz.length + 1,
+          question: `[Pregunta Personalizada - Bloque ${topicId}] ¿Cuál es el riesgo principal de omitir el análisis de seguridad en la Hoja de Ruta Digital?`,
+          options: [
+            "Aumentar el límite de almacenamiento sin coste.",
+            "Exponer dispositivos IoT y la red a vulnerabilidades o multas por incumplimiento del GDPR.",
+            "Mejorar automáticamente la formación del personal.",
+            "Desactivar el modelo OPEX de la empresa."
+          ],
+          correct: 1,
+          explanation: "El análisis de brechas de seguridad prévio previene ciberataques e infracciones legales bajo normativas como GDPR.",
+          topic: `Bloque ${topicId}`
+        };
+        currentQuiz.push(newQ);
+        document.getElementById('quizCount').innerText = currentQuiz.length;
+        resContainer.innerHTML = `
+          <div class="explanation-box" style="display:block; border-left-color: var(--success);">
+            ✅ <strong>¡Nueva Pregunta de Cuestionario Generada!</strong><br>
+            Se ha integrado la pregunta #${newQ.id} al cuestionario de autoevaluación.
+          </div>
+        `;
+      }
+    }
+
+    /* --- ACCESIBILIDAD Y PERSONALIZACIÓN DE FORMATO --- */
+    function setupAccessibilityEvents() {
+      // 1. Toggle Modo Texto Expandido / Lectura holgada
+      const btnExp = document.getElementById('btnExpandedText');
+      btnExp.addEventListener('click', () => {
+        document.body.classList.toggle('expanded-text-mode');
+        btnExp.classList.toggle('active');
+      });
+
+      // 2. Control de Tamaño de Letra
+      let currentFontSize = 16;
+      document.getElementById('btnFontSizeInc').addEventListener('click', () => {
+        if (currentFontSize < 22) {
+          currentFontSize += 1;
+          document.body.style.fontSize = `${currentFontSize}px`;
+        }
+      });
+      document.getElementById('btnFontSizeDec').addEventListener('click', () => {
+        if (currentFontSize > 13) {
+          currentFontSize -= 1;
+          document.body.style.fontSize = `${currentFontSize}px`;
+        }
+      });
+
+      // 3. Toggle Modo Oscuro
+      document.getElementById('btnThemeToggle').addEventListener('click', () => {
+        document.body.classList.toggle('dark-theme');
+      });
+
+      // Soporte para girar tarjeta con la barra espaciadora
+      document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space' && document.getElementById('tab-flashcards').classList.contains('active')) {
+          e.preventDefault();
+          flipCard();
+        }
+      });
+    }
+  </script>
+</body>
+</html>
