@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DASP - Transformación Digital (Tema 6)</title>
+    <style>
+        :root {
+            --primary: #2b5278;
+            --primary-dark: #1e3a56;
+            --accent: #20b2aa;
+            --bg-main: #f4f7f9;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --border-color: #cbd5e1;
+            --success: #2e7d32;
+            --error: #c62828;
+            --base-font-size: 16px;
+            --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --line-height: 1.5;
+            --letter-spacing: normal;
+            --word-spacing: normal;
+        }
+
+        body.accessible-font {
+            --font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body.expanded-text {
+            --line-height: 1.8;
+            --letter-spacing: 0.06em;
+            --word-spacing: 0.12em;
+        }
+
+        body.high-contrast {
+            --bg-main: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #ffffff;
+            --primary: #64b5f6;
+            --primary-dark: #90caf9;
+            --accent: #ffd54f;
+            --border-color: #555555;
+            --success: #81c784;
+            --error: #e57373;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            font-size: var(--base-font-size);
+            line-height: var(--line-height);
+            letter-spacing: var(--letter-spacing);
+            word-spacing: var(--word-spacing);
+            background-color: var(--bg-main);
+            color: var(--text-color);
+            transition: all 0.2s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Accessibility Toolbar */
+        .accessibility-bar {
+            background-color: var(--primary-dark);
+            color: #ffffff;
+            padding: 8px 16px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .acc-controls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-acc {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .btn-acc:hover, .btn-acc.active {
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        /* Header */
+        header {
+            background-color: var(--primary);
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.6rem;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--card-bg);
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            padding: 10px 18px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-color);
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .nav-btn:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-btn.active {
+            background-color: var(--primary);
+            color: #ffffff;
+        }
+
+        /* Container Main */
+        main {
+            max-width: 900px;
+            width: 100%;
+            margin: 20px auto;
+            padding: 0 15px;
+            flex: 1;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Card / Panel Component */
+        .panel {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.04);
+            margin-bottom: 20px;
+        }
+
+        /* Flashcards Section */
+        .flashcard-container {
+            perspective: 1000px;
+            width: 100%;
+            max-width: 600px;
+            height: 320px;
+            margin: 20px auto;
+            cursor: pointer;
+        }
+
+        .flashcard {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 25px;
+            text-align: center;
+            border-radius: 12px;
+            border: 2px solid var(--border-color);
+            background: var(--card-bg);
+        }
+
+        .card-front {
+            background: linear-gradient(135deg, var(--card-bg), var(--bg-main));
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            background: var(--card-bg);
+            border-color: var(--primary);
+        }
+
+        .card-tag {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        .card-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+
+        /* Quiz Section */
+        .quiz-option {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            margin: 8px 0;
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: var(--text-color);
+            transition: all 0.2s;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--primary);
+        }
+
+        .quiz-option.correct {
+            background-color: rgba(46, 125, 50, 0.15);
+            border-color: var(--success);
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .quiz-option.incorrect {
+            background-color: rgba(198, 40, 40, 0.15);
+            border-color: var(--error);
+            color: var(--error);
+        }
+
+        .feedback-box {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 6px;
+            background: var(--bg-main);
+            border-left: 4px solid var(--primary);
+        }
+
+        /* Tutor & Assistant Section */
+        .chat-box {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            height: 300px;
+            overflow-y: auto;
+            background: var(--bg-main);
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message {
+            padding: 10px 14px;
+            border-radius: 8px;
+            max-width: 85%;
+            word-wrap: break-word;
+        }
+
+        .message.user {
+            background-color: var(--primary);
+            color: white;
+            align-self: flex-end;
+        }
+
+        .message.bot {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            align-self: flex-start;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-group input, .input-group select {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            background: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        /* Theory Summary Styles */
+        .summary-item {
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        .summary-item h3 {
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        /* Utilities */
+        .text-center { text-align: center; }
+        .filter-select {
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Accessibility Bar -->
+    <div class="accessibility-bar">
+        <span>⚙️ <strong>Opciones de Lectura Accesible</strong></span>
+        <div class="acc-controls">
+            <button class="btn-acc" onclick="toggleAccOption('accessible-font')" id="btnFont">Tipografía Accesible</button>
+            <button class="btn-acc" onclick="toggleAccOption('expanded-text')" id="btnSpacing">Texto Expandido</button>
+            <button class="btn-acc" onclick="toggleAccOption('high-contrast')" id="btnContrast">Alto Contraste</button>
+            <button class="btn-acc" onclick="changeFontSize(-1)">A-</button>
+            <button class="btn-acc" onclick="changeFontSize(1)">A+</button>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <h1>Digitalización Aplicada a los Sectores Productivos</h1>
+        <p>Tema 6: Fundamentos y Desarrollo de Proyectos de Transformación Digital</p>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav>
+        <button class="nav-btn active" onclick="switchTab('flashcardsTab')">🎴 Tarjetas (30)</button>
+        <button class="nav-btn" onclick="switchTab('quizTab')">📝 Cuestionario (30)</button>
+        <button class="nav-btn" onclick="switchTab('assistantTab')">🤖 Tutor & Generador</button>
+        <button class="nav-btn" onclick="switchTab('summaryTab')">📖 Resumen de Teoría</button>
+    </nav>
+
+    <main>
+        <!-- TAB 1: FLASHCARDS -->
+        <section id="flashcardsTab" class="tab-content active">
+            <div class="panel">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                    <h2>Tarjetas Inteligentes de Estudio</h2>
+                    <select id="flashcardFilter" class="filter-select" onchange="filterFlashcards()">
+                        <option value="all">Todas las secciones (30)</option>
+                        <option value="1">1. Objetivos SMART</option>
+                        <option value="2">2. Alineación de Áreas</option>
+                        <option value="3">3. Pilares de Digitalización</option>
+                        <option value="4">4. Encaje Técnico</option>
+                        <option value="5">5. Visión Futuro & Nube</option>
+                        <option value="6">6. Herramientas por Área</option>
+                        <option value="7">7. Seguridad y GDPR</option>
+                        <option value="8">8. Tratamiento de Datos</option>
+                        <option value="9">9. Integración y ETL</option>
+                        <option value="10">10. Documentación</option>
+                        <option value="11">11. Factor Humano</option>
+                    </select>
+                </div>
+                <p style="margin-top:5px; font-size:0.9rem; color:gray;">Haz clic en la tarjeta para voltearla y ver la explicación.</p>
+
+                <div class="flashcard-container" onclick="flipCard()">
+                    <div class="flashcard" id="flashcard">
+                        <div class="card-face card-front">
+                            <div class="card-tag" id="cardSectionTag">Sección 1</div>
+                            <h3 id="cardQuestion" style="font-size:1.2rem;">Cargando...</h3>
+                        </div>
+                        <div class="card-face card-back">
+                            <div class="card-tag">Respuesta y Explicación</div>
+                            <p id="cardAnswer" style="font-size:1.05rem;"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-controls">
+                    <button class="btn btn-secondary" onclick="prevCard()">← Anterior</button>
+                    <span id="cardCounter" style="font-weight:bold;">1 / 30</span>
+                    <button class="btn" onclick="nextCard()">Siguiente →</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: QUIZ -->
+        <section id="quizTab" class="tab-content">
+            <div class="panel">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h2>Cuestionario de Autoevaluación</h2>
+                    <span id="quizScoreText" style="font-weight:bold; color:var(--primary);">Puntuación: 0 / 0</span>
+                </div>
+                <hr style="margin:12px 0; border:0; border-top:1px solid var(--border-color);">
+
+                <div id="quizContainer">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                        <span id="quizQuestionTag" style="font-size:0.85rem; font-weight:bold; color:var(--accent);">PREGUNTA 1</span>
+                    </div>
+                    <h3 id="quizQuestionText" style="margin-bottom:15px;">Cargando pregunta...</h3>
+                    <div id="quizOptions"></div>
+                    <div id="quizFeedback" class="feedback-box" style="display:none;"></div>
+                </div>
+
+                <div class="card-controls" style="margin-top:20px;">
+                    <button class="btn btn-secondary" onclick="prevQuiz()">← Anterior</button>
+                    <span id="quizCounter" style="font-weight:bold;">1 / 30</span>
+                    <button class="btn" onclick="nextQuiz()">Siguiente →</button>
+                    <button class="btn btn-secondary" onclick="resetQuiz()">Reiniciar</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: TUTOR & GENERATOR -->
+        <section id="assistantTab" class="tab-content">
+            <div class="panel">
+                <h2>Asistente Didáctico y Generador Interactivo</h2>
+                <p style="margin-bottom:15px; font-size:0.95rem;">Solicita explicaciones sencillas, analogías o genera nuevos recursos de estudio basados en el Tema 6.</p>
+
+                <div class="chat-box" id="chatBox">
+                    <div class="message bot">
+                        <strong>¡Hola!</strong> Soy tu asistente de estudio para el Tema 6. Puedes pedirme que te explique cualquier concepto con analogías cotidianas, o solicitarme la creación de **nuevas tarjetas** o **preguntas de test**.
+                    </div>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <div class="input-group">
+                        <input type="text" id="userInput" placeholder="Ej: Explícame qué es ETL con una analogía sencilla..." onkeypress="handleKeyPress(event)">
+                        <button class="btn" onclick="sendUserQuery()">Consultar</button>
+                    </div>
+
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:5px;">
+                        <button class="btn btn-secondary" style="font-size:0.85rem;" onclick="generateExtraFlashcard()">➕ Generar Nueva Tarjeta</button>
+                        <button class="btn btn-secondary" style="font-size:0.85rem;" onclick="generateExtraQuizQuestion()">➕ Generar Nueva Pregunta Test</button>
+                        <button class="btn btn-secondary" style="font-size:0.85rem;" onclick="askPreset('SMART')">💡 ¿Qué es SMART?</button>
+                        <button class="btn btn-secondary" style="font-size:0.85rem;" onclick="askPreset('RFID')">💡 Ejemplo RFID</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: SUMMARY -->
+        <section id="summaryTab" class="tab-content">
+            <div class="panel">
+                <h2>Resumen Completo de Teoría - Tema 6</h2>
+                <p style="margin-bottom:15px; font-size:0.9rem; color:gray;">Contenido oficial para el módulo de Digitalización Aplicada a los Sectores Productivos.</p>
+                <div id="summaryContent"></div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // --- BASE DE DATOS TEÓRICA OFICIAL (TEMA 6) ---
+        const themeData = [
+            {
+                section: 1,
+                title: "1. Identificación de Objetivos Estratégicos",
+                text: "El punto de partida es definir metas alineadas con la visión y misión. Deben seguir la metodología SMART: Específicos (niveles de automatización), Medibles (porcentajes de reducción de costos), Alcanzables (capacidad técnica y financiera), Relevantes (impacto en competitividad y satisfacción) y Temporales (marco de tiempo estricto). Metas comunes: eficiencia operativa, innovación y personalización de la experiencia del usuario.",
+                analogy: "Pensar en SMART es como planificar una dieta deportiva: no dices 'quiero estar en forma', sino 'quiero perder 3 kg de grasa en 2 meses reduciendo 300 kcal diarias con entrenamiento técnico'.",
+                example: "En un departamento financiero, un objetivo SMART es reducir el tiempo de emisión de facturas electrónicas de 5 días a 24 horas durante el primer trimestre del año."
+            },
+            {
+                section: 2,
+                title: "2. Alineación de Áreas de Negocio y Comunicaciones",
+                text: "Evita el trabajo en silos organizacionales. Sincroniza producción (tecnología IoT), negocio (análisis de datos) y comunicaciones (plataformas de colaboración) para trabajar de forma armónica hacia objetivos comunes.",
+                analogy: "Es como una orquesta sinfónica: si los violines (comercial) no van al mismo ritmo que la percusión (producción), la obra (empresa) suena caótica aunque cada músico sea un genio individual.",
+                example: "Si el departamento de Marketing realiza una oferta masiva online, el área de producción y logística debe estar sincronizada para garantizar que haya stock suficiente y capacidad de envío."
+            },
+            {
+                section: 3,
+                title: "3. Identificación de Áreas Susceptibles de Digitalización",
+                text: "No se digitaliza de forma indiscriminada. Se enfoca en 4 pilares: Producción (automatización con robótica y calidad con sensores IoT en tiempo real), Logística (control con RFID y software de optimización de rutas), Marketing y Ventas (analítica para segmentación y e-commerce), y Atención al Cliente (chatbots 24/7 y CRM centralizado).",
+                analogy: "Es como reformar una casa: no cambias todo a la vez. Primero arreglas la fontanería más crítica (producción/logística) y luego la pintura (atención al cliente).",
+                example: "Una empresa textil instala chips RFID en cada prenda para saber en tiempo real cuántas camisas hay en almacén sin necesidad de contar manualmente una por una."
+            },
+            {
+                section: 4,
+                title: "4. Análisis del Encaje y Compatibilidad Técnica",
+                text: "Evalúa cómo se integran las nuevas tecnologías para evitar disrupciones. Incluye: Compatibilidad de Hardware (operatividad con maquinaria actual), Integración de Software (comunicación fluida con ERP), Flujo de Información (actualización automática de sensores a BD central) y Sincronización de Plataformas (alineación de analítica con marketing y CRM).",
+                analogy: "Es como comprar un accesorio para tu teléfono: debes comprobar si tiene la conexión adecuada (USB-C) y si el sistema operativo reconoce la aplicación.",
+                example: "Al instalar un software de gestión de almacén, se verifica que pueda enviar datos directamente al sistema contable ERP central sin requerir reingresar facturas a mano."
+            },
+            {
+                section: 5,
+                title: "5. Necesidades Presentes y Visión de Futuro",
+                text: "Equilibra la resolución de problemas inmediatos con el crecimiento a largo plazo. Necesidades Presentes: reducción inmediata de costos operativos y automatización. Escalabilidad Futura: adopción de la nube (AWS, Google Cloud) para expandir almacenamiento y procesamiento según la demanda. Innovación Continua: cultura que incentive tecnologías emergentes como IA y Big Data.",
+                analogy: "Es como alquilar un piso modular: hoy pagas por un estudio pequeño (necesidad presente), pero el edificio te permite añadir habitaciones en minutos si tu familia crece (escalabilidad en la nube).",
+                example: "Una pyme utiliza almacenamiento en Amazon S3 durante la campaña navideña para soportar un pico de 10.000 facturas diarias y luego reduce su capacidad en enero ajustando costos."
+            },
+            {
+                section: 6,
+                title: "6. Relación entre Áreas e Implantación Tecnológica",
+                text: "Herramientas específicas según el área: 1. Producción: IoT para calidad y corrección de desviaciones. 2. Logística: seguimiento en tiempo real para minimizar riesgos de escasez. 3. Marketing: analítica (Google Analytics) y CRM (Salesforce). 4. Atención al cliente: chatbots y CRM que analizan patrones para sugerir mejoras internas.",
+                analogy: "Es el botiquín de herramientas especializado: un electricista no usa un martillo neumático para cambiar un fusible; cada departamento recibe la herramienta exacta.",
+                example: "El equipo comercial registra una queja recurrente en Salesforce CRM, y la herramienta genera un aviso automático al departamento de producción para corregir el defecto."
+            },
+            {
+                section: 7,
+                title: "7. Seguridad y Gestión de Riesgos",
+                text: "Pilar crítico y transversal. Medidas esenciales: Protección de Infraestructura (protocolos seguros y segmentación de red en IoT), Control de Acceso (Autenticación Multifactor - MFA), Cifrado de Datos (en tránsito y reposo en inventarios y clientes), Cumplimiento Normativo (GDPR en privacidad) y Monitoreo y Auditoría (detección de intrusiones en tiempo real).",
+                analogy: "Es como la seguridad de un banco: no basta con poner una puerta blindada (cifrado); necesitas cámaras (monitoreo), código pin + huella (MFA) y cumplir las leyes financieras (GDPR).",
+                example: "Un empleado administrativo debe autorizar su inicio de sesión en el ERP confirmando una notificación en su teléfono móvil (MFA) para evitar hackeos."
+            },
+            {
+                section: 8,
+                title: "8. Tratamiento y Análisis de Datos",
+                text: "4 fases clave: 1. Recolección (sensores IoT y sistemas centralizados). 2. Almacenamiento (soluciones escalables en la nube como Amazon S3 o Google Cloud Storage). 3. Procesamiento (herramientas Big Data como Apache Hadoop o Apache Spark para grandes volúmenes). 4. Análisis (Machine Learning para descubrir patrones predictivos e insights accionables).",
+                analogy: "Es el ciclo del petróleo: primero lo extraes (recolección), lo guardas en tanques (almacenamiento), lo refinas (procesamiento) y obtienes gasolina de alto rendimiento (análisis).",
+                example: "Un algoritmo de Machine Learning analiza miles de facturas antiguas procesadas en Apache Spark y predice qué clientes tienen mayor riesgo de retraso en el pago."
+            },
+            {
+                section: 9,
+                title: "9. Integración de Ecosistemas Digitales",
+                text: "Logra que datos, aplicaciones y plataformas trabajen en armonía. Centralización de Datos (Data Warehouses como Amazon Redshift o PostgreSQL), Conectividad de Aplicaciones (producción con mantenimiento y marketing con CRM) y Plataformas de Integración ETL (Apache NiFi, Talend, Microsoft Azure Data Factory) para automatizar extracción, transformación y carga.",
+                analogy: "ETL es como un traductor y cartero universal: toma cartas en chino (datos brutos), las traduce al español (transformación) y las entrega ordenadas en las casillas correspondientes (almacén).",
+                example: "Azure Data Factory extrae por la noche los datos de ventas de las tiendas físicas, los unifica en formato estándar y los carga en Amazon Redshift para la dirección."
+            },
+            {
+                section: 10,
+                title: "10. Documentación y Mejora Continua",
+                text: "Registro Detallado de modificaciones con herramientas de gestión de proyectos como Jira o Trello. Evaluación de Impacto comparando indicadores de eficiencia (KPIs) antes y después. Lecciones Aprendidas mediante informes periódicos para evitar repetir errores pasados.",
+                analogy: "Es la libreta de recetas de un chef profesional: si cambias la cantidad de sal en un plato, lo anotas en la ficha técnica para que cualquier cocinero obtenga el mismo resultado perfecto.",
+                example: "Al implantar la facturación electrónica, el equipo registra en Trello las tareas completadas y compara el tiempo de procesamiento mensual antes (120 hrs) y después (15 hrs)."
+            },
+            {
+                section: 11,
+                title: "11. El Factor Humano: Capacitación y Cultura",
+                text: "El éxito tecnológico depende de las personas. Programas de Formación (IoT, ciberseguridad, Tableau, Power BI), Certificaciones Oficiales en la nube (AWS, Google Cloud), Cultura de Aprendizaje (comunidades de práctica y mentoría) y Alineación con la Visión mediante comunicación constante.",
+                analogy: "Dar la mejor tecnología sin capacitar al personal es como comprar un coche de Fórmula 1 y dárselo a alguien sin carné de conducir: no avanzará y seguro chocará.",
+                example: "Un administrativo realiza un curso práctico de Power BI para convertir listados de Excel en dashboards visuales e interactivos para la junta directiva."
+            }
+        ];
+
+        // --- TARJETAS DE ESTUDIO (30 FLASHCARDS) ---
+        const flashcardsBank = [
+            { sec: 1, q: "¿Qué es la Transformación Digital?", a: "Proceso integral de adopción de tecnología para modificar procesos, cultura organizacional y experiencia del cliente." },
+            { sec: 1, q: "¿Qué significan las siglas SMART para objetivos?", a: "Específicos, Medibles, Alcanzables, Relevantes y Temporales." },
+            { sec: 1, q: "Cita tres metas comunes de la transformación digital.", a: "Mejora de la eficiencia operativa, incremento de la innovación y personalización de la experiencia del usuario." },
+            { sec: 2, q: "¿Por qué es clave alinear áreas de negocio y comunicaciones?", a: "Para eliminar los silos organizacionales y lograr que todos los departamentos colaboren de forma sincrónica." },
+            { sec: 2, q: "¿Cómo interactúan tecnología y datos en la alineación?", a: "Coordinan el IoT en producción, el análisis de datos en negocio y las plataformas de colaboración en comunicación." },
+            { sec: 3, q: "¿Cuáles son los 4 pilares fundamentales de digitalización?", a: "Producción, Logística, Marketing y Ventas, y Atención al Cliente." },
+            { sec: 3, q: "¿Cómo se digitaliza el pilar de Producción?", a: "Con robótica en líneas de ensamblaje y sensores IoT para gestión de calidad en tiempo real." },
+            { sec: 3, q: "¿Qué tecnologías destacan en la digitalización logística?", a: "Sistemas RFID para control de inventarios y software de optimización de rutas." },
+            { sec: 3, q: "¿Cómo apoya la digitalización a Marketing y Ventas?", a: "A través de análisis de datos para segmentar clientes y plataformas de e-commerce." },
+            { sec: 3, q: "¿Qué herramientas mejoran la Atención al Cliente?", a: "Chatbots para soporte 24/7 y sistemas CRM para centralizar interacciones." },
+            { sec: 4, q: "¿Qué se evalúa en la Compatibilidad de Hardware?", a: "Verificar que los nuevos sistemas operen con la maquinaria e infraestructura física actual." },
+            { sec: 4, q: "¿En qué consiste la Integración de Software en el encaje técnico?", a: "Asegurar que las nuevas aplicaciones se comuniquen fluidamente con el software ERP ya instalado." },
+            { sec: 4, q: "¿Qué requiere el Flujo de Información en el encaje técnico?", a: "Que los datos capturados (ej. RFID) se actualicen automáticamente en bases de datos centrales." },
+            { sec: 4, q: "¿Qué evita la Sincronización de Plataformas?", a: "Evita la fragmentación de datos alineando el análisis técnico con marketing y CRM." },
+            { sec: 5, q: "¿Cuál es el foco de las Necesidades Presentes?", a: "La reducción inmediata de costos operativos y la mejora de eficiencia mediante automatización." },
+            { sec: 5, q: "¿Cómo se garantiza la Escalabilidad Futura?", a: "Adoptando soluciones en la nube (AWS, Google Cloud) que adapten capacidad según demanda." },
+            { sec: 5, q: "¿Qué tecnologías impulsan la Innovación Continua?", a: "La adopción de Inteligencia Artificial y Big Data dentro de la cultura organizacional." },
+            { sec: 6, q: "¿Qué aporte hace el IoT en Producción según el punto 6?", a: "Permite la gestión de calidad en tiempo real para corregir desviaciones antes del producto final." },
+            { sec: 6, q: "¿Qué ventaja ofrece la digitalización en la logística directa?", a: "Seguimiento en tiempo real para minimizar riesgos de escasez y optimizar rutas de entrega." },
+            { sec: 6, q: "Nombra dos herramientas clave en Marketing mencionadas.", a: "Google Analytics (para analítica) y Salesforce (para gestión CRM)." },
+            { sec: 7, q: "¿Cómo se protege la infraestructura IoT en gestión de riesgos?", a: "Mediante uso de protocolos de comunicación seguros y segmentación de redes." },
+            { sec: 7, q: "¿Qué función cumple el Control de Acceso mediante MFA?", a: "Asegura mediante autenticación multifactor que solo personal autorizado acceda a sistemas críticos." },
+            { sec: 7, q: "¿Dónde debe aplicarse el Cifrado de Datos?", a: "Tanto en tránsito como en reposo, especialmente en inventarios y datos de clientes." },
+            { sec: 7, q: "¿Qué regulación de privacidad debe cumplirse estrictamente?", a: "El GDPR (Reglamento General de Protección de Datos)." },
+            { sec: 8, q: "¿Cuáles son las 4 fases del Tratamiento de Datos?", a: "1. Recolección, 2. Almacenamiento, 3. Procesamiento y 4. Análisis." },
+            { sec: 8, q: "Nombra dos herramientas de Almacenamiento en la nube.", a: "Amazon S3 y Google Cloud Storage." },
+            { sec: 8, q: "Nombra dos herramientas para Procesamiento de Big Data.", a: "Apache Hadoop y Apache Spark." },
+            { sec: 9, q: "¿Qué es y para qué sirve un Data Warehouse como Redshift?", a: "Sirve para la centralización de datos unificando información de todas las áreas." },
+            { sec: 9, q: "¿Qué hacen las herramientas ETL como NiFi, Talend o Azure Data Factory?", a: "Automatizan la Extracción, Transformación y Carga de datos entre sistemas heterogéneos." },
+            { sec: 10, q: "Cita herramientas para el Registro Detallado de proyectos.", a: "Herramientas de gestión de proyectos como Jira o Trello." }
+        ];
+
+        // --- CUESTIONARIO DE AUTOEVALUACIÓN (30 PREGUNTAS TEST) ---
+        const quizBank = [
+            { sec: 1, q: "¿Cómo se define la Transformación Digital en el tema?", options: ["A) Compra aislada de ordenadores nuevos", "B) Proceso integral para modificar procesos, cultura y experiencia del cliente", "C) Instalación de una página web estática", "D) Sustitución total de personal por algoritmos"], correct: 1, exp: "La transformación digital requiere un proceso integral que abarca procesos, cultura y cliente, no solo herramientas aisladas." },
+            { sec: 1, q: "En la metodología SMART, ¿qué representa la letra 'M'?", options: ["A) Monetizable", "B) Mantenible", "C) Medible", "D) Multidisciplinar"], correct: 2, exp: "SMART representa: Específicos, Medibles, Alcanzables, Relevantes y Temporales." },
+            { sec: 1, q: "¿Cuál de las siguientes es una meta común citada en el punto 1?", options: ["A) Reducción de impuestos", "B) Personalización de la experiencia del usuario", "C) Cierre de oficinas físicas", "D) Eliminación de bases de datos"], correct: 1, exp: "Entre las metas más comunes están la eficiencia operativa, innovación y personalización de la experiencia." },
+            { sec: 2, q: "El objetivo principal de alinear áreas de negocio y comunicaciones es:", options: ["A) Evitar trabajar en silos organizacionales", "B) Reducir el gasto de luz", "C) Eliminar el departamento de producción", "D) Subcontratar toda la plantilla"], correct: 0, exp: "La alineación garantiza que no se trabaje en silos y que la colaboración sea sincrónica." },
+            { sec: 3, q: "¿Cuáles son los 4 pilares fundamentales de digitalización?", options: ["A) Contabilidad, Finanzas, Fiscal y Auditoría", "B) Producción, Logística, Marketing/Ventas y Atención al Cliente", "C) Hardware, Software, Redes y Periféricos", "D) Dirección, Compras, Calidad y RRHH"], correct: 1, exp: "El texto identifica expresamente estos cuatro pilares fundamentales." },
+            { sec: 3, q: "En el pilar de Producción, la gestión de calidad se digitaliza mediante:", options: ["A) Formularios impresos en papel", "B) Sensores IoT que monitorean parámetros en tiempo real", "C) Encuestas anuales por correo", "D) Inspección visual manual final"], correct: 1, exp: "La gestión de calidad en producción utiliza sensores que transmiten parámetros en tiempo real." },
+            { sec: 3, q: "¿Qué tecnología se aplica en Logística para el control de inventarios?", options: ["A) Identificación por Radiofrecuencia (RFID)", "B) Códigos morse", "C) Impresión 3D", "D) Servidores locales dedicados"], correct: 0, exp: "El texto destaca el uso de sistemas RFID en logística para control de inventarios." },
+            { sec: 3, q: "En Atención al Cliente, ¿qué herramientas permiten asistencia 24/7 y centralización?", options: ["A) Chatbots y sistemas CRM", "B) Centralitas telefónicas analógicas", "C) Correo postal certificado", "D) Fax automatizado"], correct: 0, exp: "Se integran chatbots para atención continua 24/7 y CRM para centralizar las interacciones." },
+            { sec: 4, q: "El análisis de encaje técnico evalúa la Integración de Software para asegurar que:", options: ["A) El hardware sea renovado cada año", "B) Las nuevas aplicaciones se comuniquen fluidamente con el ERP", "C) No se usen contraseñas complejas", "D) Se elimine la red Wi-Fi de la fábrica"], correct: 1, exp: "Busca garantizar que los nuevos programas se comuniquen sin problemas con sistemas como el ERP." },
+            { sec: 4, q: "¿Qué riesgo se evita con la Sincronización de Plataformas?", options: ["A) La fragmentación de datos", "B) La falta de energía eléctrica", "C) La contratación de personal", "D) El uso de correo electrónico"], correct: 0, exp: "Alinear análisis con herramientas de marketing y CRM evita la fragmentación de información." },
+            { sec: 5, q: "Las Necesidades Presentes en un proyecto digital se centran en:", options: ["A) Adopción inmediata de robots humanoides", "B) Reducción inmediata de costos operativos y mejora de la eficiencia", "C) Construcción de nuevos almacenes físicos", "D) Cambio de nombre de la sociedad mercantil"], correct: 1, exp: "Atienden la solución inmediata de ineficiencias y reducción de costos operativos." },
+            { sec: 5, q: "¿Qué tecnología proporciona la Escalabilidad Futura para adaptar capacidad?", options: ["A) Soluciones en la nube como AWS o Google Cloud", "B) Discos duros externos portátiles", "C) Servidores físicos locales fijos", "D) Cintas magnéticas de respaldo"], correct: 0, exp: "La nube permite expandir almacenamiento y procesamiento con flexibilidad según la demanda." },
+            { sec: 5, q: "¿Qué tecnologías emergentes impulsan la Innovación Continua?", options: ["A) Inteligencia Artificial y Big Data", "B) Bluetooth y Radio FM", "C) Monitores 4K y escáneres", "D) Disquetes y CDs"], correct: 0, exp: "El texto cita la IA y el Big Data para mantener una cultura de innovación continua." },
+            { sec: 6, q: "En el área de Marketing, un ejemplo de herramienta de analítica citado es:", options: ["A) Google Analytics", "B) Apache Spark", "C) PostgreSQL", "D) Talend"], correct: 0, exp: "El punto 6 cita Google Analytics como herramienta de analítica y Salesforce como CRM." },
+            { sec: 6, q: "Además de resolver dudas, ¿qué otra función realizan los chatbots en Atención al Cliente?", options: ["A) Emite facturas contables", "B) Analiza patrones para sugerir mejoras internas", "C) Repara la maquinaria averiada", "D) Diseña campañas publicitarias"], correct: 1, exp: "Analizan patrones en las consultas para sugerir optimizaciones en procesos internos." },
+            { sec: 7, q: "¿Qué medida se exige para el Control de Acceso a sistemas críticos?", options: ["A) Contraseña de 4 dígitos compartida", "B) Autenticación Multifactor (MFA)", "C) Acceso libre por dirección IP pública", "D) Firma manuscrita en papel"], correct: 1, exp: "Se implementa MFA para garantizar que solo personal autorizado acceda a información sensible." },
+            { sec: 7, q: "¿Qué normativa regula la privacidad en el tratamiento de datos?", options: ["A) LSSI", "B) GDPR", "C) ISO 9001", "D) CEE 100"], correct: 1, exp: "El texto cita expresamente el cumplimiento normativo con regulaciones como el GDPR." },
+            { sec: 7, q: "La protección de infraestructura IoT requiere el uso de:", options: ["A) Protocolos de comunicación seguros y segmentación de redes", "B) Desconexión total de internet", "C) Antivirus en impresoras", "D) Contraseñas por defecto de fábrica"], correct: 0, exp: "Requiere segmentación de red y protocolos seguros para aislar y proteger dispositivos IoT." },
+            { sec: 8, q: "¿Cuál es el orden correcto de las 4 fases del Tratamiento de Datos?", options: ["A) Almacenamiento, Recolección, Análisis, Procesamiento", "B) Recolección, Almacenamiento, Procesamiento, Análisis", "C) Análisis, Procesamiento, Recolección, Almacenamiento", "D) Recolección, Análisis, Almacenamiento, Procesamiento"], correct: 1, exp: "El orden del pipeline es: 1. Recolección, 2. Almacenamiento, 3. Procesamiento, 4. Análisis." },
+            { sec: 8, q: "Amazon S3 y Google Cloud Storage se utilizan en la fase de:", options: ["A) Recolección física", "B) Almacenamiento seguro en la nube", "C) Análisis visual", "D) Auditoría presencial"], correct: 1, exp: "Son soluciones escalables de almacenamiento en la nube." },
+            { sec: 8, q: "Apache Hadoop y Apache Spark son herramientas dedicadas al:", options: ["A) Cifrado de discos", "B) Procesamiento distribuido de Big Data", "C) Diseño de interfaces Web", "D) Escaneo de códigos RFID"], correct: 1, exp: "Se aplican en el procesamiento distribuido de grandes volúmenes de información." },
+            { sec: 8, q: "¿Qué técnica se utiliza en la fase de Análisis para obtener patrones predictivos?", options: ["A) Machine Learning", "B) Hojas de cálculo estáticas", "C) Digitalización de PDFs", "D) Corrección ortográfica"], correct: 0, exp: "Se implementa Machine Learning para generar insights y predecir comportamientos." },
+            { sec: 9, q: "Amazon Redshift y PostgreSQL se mencionan como soluciones de:", options: ["A) Centralización de datos (Data Warehouses / BD Relacionales)", "B) Plataformas de email marketing", "C) Herramientas de robótica", "D) Software de diseño 3D"], correct: 0, exp: "Sirven para unificar y centralizar datos de todas las áreas organizacionales." },
+            { sec: 9, q: "¿Cuál es la función de las herramientas ETL como Talend o Azure Data Factory?", options: ["A) Automatizar Extracción, Transformación y Carga de datos", "B) Reparar discos duros dañados", "C) Crear campañas en redes sociales", "D) Gestionar llamadas telefónicas"], correct: 0, exp: "Las herramientas ETL automatizan la extracción, transformación y carga entre sistemas." },
+            { sec: 10, q: "Jira y Trello se citan como herramientas para:", options: ["A) Cifrado de tráfico web", "B) Registro detallado y gestión de proyectos", "C) Procesamiento de imágenes", "D) Almacenamiento no relacional"], correct: 1, exp: "Permiten documentar modificaciones y gestionar tareas de proyectos digitales." },
+            { sec: 10, q: "¿Para qué sirve la Evaluación de Impacto en la mejora continua?", options: ["A) Para sancionar al personal con bajas métricas", "B) Para comparar indicadores de eficiencia antes y después de implementar cambios", "C) Para calcular el precio de venta de las acciones", "D) Para solicitar subvenciones estatales"], correct: 1, exp: "Compara KPIs previos y posteriores para medir objetivamente la efectividad." },
+            { sec: 10, q: "El objetivo principal de documentar las 'Lecciones Aprendidas' es:", options: ["A) Evitar la repetición de fallos en fases futuras", "B) Aumentar la burocracia en el departamento", "C) Justificar el sobrecoste del proyecto", "D) Ocultar errores directivos"], correct: 0, exp: "Permite elaborar informes periódicos para corregir errores y no repetirlos." },
+            { sec: 11, q: "Tableau y Power BI se mencionan en la capacitación para el área de:", options: ["A) Análisis de datos e inteligencia de negocio", "B) Robótica pesada", "C) Programación de sensores IoT", "D) Redacción de contratos jurídicos"], correct: 0, exp: "Son herramientas de análisis y visualización de datos dentro de la formación." },
+            { sec: 11, q: "¿Cómo se fomenta la Cultura de Aprendizaje según el factor humano?", options: ["A) Imponiendo sanciones económicas", "B) Mediante comunidades de práctica y programas de mentoría", "C) Prohibiendo el uso de herramientas no oficiales", "D) Eliminando la formación presencial"], correct: 1, exp: "Se impulsa cuando empleados experimentados guían a otros en comunidades y mentores." },
+            { sec: 11, q: "En conclusión, el éxito de la transformación digital requiere tecnología y un compromiso firme con:", options: ["A) El aumento indiscriminado de precios", "B) El desarrollo del talento humano", "C) La sustitución total de directivos", "D) La eliminación de sistemas de seguridad"], correct: 1, exp: "El texto concluye que el talento humano, la seguridad y la gobernanza son imprescindibles." }
+        ];
+
+        // --- ESTADO GLOBAL DE LA APLICACIÓN ---
+        let currentCardIndex = 0;
+        let filteredCards = [...flashcardsBank];
+        let currentQuizIndex = 0;
+        let quizAnswers = new Array(quizBank.length).fill(null);
+        let currentFontSize = 16;
+
+        // --- INICIALIZACIÓN ---
+        window.onload = function() {
+            renderFlashcard();
+            renderQuizQuestion();
+            renderSummary();
+        };
+
+        // --- NAVEGACIÓN ENTRE PESTAÑAS ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // --- LÓGICA TARJETAS INTELIGENTES ---
+        function renderFlashcard() {
+            const card = filteredCards[currentCardIndex];
+            const flashcardElem = document.getElementById('flashcard');
+            flashcardElem.classList.remove('flipped');
+
+            setTimeout(() => {
+                document.getElementById('cardSectionTag').innerText = `Sección ${card.sec}`;
+                document.getElementById('cardQuestion').innerText = card.q;
+                document.getElementById('cardAnswer').innerText = card.a;
+                document.getElementById('cardCounter').innerText = `${currentCardIndex + 1} / ${filteredCards.length}`;
+            }, 150);
+        }
+
+        function flipCard() {
+            document.getElementById('flashcard').classList.toggle('flipped');
+        }
+
+        function nextCard() {
+            if (currentCardIndex < filteredCards.length - 1) {
+                currentCardIndex++;
+                renderFlashcard();
+            }
+        }
+
+        function prevCard() {
+            if (currentCardIndex > 0) {
+                currentCardIndex--;
+                renderFlashcard();
+            }
+        }
+
+        function filterFlashcards() {
+            const secFilter = document.getElementById('flashcardFilter').value;
+            if (secFilter === 'all') {
+                filteredCards = [...flashcardsBank];
+            } else {
+                filteredCards = flashcardsBank.filter(c => c.sec == secFilter);
+            }
+            currentCardIndex = 0;
+            if(filteredCards.length > 0) {
+                renderFlashcard();
+            } else {
+                document.getElementById('cardQuestion').innerText = "No hay tarjetas para esta sección.";
+                document.getElementById('cardAnswer').innerText = "";
+            }
+        }
+
+        // --- LÓGICA CUESTIONARIO TEST ---
+        function renderQuizQuestion() {
+            const item = quizBank[currentQuizIndex];
+            document.getElementById('quizQuestionTag').innerText = `SECCIÓN ${item.sec} - PREGUNTA ${currentQuizIndex + 1}`;
+            document.getElementById('quizQuestionText').innerText = item.q;
+            document.getElementById('quizCounter').innerText = `${currentQuizIndex + 1} / ${quizBank.length}`;
+
+            const optionsHolder = document.getElementById('quizOptions');
+            optionsHolder.innerHTML = '';
+
+            const feedbackBox = document.getElementById('quizFeedback');
+            feedbackBox.style.display = 'none';
+
+            const savedAnswer = quizAnswers[currentQuizIndex];
+
+            item.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'quiz-option';
+                btn.innerText = opt;
+
+                if (savedAnswer !== null) {
+                    btn.disabled = true;
+                    if (idx === item.correct) {
+                        btn.classList.add('correct');
+                    }
+                    if (savedAnswer === idx && savedAnswer !== item.correct) {
+                        btn.classList.add('incorrect');
+                    }
+                } else {
+                    btn.onclick = () => selectQuizOption(idx);
+                }
+                optionsHolder.appendChild(btn);
+            });
+
+            if (savedAnswer !== null) {
+                feedbackBox.style.display = 'block';
+                const isCorrect = savedAnswer === item.correct;
+                feedbackBox.innerHTML = `<strong>${isCorrect ? '✅ ¡Correcto!' : '❌ Respuesta Incorrecta.'}</strong><br>${item.exp}`;
+            }
+
+            updateScoreDisplay();
+        }
+
+        function selectQuizOption(optionIdx) {
+            quizAnswers[currentQuizIndex] = optionIdx;
+            renderQuizQuestion();
+        }
+
+        function nextQuiz() {
+            if (currentQuizIndex < quizBank.length - 1) {
+                currentQuizIndex++;
+                renderQuizQuestion();
+            }
+        }
+
+        function prevQuiz() {
+            if (currentQuizIndex > 0) {
+                currentQuizIndex--;
+                renderQuizQuestion();
+            }
+        }
+
+        function resetQuiz() {
+            quizAnswers = new Array(quizBank.length).fill(null);
+            currentQuizIndex = 0;
+            renderQuizQuestion();
+        }
+
+        function updateScoreDisplay() {
+            let correctCount = 0;
+            let answeredCount = 0;
+            quizAnswers.forEach((ans, idx) => {
+                if (ans !== null) {
+                    answeredCount++;
+                    if (ans === quizBank[idx].correct) correctCount++;
+                }
+            });
+            document.getElementById('quizScoreText').innerText = `Puntuación: ${correctCount} / ${answeredCount} respondidas (Total: ${quizBank.length})`;
+        }
+
+        // --- LÓGICA ASISTENTE DIDÁCTICO Y GENERADOR DINÁMICO ---
+        function appendMessage(sender, text) {
+            const chatBox = document.getElementById('chatBox');
+            const msg = document.createElement('div');
+            msg.className = `message ${sender}`;
+            msg.innerHTML = text;
+            chatBox.appendChild(msg);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') sendUserQuery();
+        }
+
+        function sendUserQuery() {
+            const input = document.getElementById('userInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            appendMessage('user', text);
+            input.value = '';
+
+            setTimeout(() => {
+                const response = processQuery(text);
+                appendMessage('bot', response);
+            }, 300);
+        }
+
+        function processQuery(query) {
+            const q = query.toLowerCase();
+
+            // Buscar coincidencias de temas
+            let matchedSec = themeData.find(t => 
+                q.includes(t.title.toLowerCase()) || 
+                (q.includes("smart") && t.section === 1) ||
+                (q.includes("rfid") && t.section === 3) ||
+                (q.includes("etl") && t.section === 9) ||
+                (q.includes("nube") && t.section === 5) ||
+                (q.includes("seguridad") && t.section === 7) ||
+                (q.includes("datos") && t.section === 8)
+            );
+
+            if (matchedSec) {
+                return `<strong>Explicación Didáctica (${matchedSec.title}):</strong><br>${matchedSec.text}<br><br>💡 <strong>Analogía Sencilla:</strong> ${matchedSec.analogy}<br><br>🏢 <strong>Ejemplo Práctico en la Empresa:</strong> ${matchedSec.example}`;
+            }
+
+            if (q.includes("generar") || q.includes("nueva tarjeta") || q.includes("mas tarjetas")) {
+                generateExtraFlashcard();
+                return "¡He generado una nueva tarjeta pedagógica de refuerzo! Revisa la pestaña de Tarjetas o consulta abajo.";
+            }
+
+            if (q.includes("pregunta") || q.includes("test")) {
+                generateExtraQuizQuestion();
+                return "¡He creado una nueva pregunta de examen tipo test! Revisa el módulo de cuestionarios.";
+            }
+
+            return "Entendido. Para el **Tema 6 de DASP**, puedo explicarte conceptos como los **objetivos SMART**, la **tecnología RFID**, la **integración ETL**, las **fases de análisis de datos** o la **seguridad GDPR** mediante analogías sencillas. Escribe palabras clave como 'SMART', 'RFID' o 'ETL' para una respuesta inmediata.";
+        }
+
+        function askPreset(concept) {
+            if (concept === 'SMART') {
+                document.getElementById('userInput').value = "Explícame los objetivos SMART con una analogía";
+            } else if (concept === 'RFID') {
+                document.getElementById('userInput').value = "Dame un ejemplo práctico de RFID en logística";
+            }
+            sendUserQuery();
+        }
+
+        function generateExtraFlashcard() {
+            const randomSec = themeData[Math.floor(Math.random() * themeData.length)];
+            const newCard = {
+                sec: randomSec.section,
+                q: `[Refuerzo] ¿Cómo se aplica la clave de '${randomSec.title}' en la gestión empresarial?`,
+                a: `${randomSec.text} Ejemplo práctico: ${randomSec.example}`
+            };
+            flashcardsBank.push(newCard);
+            filteredCards = [...flashcardsBank];
+            currentCardIndex = filteredCards.length - 1;
+            renderFlashcard();
+            appendMessage('bot', `✨ **Nueva Tarjeta Creada:** Se ha añadido una tarjeta sobre <em>${randomSec.title}</em>. Puedes verla ahora en la pestaña de Tarjetas (${filteredCards.length} en total).`);
+        }
+
+        function generateExtraQuizQuestion() {
+            const randomSec = themeData[Math.floor(Math.random() * themeData.length)];
+            const newQuiz = {
+                sec: randomSec.section,
+                q: `[Caso Práctico Extra] En el contexto de '${randomSec.title}', ¿cuál de las siguientes actuaciones es la más adecuada?`,
+                options: [
+                    `A) Aplicar: ${randomSec.example.substring(0, 75)}...`,
+                    "B) Omitir la planificación y proceder a compras sin análisis previo.",
+                    "C) Limitar la digitalización únicamente al departamento jurídico.",
+                    "D) Trabajar de forma aislada sin comunicar cambios a producción."
+                ],
+                correct: 0,
+                exp: `Correcto. ${randomSec.text}`
+            };
+            quizBank.push(newQuiz);
+            quizAnswers.push(null);
+            currentQuizIndex = quizBank.length - 1;
+            renderQuizQuestion();
+            appendMessage('bot', `📝 **Nueva Pregunta de Test Creada:** Se ha agregado la pregunta ${quizBank.length} orientada a un caso práctico de <em>${randomSec.title}</em>.`);
+        }
+
+        // --- LÓGICA DE RESUMEN DE TEORÍA ---
+        function renderSummary() {
+            const container = document.getElementById('summaryContent');
+            container.innerHTML = themeData.map(t => `
+                <div class="summary-item">
+                    <h3>${t.title}</h3>
+                    <p style="margin-bottom:8px;">${t.text}</p>
+                    <p style="font-size:0.9rem; color:var(--primary-dark);">💡 <strong>Analogía:</strong> ${t.analogy}</p>
+                    <p style="font-size:0.9rem; color:var(--success);">🏢 <strong>Ejemplo Aplicado:</strong> ${t.example}</p>
+                </div>
+            `).join('');
+        }
+
+        // --- ACCESIBILIDAD Y PERSONALIZACIÓN ---
+        function toggleAccOption(className) {
+            document.body.classList.toggle(className);
+            const btnId = className === 'accessible-font' ? 'btnFont' : (className === 'expanded-text' ? 'btnSpacing' : 'btnContrast');
+            document.getElementById(btnId).classList.toggle('active');
+        }
+
+        function changeFontSize(delta) {
+            currentFontSize = Math.min(22, Math.max(14, currentFontSize + delta));
+            document.body.style.setProperty('--base-font-size', currentFontSize + 'px');
+        }
+    </script>
+</body>
+</html>
