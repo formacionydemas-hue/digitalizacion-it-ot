@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DASP: La Inteligencia Artificial en el Sector Productivo</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --text-muted: #64748b;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary: #0d9488;
+            --accent: #7c3aed;
+            --success: #10b981;
+            --danger: #ef4444;
+            --border-color: #cbd5e1;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --font-size-base: 16px;
+            --line-height: 1.6;
+            --letter-spacing: normal;
+        }
+
+        /* Modo de visualización adaptada: Se mantiene la misma tipografía pero se expande espacio e interlineado */
+        body.accessible-mode {
+            --line-height: 2.1;
+            --letter-spacing: 0.12em;
+            --bg-color: #fefce8;
+            --card-bg: #ffffff;
+            --text-color: #0f172a;
+            --border-color: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family) !important;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: var(--font-size-base);
+            line-height: var(--line-height);
+            letter-spacing: var(--letter-spacing);
+            padding-bottom: 50px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        header {
+            background: linear-gradient(135deg, #0f172a, #2563eb);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-title h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .header-title p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .accessibility-controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s ease, transform 0.1s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-accent {
+            background-color: var(--accent);
+        }
+
+        .btn-accent:hover {
+            background-color: #6d28d9;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        nav.tabs {
+            display: flex;
+            gap: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            padding: 0.8rem 1.4rem;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* TARJETAS INTELEGENTES */
+        .flashcard-wrapper {
+            perspective: 1000px;
+            max-width: 680px;
+            margin: 1.5rem auto;
+            height: 330px;
+        }
+
+        .flashcard {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s cubic-bezier(0.4, 0.2, 0.2, 1);
+            cursor: pointer;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            background-color: #f1f5f9;
+        }
+
+        body.accessible-mode .card-back {
+            background-color: #fef08a;
+        }
+
+        .card-tag {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: var(--secondary);
+            background: rgba(13, 148, 136, 0.12);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+        }
+
+        .card-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        /* CUESTIONARIO */
+        .quiz-card {
+            background-color: var(--card-bg);
+            padding: 1.8rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+
+        .quiz-question {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+        }
+
+        .options-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+        }
+
+        .option-btn {
+            width: 100%;
+            text-align: left;
+            padding: 0.85rem 1.2rem;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            background-color: rgba(37, 99, 235, 0.05);
+        }
+
+        .option-btn.correct {
+            background-color: #d1fae5 !important;
+            border-color: var(--success) !important;
+            color: #065f46;
+            font-weight: bold;
+        }
+
+        .option-btn.incorrect {
+            background-color: #fee2e2 !important;
+            border-color: var(--danger) !important;
+            color: #991b1b;
+        }
+
+        .explanation-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background-color: #eff6ff;
+            border-left: 4px solid var(--primary);
+            display: none;
+        }
+
+        /* TUTOR INTERACTIVO Y API */
+        .tutor-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .tutor-container {
+                grid-template-columns: 320px 1fr;
+            }
+        }
+
+        .concept-list {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            max-height: 520px;
+            overflow-y: auto;
+        }
+
+        .concept-item {
+            padding: 0.9rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .concept-item:hover, .concept-item.active {
+            background-color: rgba(37, 99, 235, 0.1);
+            color: var(--primary);
+        }
+
+        .tutor-view {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            background-color: var(--border-color);
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .stat-badge {
+            display: inline-block;
+            padding: 0.25rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            background-color: #e2e8f0;
+        }
+
+        .api-box {
+            background-color: #f1f5f9;
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-title">
+            <h1>Digitalización Aplicada (DASP) - CFGS Administración y Finanzas</h1>
+            <p>Tema 4: La Inteligencia Artificial en el Sector Productivo</p>
+        </div>
+        <div class="accessibility-controls">
+            <button class="btn btn-outline" id="toggleAccessibility" style="color: white; border-color: rgba(255,255,255,0.4);" title="Formato de lectura adaptada con mayor espacio entre líneas y caracteres">
+                📖 Texto Expandido
+            </button>
+            <button class="btn btn-outline" id="decreaseFont" style="color: white; border-color: rgba(255,255,255,0.4);">A-</button>
+            <button class="btn btn-outline" id="increaseFont" style="color: white; border-color: rgba(255,255,255,0.4);">A+</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav class="tabs">
+            <button class="tab-btn active" onclick="switchTab('flashcards', event)">🎴 Tarjetas Inteligentes (<span id="cardsCount">0</span>)</button>
+            <button class="tab-btn" onclick="switchTab('quiz', event)">📝 Cuestionario (<span id="quizCount">0</span>)</button>
+            <button class="tab-btn" onclick="switchTab('tutor', event)">💡 Tutor e Explicador (<span id="tutorCount">0</span>)</button>
+            <button class="tab-btn" onclick="switchTab('generator', event)">⚡ Generador de Recursos</button>
+        </nav>
+
+        <!-- MÓDULO 1: TARJETAS INTELEGENTES -->
+        <div id="flashcards" class="tab-content active">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div>
+                    <h2>Tarjetas de Autoevaluación</h2>
+                    <p style="color: var(--text-muted);">Haz clic en la tarjeta para voltearla y revisar el concepto.</p>
+                </div>
+                <span class="stat-badge" id="cardProgressText">Tarjeta 1 de 30</span>
+            </div>
+
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="cardProgressBar"></div>
+            </div>
+
+            <div class="flashcard-wrapper">
+                <div class="flashcard" id="activeFlashcard" onclick="flipCard()">
+                    <div class="card-face card-front">
+                        <span class="card-tag" id="cardFrontTag">CONCEPTO</span>
+                        <h3 id="cardFrontText" style="font-size: 1.25rem;">Cargando...</h3>
+                        <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">(Haz clic para voltear)</p>
+                    </div>
+                    <div class="card-face card-back">
+                        <span class="card-tag" id="cardBackTag">RESPUESTA TÉCNICA</span>
+                        <p id="cardBackText" style="font-size: 1.05rem;">Cargando respuesta...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-controls">
+                <button class="btn btn-outline" onclick="prevCard()">⬅️ Anterior</button>
+                <button class="btn btn-accent" onclick="shuffleCards()">🔀 Aleatorio</button>
+                <button class="btn" onclick="nextCard()">Siguiente ➡️</button>
+            </div>
+        </div>
+
+        <!-- MÓDULO 2: CUESTIONARIO MULTIOPCIÓN -->
+        <div id="quiz" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div>
+                    <h2>Cuestionario Tipo Test</h2>
+                    <p style="color: var(--text-muted);">Responde a las preguntas oficiales extraídas de los contenidos del tema.</p>
+                </div>
+                <div>
+                    <span class="stat-badge" id="scoreBadge">Puntuación: 0 / 0</span>
+                </div>
+            </div>
+
+            <div id="quizContainer">
+                <!-- Se cargan dinámicamente -->
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="btn btn-accent" onclick="resetQuiz()">🔄 Reiniciar Cuestionario</button>
+            </div>
+        </div>
+
+        <!-- MÓDULO 3: TUTOR Y EXPLICADOR DE CONCEPTOS (+ API EN VIVO) -->
+        <div id="tutor" class="tab-content">
+            <h2>Aclarador Didáctico de Conceptos</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Explicaciones detalladas con ejemplos del sector productivo y analogías cotidianas.</p>
+
+            <input type="text" class="search-box" id="tutorSearch" placeholder="🔍 Buscar concepto (ej. Deep Learning, Test de Turing, Machine Learning, Ciberseguridad...)" oninput="filterConcepts()">
+
+            <div class="tutor-container">
+                <div class="concept-list" id="conceptListContainer">
+                    <!-- Conceptos dinámicos -->
+                </div>
+                <div class="tutor-view" id="tutorViewContent">
+                    <h3 id="tutorTitle" style="color: var(--primary); margin-bottom: 0.8rem;">Selecciona un concepto de la lista</h3>
+                    <div id="tutorBody">
+                        <p>Haz clic en cualquier término para ver su explicación adaptada.</p>
+                    </div>
+
+                    <!-- Panel de interacción mediante API -->
+                    <div class="api-box">
+                        <h4 style="margin-bottom: 0.5rem; color: var(--accent);">🤖 Consultar dudas en directo al Tutor IA (Opcional)</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.8rem;">Introduce tu clave API gratuita de Google Gemini para hacer preguntas personalizadas sobre el tema:</p>
+                        <input type="password" id="geminiApiKey" class="search-box" style="margin-bottom: 0.5rem;" placeholder="Pega aquí tu Gemini API Key (AI Studio)...">
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="text" id="livePrompt" class="search-box" style="margin-bottom: 0;" placeholder="Escribe tu duda sobre este tema...">
+                            <button class="btn btn-accent" onclick="askLiveAI()">Consultar</button>
+                        </div>
+                        <div id="apiResponse" style="margin-top: 0.8rem; font-size: 0.9rem; display: none; padding: 0.8rem; background: white; border-radius: 6px; border: 1px solid var(--border-color);"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MÓDULO 4: GENERADOR DE NUEVOS RECURSOS -->
+        <div id="generator" class="tab-content">
+            <h2>Generador e Incorporador de Nuevos Recursos</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Crea e incorpora instantáneamente nuevas tarjetas y preguntas de autoevaluación al material activo.</p>
+
+            <div class="quiz-card" style="max-width: 700px; margin: 0 auto;">
+                <label style="font-weight: bold; display: block; margin-bottom: 0.5rem;">Selecciona el Subtema del PDF para generar contenido:</label>
+                <select id="genTopicSelect" class="search-box">
+                    <option value="evolucion">1. Evolución Histórica de la IA (Años 50 a 2020+)</option>
+                    <option value="tipos">2. Tipos de Inteligencia (Humana vs Artificial, Débil vs Fuerte)</option>
+                    <option value="aprendizaje">3. Formas de Aprendizaje (Machine Learning vs Deep Learning)</option>
+                    <option value="generativa">4. IA Generativa y Lenguajes de Programación</option>
+                    <option value="sectores">5. Aplicaciones en Sectores Empresariales y Tecnologías</option>
+                    <option value="laboral">6. Impacto en el Mercado Laboral y Ciberseguridad</option>
+                </select>
+
+                <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
+                    <button class="btn" onclick="generateNewCard()">➕ Generar y Añadir Tarjeta</button>
+                    <button class="btn btn-accent" onclick="generateNewQuestion()">➕ Generar y Añadir Pregunta Test</button>
+                </div>
+
+                <div id="generatorOutput" style="margin-top: 1.5rem; padding: 1rem; border-top: 1px solid var(--border-color); display: none;">
+                    <!-- Resultado generado -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // BD DE DATOS OFICIALES Extraídos íntegramente del PDF "Tema 4. La inteligencia artificial"
+
+        const rawCards = [
+            { question: "¿Qué se entiende por 'Inteligencia' en términos generales?", answer: "Es la capacidad de aprender, razonar, resolver problemas y adaptarse al entorno mediante el procesamiento de información y la experiencia.", tag: "Concepto" },
+            { question: "¿Qué es una Inteligencia Artificial (IA)?", answer: "Un sistema informático diseñado para realizar tareas que normalmente requieren inteligencia humana de forma autónoma, sin especificar cada paso.", tag: "Definición IA" },
+            { question: "¿En qué consiste el Test de Turing ideado en los años 50?", answer: "Propuesto por Alan Turing, establece que una máquina es inteligente cuando logra hacer creer a las personas que es un ser humano.", tag: "Historia" },
+            { question: "¿Qué caracterizó los inicios de la IA en los años 50 y 60?", answer: "Desarrollo de primeros ordenadores programables, lenguajes de programación y programas iniciales para resolver problemas matemáticos y ajedrez básico.", tag: "Evolución" },
+            { question: "¿Qué eran los Sistemas Expertos en los años 80?", answer: "Programas creados para imitar el conocimiento de especialistas en áreas concretas como medicina, finanzas o diagnóstico de averías.", tag: "Evolución" },
+            { question: "¿Qué supuso la expansión de la Web en los años 90 para la IA?", answer: "Generó una cantidad masiva de datos que exigió algoritmos para organizar, clasificar y presentar información (buscadores, filtros de correo).", tag: "Evolución" },
+            { question: "¿Qué hito impulsó la IA en la década de 2010?", answer: "El desarrollo del Deep Learning y las redes neuronales, revolucionando el reconocimiento de imágenes, voz y recomendación de contenidos.", tag: "Deep Learning" },
+            { question: "¿Qué cambio marcan los años 2020 en la evolución de la IA?", answer: "Los modelos avanzados de lenguaje (NLP) como ChatGPT hacen que la IA deje los laboratorios y sea una herramienta diaria transversal.", tag: "Modelos NLP" },
+            { question: "¿Qué sostiene el modelo de las Inteligencias Múltiples?", answer: "Que cada persona posee distintas capacidades independientes en diferente grado (lógico-matemática, verbal, creativa, social, etc.).", tag: "Inteligencia Humana" },
+            { question: "¿Qué caracteriza a la IA Estrecha o Débil?", answer: "Está diseñada para tareas específicas (ej. Siri, Alexa, recomendación de Netflix) y no puede actuar fuera de su ámbito.", tag: "Tipos de IA" },
+            { question: "¿Existe actualmente la Inteligencia Artificial General (fuerte)?", answer: "No. Un algoritmo capaz de realizar cualquier tarea cognitiva humana igualando la mente sigue siendo un desafío no alcanzado.", tag: "Tipos de IA" },
+            { question: "¿Qué es un Algoritmo?", answer: "Una secuencia ordenada de pasos o instrucciones que describen cómo realizar una tarea o resolver un problema.", tag: "Programación" },
+            { question: "¿Cuál es el uso principal de Python en la IA?", answer: "Es un lenguaje asequible con 7M de desarrolladores, diseñado especialmente para trabajar con grandes cantidades de datos e IA.", tag: "Lenguajes" },
+            { question: "¿Cuál es el lenguaje con más desarrolladores activos según el tema?", answer: "JavaScript, con 10,7 millones de desarrolladores activos, muy utilizado en web, nube e Internet de las Cosas (IoT).", tag: "Lenguajes" },
+            { question: "¿Para qué sirve el lenguaje Java?", answer: "Con 7,1 millones de desarrolladores, es muy utilizado en la creación de aplicaciones móviles Android, IoT, nube y PC.", tag: "Lenguajes" },
+            { question: "¿Cómo tomaba decisiones el Machine Learning tradicional?", answer: "A través de algoritmos que evalúan datos siguiendo un árbol de decisión o diagrama de flujo jerárquico en cascada paso a paso.", tag: "Machine Learning" },
+            { question: "¿Qué es el Aprendizaje Supervisado?", answer: "Entrenamiento donde se muestran a la máquina multitud de datos previamente clasificados y etiquetados (ej. filtro de spam).", tag: "Machine Learning" },
+            { question: "¿En qué consiste el Aprendizaje No Supervisado?", answer: "La máquina examina datos sin etiquetar para encontrar patrones o similitudes autónomamente (ej. hábitos en redes sociales).", tag: "Machine Learning" },
+            { question: "¿Cómo funciona el Aprendizaje por Refuerzo?", answer: "La máquina aprende a alcanzar un objetivo mediante ensayo y error con un sistema de premios por aciertos y castigos por fallos.", tag: "Machine Learning" },
+            { question: "¿En qué se inspiran las Redes Neuronales Artificiales del Deep Learning?", answer: "En el funcionamiento de las neuronas del cerebro humano, analizando datos y combinando múltiples variables simultáneamente.", tag: "Deep Learning" },
+            { question: "¿Qué es la IA Generativa?", answer: "Una rama de la IA capaz de crear nuevos contenidos (texto, imágenes, vídeo, código, audio) tras recibir instrucciones (prompts).", tag: "IA Generativa" },
+            { question: "¿Por qué comete errores la IA Generativa en la creación de contenidos?", answer: "Porque la realidad es compleja y los modelos generativos simplifican o malinterpretan situaciones (ej. dibujar 3 piernas a una persona).", tag: "Limitaciones IA" },
+            { question: "¿Cómo se aplica la IA en el área de Marketing?", answer: "Analiza el perfil comprador del usuario para sugerir productos, estimar ventas y atender clientes con chatbots postventa.", tag: "Aplicación Empresa" },
+            { question: "¿Qué aplicación tiene la IA en Recursos Humanos?", answer: "Selección del candidato más cualificado buscando evitar el sesgo humano y mejorar la gestión del personal.", tag: "Aplicación Empresa" },
+            { question: "¿Cómo se aplica la IA en Sanidad y Medicina?", answer: "Analiza historias clínicas y datos genéticos para ofrecer tratamientos personalizados y predecir posibles enfermedades.", tag: "Aplicación Empresa" },
+            { question: "¿Qué función cumple el modelo GAN (Redes Generativas Adversativas) en el arte?", answer: "Genera autónomamente obras de arte únicas, imágenes, pinturas y composiciones musicales.", tag: "Arte & IA" },
+            { question: "¿Cómo beneficia la combinación de IA y Robótica en residencias de ancianos?", answer: "Permite acompañamiento, tareas de rehabilitación y conversaciones en diferentes idiomas.", tag: "Robótica" },
+            { question: "¿Qué aportación hace la IA a la Impresión 3D?", answer: "Ayuda en el diseño CAD, elige materiales óptimos, supervisa la fabricación y predice el rendimiento del objeto.", tag: "Impresión 3D" },
+            { question: "¿Qué profesión se ve amenazada por los vehículos autónomos PAV de Boeing?", answer: "La profesión de piloto de avión.", tag: "Mercado Laboral" },
+            { question: "¿A qué se dedica un 'Entrenador de modelos de IA'?", answer: "Alimenta algoritmos con datos de calidad, etiqueta información y corrige errores o sesgos iniciales del sistema.", tag: "Nuevas Profesiones" }
+        ];
+
+        const rawQuiz = [
+            { q: "¿Cuál es el objetivo principal del Test de Turing propuesto en los años 50?", options: ["Medir la velocidad de cálculo de un servidor", "Determinar si una máquina puede hacer creer a un humano que habla con otra persona", "Calcular la capacidad del disco duro", "Evaluar el consumo de batería de un robot"], correct: 1, exp: "Alan Turing definió que una máquina es inteligente si sus respuestas resultan indistinguibles de las de un ser humano." },
+            { q: "¿Qué caracteriza a los Sistemas Expertos desarrollados en la década de 1980?", options: ["Remplazaron a la red de internet", "Imitaban el conocimiento de especialistas en áreas concretas como medicina o finanzas", "Generaban vídeos automáticos", "Eran programas sin necesidad de código"], correct: 1, exp: "Los sistemas expertos imitaban a los especialistas humanos mediante reglas lógicas en áreas concretas." },
+            { q: "¿En qué década vivió la IA un salto cualitativo gracias al auge del Deep Learning y las Redes Neuronales?", options: ["Años 1950", "Años 1980", "Años 2010", "Años 1970"], correct: 2, exp: "A partir de 2010 las redes neuronales y el aprendizaje profundo permitieron avances en visión por computador y lenguaje." },
+            { q: "¿Cuál es una característica fundamental de la IA Estrecha o Débil?", options: ["Tiene conciencia humana propia", "Está diseñada solo para realizar tareas específicas dentro de su ámbito", "Puede realizar cualquier tarea cognitiva", "No utiliza algoritmos"], correct: 1, exp: "La IA débil (Siri, chatbots, recomendadores) solo opera eficazmente en la tarea concreta para la que fue creada." },
+            { q: "¿Qué afirmación es correcta sobre la Inteligencia Artificial General (Fuerte)?", options: ["Es la que usan los móviles actuales", "A día de hoy no existe y sigue siendo un desafío tecnológico", "Se inventó en los años 60", "Solo funciona en ordenadores cuánticos"], correct: 1, exp: "La AGI, capaz de imitar globalmente cualquier capacidad cognitiva del ser humano, aún no se ha conseguido." },
+            { q: "Según el texto, ¿qué lenguaje de programación cuenta con 7 millones de desarrolladores y está pensado para IA y grandes volúmenes de datos?", options: ["PHP", "Python", "C#", "JavaScript"], correct: 1, exp: "Python es el lenguaje predilecto para el manejo de datos e inteligencia artificial." },
+            { q: "¿Cuál es el lenguaje con mayor número de desarrolladores activos según el tema (10,7 millones)?", options: ["Java", "JavaScript", "C++", "Python"], correct: 1, exp: "JavaScript lidera el número de desarrolladores activos por su uso masivo en web, nube e IoT." },
+            { q: "¿Cómo se toman las decisiones en el Machine Learning (aprendizaje automático) tradicional?", options: ["Analizando todas las variables a la vez", "Siguiendo un árbol de decisión o diagrama de flujo jerárquico paso a paso", "Por decisiones aleatorias", "Mediante sensores biológicos"], correct: 1, exp: "El Machine Learning tradicional evalúa las circunstancias en cascada sucesiva mediante árboles de decisión." },
+            { q: "¿En qué consiste el Aprendizaje Supervisado?", options: ["La máquina aprende sin datos iniciales", "Se entrena a la máquina mostrándole multitud de datos previamente clasificados y etiquetados", "Aprendizaje mediante castigos únicamente", "No utiliza código"], correct: 1, exp: "Se le aportan datos etiquetados (como miles de correos etiquetados como spam) para que aprenda a reconocer el patrón." },
+            { q: "¿Qué tipo de aprendizaje analiza redes sociales para detectar gustos y hábitos sin datos etiquetados?", options: ["Supervisado", "No supervisado", "Por refuerzo", "Biológico"], correct: 1, exp: "El aprendizaje no supervisado busca patrones y similitudes de forma autónoma entre datos no clasificados." },
+            { q: "¿En qué consiste el Aprendizaje por Refuerzo?", options: ["En redactar manuales a mano", "En aprender mediante ensayo y error con un sistema de premios y castigos", "En traducir idiomas mediante diccionarios", "En imprimir piezas 3D"], correct: 1, exp: "La máquina descubre cuál es la mejor ruta o solución probando opciones y recibiendo recompensas o penalizaciones." },
+            { q: "¿Cuál es la diferencia clave del Deep Learning frente al Machine Learning tradicional?", options: ["El Deep Learning no requiere ordenadores", "El Deep Learning analiza datos continuamente y detecta patrones evaluando variables de forma combinada", "El Machine Learning es más moderno", "No hay diferencias"], correct: 1, exp: "Las redes neuronales artificiales evalúan múltiples variables de manera conjunta como hace la mente humana." },
+            { q: "¿Qué es un 'Prompt' en las herramientas de IA generativa?", options: ["Un error del sistema", "Las instrucciones u órdenes que el usuario facilita a la IA", "Un cable de conexión", "Un lenguaje de programación"], correct: 1, exp: "El prompt es el comando o texto con el que indicamos a la IA generativa lo que debe crear." },
+            { q: "¿A qué se deben las imperfecciones de la IA Generativa (ej. tres piernas en una persona)?", options: ["A virus informáticos", "A que la realidad es compleja y los modelos generativos simplifican o malinterpretan situaciones", "A que no usa internet", "A un fallo en la pantalla"], correct: 1, exp: "Los modelos de IA generativa simplifican patrones y en ocasiones generan incoherencias estructurales." },
+            { q: "¿Cómo ayuda la IA en el área de Recursos Humanos?", options: ["Sustituyendo los sueldos", "Seleccionando al candidato más cualificado evitando el sesgo humano", "Eliminando el departamento", "Obligando a trabajar en papel"], correct: 1, exp: "Analiza perfiles de candidatos de forma objetiva buscando mitigar los sesgos en la selección." },
+            { q: "¿Qué tecnología generativa se utiliza especialmente para crear obras de arte únicas?", options: ["Redes Generativas Adversativas (GAN)", "Lenguaje HTML", "Servidores PHP", "Discos duros SSD"], correct: 0, exp: "Las GAN utilizan dos redes contrapuestas para crear arte, música e imágenes de alta calidad." },
+            { q: "¿Qué utilidad ofrece la IA en la Medicina según el contenido oficial?", options: ["Remplazar a los médicos", "Analizar historias clínicas y datos genéticos para predecir enfermedades y personalizar tratamientos", "Fabricar tiritas", "Hacer anuncios de clínicas"], correct: 1, exp: "Permite diagnósticos precoces y tratamientos adaptados al perfil genético del paciente." },
+            { q: "En el sector agrícola, ¿para qué se combina el uso de la IA con drones?", options: ["Para ahuyentar aves", "Para monitorear cultivos, gestionar el agua, predecir el clima y plantar árboles", "Para vender fruta online", "Para transportar agricultores"], correct: 1, exp: "Los drones supervisan grandes terrenos de cultivo optimizando el consumo de agua y fertilizantes." },
+            { q: "¿Qué función tiene la IA en el sector Financiero y bancario?", options: ["Detectar fraudes, predecir tendencias del mercado y asesorar operaciones", "Imprimir billetes físicamente", "Diseñar cajeros de madera", "Limpiar las oficinas"], correct: 0, exp: "Analiza millones de patrones financieros en tiempo real para alertar de fraudes." },
+            { q: "¿Cómo beneficia la IA a la tecnología de Impresión 3D?", options: ["Asistiendo en el diseño CAD, seleccionando materiales y evitando errores de impresión", "Evitando el uso de luz", "Generando facturas impresas", "Aumentando el peso del plástico"], correct: 0, exp: "Supervisa todo el proceso de modelado e impresión evitando fallos en la estructura del objeto." },
+            { q: "¿Para qué se aplica la Realidad Virtual con IA en el campo de la Salud Mental?", options: ["Para curar la miopía", "Para simular escenarios inmersivos que ayuden a superar el estrés y la ansiedad", "Para hacer análisis de sangre", "Para medir la tensión"], correct: 1, exp: "Recrea entornos seguros e inmersivos de exposición progresiva para la terapia de ansiedad." },
+            { q: "¿Qué ventaja aporta la combinación de Blockchain e Inteligencia Artificial?", options: ["Reducir el tamaño del ratón", "Evitar fraudes y mejorar la transparencia y seguridad en la gestión de datos", "Hacer el monitor más brillante", "Eliminar los teclados"], correct: 1, exp: "La inalterabilidad de Blockchain se suma al análisis de datos seguro de la IA." },
+            { q: "¿Qué ventaja ofrece La Nube (Cloud) a las empresas que usan IA?", options: ["Desplegar y entrenar modelos de IA sin necesidad de gestionar la infraestructura subyacente", "Garantizar que la IA nunca falle", "Eliminar el pago de impuestos", "Evitar el uso de contraseñas"], correct: 0, exp: "Ahorra grandes costes de infraestructura física al permitir usar servidores remotos para IA." },
+            { q: "Según la tabla del tema, ¿qué profesión se ve amenazada por el vehículo aéreo autónomo PAV de Boeing?", options: ["Entrenador de IA", "Piloto de avión", "Experto en ciberseguridad", "Administrador de fincas"], correct: 1, exp: "El desarrollo de aviones comerciales autónomos pone en riesgo el perfil laboral del piloto." },
+            { q: "¿Cuál es la función principal de un 'Entrenador de modelos de IA'?", options: ["Dar clases de gimnasia a informáticos", "Alimentar algoritmos con datos de calidad, etiquetar información y corregir errores/sesgos", "Reparar cables de red", "Vender ordenadores"], correct: 1, exp: "Se encarga del filtrado, etiquetado y corrección inicial durante el aprendizaje de los modelos." },
+            { q: "¿A qué se dedica un 'Experto en Ciberseguridad' en el ámbito de la IA?", options: ["Proteger los modelos frente a ataques como el envenenamiento de datos o hackeo de algoritmos", "Limpiar el polvo de las CPU", "Instalar antivirus gratuitos", "Configurar la hora de los equipos"], correct: 0, exp: "Defiende a los sistemas de IA frente a modificaciones maliciosas en sus fuentes de aprendizaje." },
+            { q: "¿De qué cualidades netamente humanas carece la IA actual?", options: ["Velocidad de cálculo", "Almacenamiento masivo", "Creatividad y emoción genuinas", "Procesamiento de texto"], correct: 2, exp: "La IA solo simula la emoción y creatividad, pero carece de conciencia o sensibilidad real." },
+            { q: "¿Qué ventaja ofrecen los Chatbots con IA al sector del Marketing?", options: ["Atención postventa automatizada mejorando la experiencia del cliente 24/7", "Sustituir los productos de la tienda", "Eliminar la publicidad", "Regalar compras"], correct: 0, exp: "Atienden consultas frecuentes del cliente de manera inmediata y continuada." },
+            { q: "¿Qué lenguaje de programación destaca por su uso en la creación de aplicaciones para móviles Android?", options: ["Java", "C#", "PHP", "JavaScript"], correct: 0, exp: "Java es ampliamente utilizado para la programación en entornos Android y sistemas IoT." },
+            { q: "¿En qué consiste el 'envenenamiento de datos' en ciberseguridad para IA?", options: ["Derramar líquidos en el servidor", "Introducir datos falsos o sesgados intencionadamente para corromper el aprendizaje del modelo", "Borrar carpetas por error", "Quedarse sin espacio en disco"], correct: 1, exp: "Es una técnica de ciberataque destinada a desorientar el comportamiento futuro del algoritmo." }
+        ];
+
+        const tutorDatabase = [
+            {
+                title: "1. Machine Learning vs Deep Learning",
+                simple: "El Machine Learning tradicional decide mediante una lista rígida de reglas ('Si hace sol y tengo tiempo, voy andando'). El Deep Learning funciona mediante redes neuronales que analizan todas las variables a la vez (tiempo, distancia, hambre, tráfico, cansancio) para tomar la decisión global.",
+                example: "En banca: El Machine Learning evalúa si concederte un préstamo mirando 2 o 3 casillas rígidas. El Deep Learning analiza miles de patrones de tu historial financiero simultáneamente.",
+                sector: "Sector Financiero y Riesgo"
+            },
+            {
+                title: "2. Formas de Aprendizaje Automático",
+                simple: "Existen 3 formas: Supervisado (el profesor te da preguntas con respuestas para estudiar), No Supervisado (te dan una caja de objetos y debes agruparlos por similitud tú solo) y Por Refuerzo (aprendes a jugar mediante ensayo-error, ganando puntos o perdiéndolos).",
+                example: "Filtro de Spam (Supervisado), Segmentación de clientes por hábitos (No supervisado), Robótica de navegación (Por refuerzo).",
+                sector: "Marketing y Automatización"
+            },
+            {
+                title: "3. IA Estrecha (Débil) vs IA General (Fuerte)",
+                simple: "La IA Estrecha es un especialista en una sola cosa (un traductor, Siri, un recomendador de Netflix). La IA General (AGI) sería un sistema que pudiera razonar y aprender cualquier trabajo humano. A día de hoy la AGI no existe.",
+                example: "Un bot de atención al cliente resuelve dudas de facturas (IA estrecha), pero no puede escribir una novela ni diagnosticar una avería mecánica.",
+                sector: "Atención al Cliente"
+            },
+            {
+                title: "4. Test de Turing e Historia de la IA",
+                simple: "Alan Turing propuso en los años 50 que una máquina es inteligente si chateas con ella y no logras adivinar si es un humano o un ordenador. La IA ha pasado por épocas de gran ilusión y 'inviernos de la IA' por falta de potencia.",
+                example: "Los chatbots modernos superan el Test de Turing en conversaciones cotidianas haciendo dudar al usuario.",
+                sector: "Servicios Digitales"
+            },
+            {
+                title: "5. IA Generativa y Prompts",
+                simple: "La IA generativa crea texto, imágenes o código desde cero. Un 'Prompt' es la orden que le das. Si le das un prompt ambiguo, el resultado será deficiente; si le das un prompt detallado, generará el trabajo exacto.",
+                example: "Pedir 'Haz un contrato' genera una plantilla genérica. Pedir 'Redacta una plantilla de contrato de alquiler comercial según la ley vigente' genera el documento ajustado.",
+                sector: "Gestión Administrativa"
+            },
+            {
+                title: "6. Lenguajes de Programación en IA",
+                simple: "Python es el rey de la IA por ser sencillo y manejar grandes volúmenes de datos. JavaScript lidera en desarrollo web e IoT (10,7M desarrolladores). Java domina en móviles Android.",
+                example: "Un científico de datos programa el algoritmo en Python y el diseñador web lo conecta a la página mediante JavaScript.",
+                sector: "Tecnologías de la Información"
+            },
+            {
+                title: "7. Aplicaciones en Finanzas y Detección del Fraude",
+                simple: "La IA analiza millones de transacciones con tarjeta en milisegundos. Si detecta un patrón inusual (comprar en dos países a la vez), bloquea la tarjeta al instante.",
+                example: "Banca online alertando al cliente de un intento de duplicación de tarjeta en el extranjero.",
+                sector: "Banca y Finanzas"
+            },
+            {
+                title: "8. IA en Recursos Humanos y Selección de Personal",
+                simple: "Los algoritmos analizan cientos de currículums buscando las competencias idóneas, ayudando a filtrar candidatos sin los sesgos subjetivos que afectan a los humanos.",
+                example: "Un software que evalúa de forma transparente la experiencia relevante sin conocer el género o la edad del solicitante.",
+                sector: "Recursos Humanos"
+            },
+            {
+                title: "9. IA en Marketing y Servicio Postventa",
+                simple: "Permite analizar el historial de compra del cliente para ofrecerle recomendaciones exactas y resolver dudas 24/7 mediante asistentes virtuales interactivos.",
+                example: "Plataformas como Amazon o Netflix sugiriendo productos o películas en función de lo que consumiste ayer.",
+                sector: "Comercio Electrónico"
+            },
+            {
+                title: "10. Robótica, Impresión 3D y Realidad Virtual",
+                simple: "La IA se integra con robots para ayudar a mayores, con impresoras 3D para corregir fallos mientras se fabrica la pieza, y con gafas VR para simulaciones de formación profesional.",
+                example: "Simuladores de vuelo con VR para pilotos o gafas inteligentes para guiado de conductores.",
+                sector: "Industria y Sanidad"
+            },
+            {
+                title: "11. Nube, IoT y Blockchain unidos a la IA",
+                simple: "La Nube permite alquilar potencia de cálculo sin comprar servidores. El IoT conecta sensores físicos a la IA. El Blockchain aporta un registro inalterable para evitar manipulaciones.",
+                example: "Una granja inteligente con sensores de humedad (IoT) procesados en la nube para regar exactamente cuando sea preciso.",
+                sector: "Infraestructura Digital"
+            },
+            {
+                title: "12. Mercado Laboral: Amenazas y Nuevos Roles",
+                simple: "La IA automatiza tareas repetitivas amenazando empleos tradicionales (pilotos, tareas administrativas básicas), pero crea nuevas profesiones clave como 'Entrenador de IA' o 'Experto en Ciberseguridad de IA'.",
+                example: "Nuevas ofertas de empleo buscando especialistas para entrenar modelos de IA o evitar ataques de 'envenenamiento de datos'.",
+                sector: "Mercado de Trabajo"
+            }
+        ];
+
+        // ESTADO GLOBAL DE LA APLICACIÓN
+        let currentCardIndex = 0;
+        let score = 0;
+        let fontSizeLevel = 16;
+
+        // INICIALIZACIÓN
+        window.onload = function() {
+            updateCounters();
+            renderCard(currentCardIndex);
+            renderQuiz();
+            renderTutorConcepts();
+            
+            document.getElementById('toggleAccessibility').addEventListener('click', toggleAccessibilityMode);
+            document.getElementById('increaseFont').addEventListener('click', () => changeFontSize(1));
+            document.getElementById('decreaseFont').addEventListener('click', () => changeFontSize(-1));
+        };
+
+        function updateCounters() {
+            document.getElementById('cardsCount').innerText = rawCards.length;
+            document.getElementById('quizCount').innerText = rawQuiz.length;
+            document.getElementById('tutorCount').innerText = tutorDatabase.length;
+        }
+
+        // CONTROL DE PESTAÑAS
+        function switchTab(tabId, event) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            if (event) event.target.classList.add('active');
+        }
+
+        // MÓDULO 1: TARJETAS INTELEGENTES
+        function renderCard(index) {
+            if (rawCards.length === 0) return;
+            const card = rawCards[index];
+            const flashcardEl = document.getElementById('activeFlashcard');
+            flashcardEl.classList.remove('flipped');
+            
+            setTimeout(() => {
+                document.getElementById('cardFrontTag').innerText = card.tag;
+                document.getElementById('cardFrontText').innerText = card.question;
+                document.getElementById('cardBackTag').innerText = card.tag;
+                document.getElementById('cardBackText').innerText = card.answer;
+                
+                document.getElementById('cardProgressText').innerText = `Tarjeta ${index + 1} de ${rawCards.length}`;
+                document.getElementById('cardProgressBar').style.width = `${((index + 1) / rawCards.length) * 100}%`;
+            }, 150);
+        }
+
+        function flipCard() {
+            document.getElementById('activeFlashcard').classList.toggle('flipped');
+        }
+
+        function nextCard() {
+            currentCardIndex = (currentCardIndex + 1) % rawCards.length;
+            renderCard(currentCardIndex);
+        }
+
+        function prevCard() {
+            currentCardIndex = (currentCardIndex - 1 + rawCards.length) % rawCards.length;
+            renderCard(currentCardIndex);
+        }
+
+        function shuffleCards() {
+            currentCardIndex = Math.floor(Math.random() * rawCards.length);
+            renderCard(currentCardIndex);
+        }
+
+        // MÓDULO 2: CUESTIONARIO
+        function renderQuiz() {
+            const container = document.getElementById('quizContainer');
+            container.innerHTML = '';
+
+            rawQuiz.forEach((qItem, qIdx) => {
+                const quizCard = document.createElement('div');
+                quizCard.className = 'quiz-card';
+                quizCard.id = `quiz_item_${qIdx}`;
+                
+                let optionsHTML = '';
+                qItem.options.forEach((opt, optIdx) => {
+                    optionsHTML += `
+                        <li>
+                            <button class="option-btn" id="q_${qIdx}_opt_${optIdx}" onclick="checkAnswer(${qIdx}, ${optIdx})">
+                                ${String.fromCharCode(65 + optIdx)}) ${opt}
+                            </button>
+                        </li>
+                    `;
+                });
+
+                quizCard.innerHTML = `
+                    <div class="quiz-question">${qIdx + 1}. ${qItem.q}</div>
+                    <ul class="options-list">${optionsHTML}</ul>
+                    <div class="explanation-box" id="exp_${qIdx}">
+                        <strong>💡 Explicación del tema:</strong> ${qItem.exp}
+                    </div>
+                `;
+                container.appendChild(quizCard);
+            });
+            updateScoreBadge();
+        }
+
+        function checkAnswer(questionIdx, optionIdx) {
+            const qItem = rawQuiz[questionIdx];
+            const expBox = document.getElementById(`exp_${questionIdx}`);
+            
+            for (let i = 0; i < qItem.options.length; i++) {
+                const btn = document.getElementById(`q_${questionIdx}_opt_${i}`);
+                btn.disabled = true;
+                if (i === qItem.correct) {
+                    btn.classList.add('correct');
+                } else if (i === optionIdx) {
+                    btn.classList.add('incorrect');
+                }
+            }
+
+            if (optionIdx === qItem.correct) {
+                score++;
+            }
+            expBox.style.display = 'block';
+            updateScoreBadge();
+        }
+
+        function updateScoreBadge() {
+            document.getElementById('scoreBadge').innerText = `Puntuación: ${score} / ${rawQuiz.length}`;
+        }
+
+        function resetQuiz() {
+            score = 0;
+            renderQuiz();
+        }
+
+        // MÓDULO 3: TUTOR DIDÁCTICO
+        function renderTutorConcepts() {
+            const listContainer = document.getElementById('conceptListContainer');
+            listContainer.innerHTML = '';
+
+            tutorDatabase.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = `concept-item ${index === 0 ? 'active' : ''}`;
+                div.innerText = item.title;
+                div.onclick = () => selectConcept(index, div);
+                listContainer.appendChild(div);
+            });
+
+            if (tutorDatabase.length > 0) {
+                displayConceptDetails(0);
+            }
+        }
+
+        function selectConcept(index, element) {
+            document.querySelectorAll('.concept-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            displayConceptDetails(index);
+        }
+
+        function displayConceptDetails(index) {
+            const item = tutorDatabase[index];
+            document.getElementById('tutorTitle').innerText = item.title;
+            document.getElementById('tutorBody').innerHTML = `
+                <div style="margin-bottom: 1.2rem;">
+                    <h4 style="color: var(--primary);">🗣️ En palabras sencillas:</h4>
+                    <p>${item.simple}</p>
+                </div>
+                <div style="margin-bottom: 1.2rem; background: rgba(37, 99, 235, 0.05); padding: 1rem; border-radius: 6px; border: 1px solid var(--border-color);">
+                    <h4 style="color: var(--secondary);">🏢 Ejemplo Práctico en el Sector Productivo:</h4>
+                    <p>${item.example}</p>
+                </div>
+                <div>
+                    <span class="card-tag" style="position: static;">Área de Aplicación: ${item.sector}</span>
+                </div>
+            `;
+        }
+
+        function filterConcepts() {
+            const query = document.getElementById('tutorSearch').value.toLowerCase();
+            const items = document.querySelectorAll('.concept-item');
+            
+            tutorDatabase.forEach((item, idx) => {
+                const match = item.title.toLowerCase().includes(query) || item.simple.toLowerCase().includes(query);
+                if (items[idx]) {
+                    items[idx].style.display = match ? 'block' : 'none';
+                }
+            });
+        }
+
+        // CONSULTA A API GEMINI EN VIVO (OPCIONAL)
+        async function askLiveAI() {
+            const key = document.getElementById('geminiApiKey').value.trim();
+            const prompt = document.getElementById('livePrompt').value.trim();
+            const resDiv = document.getElementById('apiResponse');
+
+            if (!key) {
+                alert("Por favor, introduce tu clave API Key de Google Gemini para usar la tutoría en vivo.");
+                return;
+            }
+            if (!prompt) {
+                alert("Escribe una duda para consultar al tutor.");
+                return;
+            }
+
+            resDiv.style.display = "block";
+            resDiv.innerHTML = "⏳ Consultando al Tutor IA sobre el Tema 4...";
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: `Eres un tutor docente del módulo 'Digitalización Aplicada a los Sectores Productivos' para CFGS de Administración y Finanzas. Responde brevemente y de forma muy didáctica a la siguiente duda del alumno basándote en la materia del Tema 4 (Inteligencia Artificial): ${prompt}`
+                            }]
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                if (data.candidates && data.candidates[0].content.parts[0].text) {
+                    resDiv.innerHTML = `<strong>🤖 Respuesta del Tutor:</strong><br>${data.candidates[0].content.parts[0].text.replace(/\n/g, '<br>')}`;
+                } else {
+                    resDiv.innerHTML = "❌ No se pudo obtener una respuesta válida. Revisa tu API Key.";
+                }
+            } catch (err) {
+                resDiv.innerHTML = "❌ Error al conectar con la API de Gemini. Revisa tu clave y conexión.";
+            }
+        }
+
+        // MÓDULO 4: GENERADOR DE RECURSOS (CORREGIDO Y TOTALMENTE FUNCIONAL)
+        function generateNewCard() {
+            const topic = document.getElementById('genTopicSelect').value;
+            const output = document.getElementById('generatorOutput');
+            output.style.display = 'block';
+
+            let newQ = "", newA = "", tag = "";
+
+            switch(topic) {
+                case 'evolucion':
+                    newQ = "¿Qué diferencia los modelos avanzados de lenguaje de los años 2020 respecto a la IA de los años 80?";
+                    newA = "Los modelos de los 2020 (NLP/LLM) aprenden patrones complejos del lenguaje humano sobre volúmenes masivos de texto, redactando, traduciendo y analizando emociones, a diferencia de los sistemas expertos rígidos de los 80.";
+                    tag = "Evolución 2020";
+                    break;
+                case 'tipos':
+                    newQ = "¿Por qué un asistente como Siri o Alexa se clasifica como IA Estrecha o Débil?";
+                    newA = "Porque están diseñados específicamente para responder comandos y ejecutar tareas concretas dentro de su ámbito, sin capacidad cognitiva general fuera de él.";
+                    tag = "IA Estrecha";
+                    break;
+                case 'aprendizaje':
+                    newQ = "¿Cómo aborda el Deep Learning la toma de decisiones complejas?";
+                    newA = "Mediante redes neuronales artificiales que evalúan multitud de datos y variables de forma combinada y simultánea, de modo análogo al cerebro humano.";
+                    tag = "Deep Learning";
+                    break;
+                case 'generativa':
+                    newQ = "¿Qué lenguajes destacan para el desarrollo en la Nube e Internet de las Cosas (IoT)?";
+                    newA = "JavaScript (10,7M de desarrolladores) y Java (7,1M de desarrolladores).";
+                    tag = "Lenguajes & IoT";
+                    break;
+                case 'sectores':
+                    newQ = "¿Cómo ayuda la Inteligencia Artificial a las empresas proveedoras de suministros (luz, agua, gas)?";
+                    newA = "Optimiza la distribución y el uso eficiente de la energía en hogares y empresas.";
+                    tag = "Sector Energético";
+                    break;
+                case 'laboral':
+                    newQ = "¿Cuál es el rol principal del 'Experto en Ciberseguridad' en el ámbito de la IA?";
+                    newA = "Proteger los modelos de IA frente a ciberataques externos como el envenenamiento de datos o el hackeo de algoritmos.";
+                    tag = "Ciberseguridad";
+                    break;
+            }
+
+            // CORRECCIÓN CLAVE: Añadir dinámicamente al arreglo activo rawCards
+            rawCards.push({ question: newQ, answer: newA, tag: tag });
+            updateCounters();
+
+            // Renderizar la nueva tarjeta directamente si el usuario quiere revisarla
+            currentCardIndex = rawCards.length - 1;
+            renderCard(currentCardIndex);
+
+            output.innerHTML = `
+                <div style="background-color: #d1fae5; color: #065f46; padding: 0.8rem; border-radius: 6px; margin-bottom: 0.8rem;">
+                    ✅ <strong>¡Nueva Tarjeta Creada e Incorporada con Éxito!</strong> (Ahora hay ${rawCards.length} tarjetas).
+                </div>
+                <p><strong>Pregunta:</strong> ${newQ}</p>
+                <p><strong>Respuesta:</strong> ${newA}</p>
+                <button class="btn btn-outline" style="margin-top: 0.5rem;" onclick="switchTab('flashcards', null)"> Ver Tarjeta en el Módulo 1 ➡️</button>
+            `;
+        }
+
+        function generateNewQuestion() {
+            const topic = document.getElementById('genTopicSelect').value;
+            const output = document.getElementById('generatorOutput');
+            output.style.display = 'block';
+
+            let qObj = null;
+
+            if (topic === 'evolucion') {
+                qObj = {
+                    q: "¿Qué fenómeno de los años 90 permitió el paso de una IA académica a herramientas cotidianas como buscadores?",
+                    options: ["La invención del microchip", "La expansión de la Web y la generación masiva de datos", "El lanzamiento de los smartphones", "La creación de ordenadores cuánticos"],
+                    correct: 1,
+                    exp: "La expansión masiva de datos en la web exigió algoritmos para clasificar y organizar la información."
+                };
+            } else if (topic === 'laboral') {
+                qObj = {
+                    q: "¿Qué profesional se encarga de alimentar los algoritmos con datos de calidad y corregir sesgos iniciales?",
+                    options: ["Piloto autónomo", "Entrenador de modelos de IA", "Técnico de redes físicas", "Diseñador gráfico tradicional"],
+                    correct: 1,
+                    exp: "El entrenador de modelos curará y etiquetará los datos para garantizar un aprendizaje correcto."
+                };
+            } else {
+                qObj = {
+                    q: "¿Qué beneficio ofrece el uso de la IA en el área de Logística y Transporte?",
+                    options: ["Aumentar el precio del combustible", "Optimizar el tráfico y evitar colisiones", "Eliminar los camiones", "Fabricar neumáticos"],
+                    correct: 1,
+                    exp: "La IA analiza rutas en tiempo real y previene accidentes optimizando el tráfico urbano e interurbano."
+                };
+            }
+
+            // CORRECCIÓN CLAVE: Añadir al arreglo activo rawQuiz y volver a renderizar el test
+            rawQuiz.push(qObj);
+            updateCounters();
+            renderQuiz();
+
+            const newQIdx = rawQuiz.length - 1;
+
+            output.innerHTML = `
+                <div style="background-color: #d1fae5; color: #065f46; padding: 0.8rem; border-radius: 6px; margin-bottom: 0.8rem;">
+                    ✅ <strong>¡Nueva Pregunta Múltiple Añadida con Éxito al Cuestionario!</strong> (Total: ${rawQuiz.length} preguntas).
+                </div>
+                <p><strong>Pregunta:</strong> ${qObj.q}</p>
+                <p><strong>Respuesta Correcta:</strong> ${qObj.options[qObj.correct]}</p>
+                <button class="btn btn-outline" style="margin-top: 0.5rem;" onclick="scrollToNewQuestion(${newQIdx})">Ir a la Pregunta en el Cuestionario ➡️</button>
+            `;
+        }
+
+        function scrollToNewQuestion(qIdx) {
+            switchTab('quiz', null);
+            const el = document.getElementById(`quiz_item_${qIdx}`);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // ACCESIBILIDAD Y PERSONALIZACIÓN
+        function toggleAccessibilityMode() {
+            document.body.classList.toggle('accessible-mode');
+            const btn = document.getElementById('toggleAccessibility');
+            if (document.body.classList.contains('accessible-mode')) {
+                btn.style.backgroundColor = '#fef08a';
+                btn.style.color = '#000000';
+            } else {
+                btn.style.backgroundColor = 'transparent';
+                btn.style.color = '#ffffff';
+            }
+        }
+
+        function changeFontSize(delta) {
+            fontSizeLevel += delta;
+            if (fontSizeLevel < 12) fontSizeLevel = 12;
+            if (fontSizeLevel > 22) fontSizeLevel = 22;
+            document.documentElement.style.setProperty('--font-size-base', fontSizeLevel + 'px');
+        }
+    </script>
+</body>
+</html>
