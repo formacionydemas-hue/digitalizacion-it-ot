@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DASP - Unidad 2: Tecnologías Habilitadoras Digitales (THD)</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #0f172a;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #334155;
+            --text-heading: #0f172a;
+            --accent: #10b981;
+            --accent-warn: #ef4444;
+            --border: #cbd5e1;
+            --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --line-height: 1.5;
+            --letter-spacing: normal;
+            --font-base: 16px;
+        }
+
+        /* Modo Texto Expandido (Lectura Accesible) */
+        body.accessible-reading {
+            --font-family: 'Atkinson Hyperlegible', Verdana, sans-serif;
+            --line-height: 1.85;
+            --letter-spacing: 0.04em;
+            --bg: #faf8f5;
+            --card-bg: #ffffff;
+            --text: #111827;
+            --border: #94a3b8;
+        }
+
+        /* Modo Alto Contraste */
+        body.high-contrast {
+            --bg: #000000;
+            --card-bg: #121212;
+            --text: #ffffff;
+            --text-heading: #fbbf24;
+            --primary: #60a5fa;
+            --border: #555555;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family);
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: var(--line-height);
+            letter-spacing: var(--letter-spacing);
+            font-size: var(--font-base);
+            padding-bottom: 50px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        header {
+            background-color: var(--secondary);
+            color: #ffffff;
+            padding: 1.25rem 1.5rem;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            color: #ffffff;
+            margin-bottom: 0.25rem;
+        }
+
+        header p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .container {
+            max-width: 1050px;
+            margin: 1.25rem auto;
+            padding: 0 1rem;
+        }
+
+        /* Barra de herramientas */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            margin-bottom: 1.25rem;
+            gap: 0.75rem;
+        }
+
+        .toolbar-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-toggle {
+            background: #e2e8f0;
+            border: none;
+            padding: 0.45rem 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #0f172a;
+        }
+
+        .btn-toggle:hover {
+            background: #cbd5e1;
+        }
+
+        .btn-toggle.active {
+            background: var(--primary);
+            color: #ffffff;
+        }
+
+        /* Navegación por pestañas compacta (sin scrollbar) */
+        nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.25rem;
+        }
+
+        .tab-btn {
+            padding: 0.6rem 1rem;
+            border: none;
+            background: none;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            border-radius: 6px 6px 0 0;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            background: rgba(37, 99, 235, 0.08);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background: var(--card-bg);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Tarjetas Inteligentes (Flashcards) */
+        .flashcard-container {
+            perspective: 1000px;
+            max-width: 620px;
+            margin: 1.5rem auto;
+            height: 300px;
+        }
+
+        .flashcard {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease;
+            cursor: pointer;
+            border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 14px;
+            padding: 1.75rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        body.high-contrast .card-back {
+            background: #1e293b;
+            color: #ffffff;
+        }
+
+        .card-badge {
+            position: absolute;
+            top: 0.85rem;
+            left: 0.85rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .card-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .btn-action {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.55rem 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .btn-action:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-success {
+            background: var(--accent);
+        }
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        /* Cuestionarios */
+        .quiz-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 1.25rem;
+            border: 1px solid var(--border);
+            margin-bottom: 1.25rem;
+        }
+
+        .quiz-question {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-heading);
+            margin-bottom: 0.85rem;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 0.6rem;
+        }
+
+        .option-btn {
+            text-align: left;
+            padding: 0.75rem 0.9rem;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.15s;
+        }
+
+        .option-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .option-btn.correct {
+            background: #d1fae5 !important;
+            border-color: #10b981 !important;
+            color: #065f46 !important;
+            font-weight: 700;
+        }
+
+        .option-btn.incorrect {
+            background: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
+        }
+
+        .explanation-box {
+            margin-top: 0.85rem;
+            padding: 0.85rem;
+            border-radius: 6px;
+            background: #eff6ff;
+            border-left: 4px solid var(--primary);
+            font-size: 0.88rem;
+            display: none;
+        }
+
+        /* Tutor Virtual y Generador */
+        .interactive-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group {
+            margin-bottom: 0.85rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+            color: var(--text-heading);
+        }
+
+        select, input {
+            width: 100%;
+            padding: 0.65rem;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+
+        .response-box {
+            margin-top: 1rem;
+            padding: 1.1rem;
+            border-radius: 8px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            min-height: 70px;
+        }
+
+        /* Estilos diferenciados para Explicación y Analogía en Tutor */
+        .tutor-section {
+            margin-bottom: 0.85rem;
+        }
+
+        .tutor-section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 0.95rem;
+            margin-bottom: 0.3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .tutor-section-analogy .tutor-section-title {
+            color: #d97706; /* Color ámbar para destacar la analogía */
+        }
+
+        .tutor-text {
+            font-size: 0.93rem;
+            line-height: 1.55;
+            background: #ffffff;
+            padding: 0.75rem 0.9rem;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        body.high-contrast .tutor-text {
+            background: #18181b;
+        }
+
+        .toast-notify {
+            padding: 0.6rem 1rem;
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+            border-radius: 6px;
+            margin-top: 0.75rem;
+            font-weight: 600;
+            font-size: 0.88rem;
+            display: none;
+        }
+
+        .progress-bar-bg {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0.75rem 0 1.25rem 0;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .score-summary {
+            font-size: 1.15rem;
+            font-weight: bold;
+            text-align: center;
+            margin: 1.25rem 0;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>DASP - Digitalización Aplicada a los Sectores Productivos</h1>
+    <p>Unidad 2: Las Tecnologías Habilitadoras Digitales (THD) | FP Grado Superior Administración y Finanzas</p>
+</header>
+
+<div class="container">
+
+    <!-- BARRA DE ACCESIBILIDAD -->
+    <div class="toolbar">
+        <div class="toolbar-group">
+            <button class="btn-toggle" id="btn-expanded-text" onclick="toggleExpandedText()">📖 Texto expandido</button>
+            <button class="btn-toggle" id="btn-high-contrast" onclick="toggleContrast()">🌗 Alto contraste</button>
+        </div>
+        <div class="toolbar-group">
+            <span style="font-size: 0.85rem; font-weight:600;">Tamaño de letra:</span>
+            <button class="btn-toggle" onclick="changeFontSize(-1)">A-</button>
+            <button class="btn-toggle" onclick="changeFontSize(0)">A</button>
+            <button class="btn-toggle" onclick="changeFontSize(1)">A+</button>
+        </div>
+    </div>
+
+    <!-- NAVEGACIÓN PRINCIPAL -->
+    <nav>
+        <button class="tab-btn active" onclick="switchTab('tab-cards')">🃏 Tarjetas (<span id="total-cards-badge">30</span>)</button>
+        <button class="tab-btn" onclick="switchTab('tab-quiz')">📝 Cuestionario (<span id="total-quiz-badge">30</span>)</button>
+        <button class="tab-btn" onclick="switchTab('tab-tutor')">💡 Tutor Virtual</button>
+        <button class="tab-btn" onclick="switchTab('tab-generator')">⚡ Generador de Recursos</button>
+    </nav>
+
+    <!-- SECCIÓN 1: TARJETAS INTELIGENTES -->
+    <div id="tab-cards" class="tab-content active">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <p><strong>Progreso de estudio:</strong> <span id="card-counter">1 / 30</span></p>
+            <button class="btn-toggle" onclick="shuffleCards()">🎲 Mezclar mazo</button>
+        </div>
+
+        <div class="flashcard-container">
+            <div class="flashcard" id="flashcard" onclick="flipCard()">
+                <div class="card-face">
+                    <span class="card-badge" id="card-category">Categoría</span>
+                    <p id="card-front-text" style="font-size:1.1rem; font-weight:600;">Cargando pregunta...</p>
+                    <small style="margin-top: 1.25rem; color: #64748b;">(Haz clic en la tarjeta para voltearla)</small>
+                </div>
+                <div class="card-face card-back">
+                    <p id="card-back-text" style="font-size:0.95rem;">Cargando explicación...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-controls">
+            <button class="btn-action" onclick="prevCard()">Anterior</button>
+            <button class="btn-action" onclick="flipCard()">Voltear</button>
+            <button class="btn-action" onclick="nextCard()">Siguiente</button>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 2: CUESTIONARIO MULTIOPCIÓN -->
+    <div id="tab-quiz" class="tab-content">
+        <p>Responde a las preguntas basadas rigurosamente en el temario oficial de la Unidad 2.</p>
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="quiz-progress"></div>
+        </div>
+
+        <div id="quiz-container"></div>
+
+        <div class="score-summary" id="score-summary" style="display:none;"></div>
+        <div style="text-align: center; margin-top: 1rem;">
+            <button class="btn-action" onclick="resetQuiz()">Reiniciar Cuestionario</button>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 3: TUTOR VIRTUAL (EXPLICACIÓN SENCILLA Y ANALOGÍA DIFERENCIADAS) -->
+    <div id="tab-tutor" class="tab-content">
+        <div class="interactive-panel">
+            <h2>💡 Explicador Didáctico y Aclaración de Conceptos</h2>
+            <p style="margin-bottom: 0.85rem; font-size:0.9rem;">Consulta cualquier concepto clave del tema para obtener una explicación sencilla y comprensible para un profano, acompañada de una analogía práctica.</p>
+
+            <div class="form-group">
+                <label for="concept-select">Selecciona un concepto del tema:</label>
+                <select id="concept-select" onchange="explainConcept()">
+                    <option value="">-- Selecciona un concepto --</option>
+                    <option value="td">Transformación Digital vs Adopción Tecnológica</option>
+                    <option value="thd">Tecnologías Habilitadoras Digitales (THD)</option>
+                    <option value="ia">Inteligencia Artificial y Machine Learning</option>
+                    <option value="bigdata">Big Data y las 5 Vs</option>
+                    <option value="iot">Internet de las Cosas (IoT) y Sensores en Retail</option>
+                    <option value="cloud">Cloud Computing (IaaS, PaaS, SaaS)</option>
+                    <option value="blockchain">Blockchain y Contratos Inteligentes</option>
+                    <option value="ciberseguridad">Ciberseguridad y Estrategia Zero Trust</option>
+                    <option value="it_ot">Integración IT / OT y Mantenimiento Predictivo</option>
+                    <option value="churning">Fuga de Clientes (Churning) con IA</option>
+                    <option value="sesgo">Sesgo Algorítmico y de Estandarización</option>
+                    <option value="gafan">Empresas GAFAN y Valor de Datos</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="custom-query">O escribe una duda o término concreto del temario:</label>
+                <input type="text" id="custom-query" placeholder="Ej: ¿Qué relación hay entre el Cloud Computing y la sostenibilidad?">
+            </div>
+
+            <button class="btn-action" onclick="handleCustomQuery()">Explicar concepto</button>
+
+            <div class="response-box" id="tutor-response">
+                <em>Selecciona un concepto o escribe una consulta para ver su explicación y analogía.</em>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 4: GENERADOR DE RECURSOS -->
+    <div id="tab-generator" class="tab-content">
+        <div class="interactive-panel">
+            <h2>⚡ Generador Dinámico de Recursos de Estudio</h2>
+            <p style="margin-bottom: 0.85rem; font-size:0.9rem;">Genera nuevos recursos basados en el contenido del PDF e incorpóralos directamente a tu mazo de tarjetas o cuestionario activo.</p>
+
+            <div class="form-group">
+                <label for="gen-topic">Área temática del PDF:</label>
+                <select id="gen-topic">
+                    <option value="ia_data">Inteligencia Artificial, ML y Big Data</option>
+                    <option value="iot_cloud">IoT y Cloud Computing</option>
+                    <option value="block_ciber">Blockchain y Ciberseguridad</option>
+                    <option value="estrategia">Integración IT/OT y Estrategia de Negocio</option>
+                    <option value="etica_rol">Sostenibilidad, Ética y Rol Profesional DASP</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
+                <button class="btn-action" onclick="generateNewCard()">Generar Tarjeta</button>
+                <button class="btn-action" onclick="generateNewQuestion()">Generar Pregunta</button>
+            </div>
+
+            <div class="response-box" id="generator-output">
+                <em>Elige una temática y haz clic en uno de los botones para generar un recurso nuevo.</em>
+            </div>
+
+            <div class="toast-notify" id="toast-notify"></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+/* BANCO OFICIAL DE TARJETAS INTELIGENTES (30 INICIALES SIN CITAS DE FORMATO [cite]) */
+let flashcardsData = [
+    { cat: "Introducción THD", q: "¿En qué consiste la Transformación Digital (TD) según el módulo?", a: "No es simplemente la adopción de tecnologías, sino una reinvención fundamental de la manera en que las empresas operan y entregan valor en la Industria 4.0." },
+    { cat: "Introducción THD", q: "¿Qué son las Tecnologías Habilitadoras Digitales (THD)?", a: "Son el conjunto de herramientas tecnológicas avanzadas que actúan como catalizadores de la innovación empresarial." },
+    { cat: "Introducción THD", q: "¿Cuál es el doble propósito de las THD?", a: "1) Innovar en productos y servicios (abriendo nuevos mercados). 2) Mejorar la eficiencia operativa y contribuir a una economía más sostenible." },
+    { cat: "IA y Machine Learning", q: "¿Cuál es la diferencia entre IA y Machine Learning (ML)?", a: "La IA permite a las máquinas simular la inteligencia humana (razonamiento, decisiones). El ML es la subdisciplina que permite aprender autónomamente de grandes volúmenes de datos." },
+    { cat: "IA y Machine Learning", q: "¿Qué capacidades destaca la IA Generativa en el ámbito empresarial?", a: "Genera texto (artículos, correos), imágenes (logos) y código de programación. Netflix y Amazon la usan para tomar decisiones de producción o recomendación." },
+    { cat: "Big Data", q: "¿Cómo se define el concepto de Big Data?", a: "Procesamiento de volúmenes de datos tan grandes y complejos que superan las herramientas tradicionales, procedentes de redes sociales, transacciones e IoT." },
+    { cat: "Big Data", q: "¿Cuáles son las '5 Vs' que definen al Big Data?", a: "Volumen (cantidad masiva), Velocidad (generación rápida), Variedad (diferentes formatos), Veracidad (calidad/precisión) y Valor (insights accionables)." },
+    { cat: "Big Data", q: "¿Qué ventaja destaca Apache Spark frente a Hadoop MapReduce?", a: "Apache Spark realiza el procesamiento de datos en memoria, ofreciendo una velocidad muy superior a Hadoop MapReduce." },
+    { cat: "IoT", q: "¿Qué es el Internet de las Cosas (IoT)?", a: "Red de dispositivos físicos (sensores, máquinas, vehículos) interconectados que recopilan y comparten datos por Internet, fusionando el mundo físico y digital." },
+    { cat: "IoT", q: "¿Cómo se aplica el IoT en el sector Retail de alimentación?", a: "Sensores de temperatura en refrigeradores emiten alertas en tiempo real y ajustan horarios de enfriamiento. Se usan también etiquetas RFID y sensores de movimiento." },
+    { cat: "Cloud Computing", q: "¿Cuáles son los beneficios clave del Cloud Computing?", a: "Acceso flexible a recursos informáticos por Internet bajo pago por uso, escalabilidad, reducción de costes de infraestructura física y democratización para PYMEs." },
+    { cat: "Cloud Computing", q: "¿Cuáles son los tres modelos de servicio de Cloud Computing?", a: "IaaS (Infraestructura como Servicio), PaaS (Plataforma como Servicio) y SaaS (Software como Servicio)." },
+    { cat: "Cloud Computing", q: "¿Qué uso hacen empresas como Dropbox y Netflix de la nube?", a: "Dropbox utiliza la nube para almacenamiento masivo escalable; Netflix para desplegar funciones rápidamente y atender la demanda global de streaming." },
+    { cat: "Blockchain", q: "¿Qué es Blockchain y cuál es su valor principal?", a: "Un registro distribuido (libro contable digital) inmutable, seguro y descentralizado. Su valor principal es eliminar la necesidad de intermediarios centrales de confianza." },
+    { cat: "Blockchain", q: "¿Qué son los Smart Contracts (Contratos Inteligentes)?", a: "Acuerdos autoejecutables escritos en código de programación que se ejecutan automáticamente en Blockchain." },
+    { cat: "Ciberseguridad", q: "¿Cuáles son las tres amenazas cibernéticas más comunes mencionadas?", a: "Malware (virus, ransomware), Phishing (ingeniería social para robo de datos) y ataques DDoS (Denegación de Servicio)." },
+    { cat: "Ciberseguridad", q: "¿En qué consiste la estrategia de Ciberseguridad 'Zero Trust'?", a: "Confianza Cero: no confía automáticamente en ningún usuario o dispositivo (interno o externo), verificando siempre su identidad y autorización." },
+    { cat: "Estrategia THD", q: "¿Qué significan las siglas IT y OT?", a: "IT = Tecnología de la Información (datos/procesamiento). OT = Tecnología Operativa (control físico y funcionamiento de dispositivos)." },
+    { cat: "Estrategia THD", q: "¿Cómo beneficia la integración IT / OT al mantenimiento industrial?", a: "Combina datos de IT con sensores de OT para aplicar mantenimiento predictivo, anticipando fallos y reduciendo tiempos de inactividad de máquinas." },
+    { cat: "Estrategia THD", q: "¿Qué es el 'Churning' y cómo ayudan el Big Data y la IA a evitarlo?", a: "Es la fuga de clientes. La IA predice cuándo un cliente se irá para que la empresa le lance una oferta personalizada de retención con alto ROI." },
+    { cat: "Estrategia THD", q: "¿Qué es la Ciberseguridad como Servicio (Security as a Service)?", a: "Modelo de negocio (SaaS) que ofrece protección cibernética bajo demanda sin requerir que la empresa invierta en infraestructura propia." },
+    { cat: "Estrategia THD", q: "¿Qué resultado cuantitativo logró el caso práctico en manufactura citado?", a: "Una reducción del 20% en el tiempo de inactividad de máquinas y un incremento del 15% en la eficiencia de producción." },
+    { cat: "Sostenibilidad y Ética", q: "¿Cómo contribuye el Cloud Computing a la sostenibilidad ambiental?", a: "Reduce la huella de carbono al centralizar recursos en infraestructuras altamente eficientes, alimentadas frecuentemente con energías renovables (ej. Google Cloud)." },
+    { cat: "Sostenibilidad y Ética", q: "¿En qué consiste el 'sesgo de la estandarización' en la IA?", a: "La tendencia de la IA a ofrecer la respuesta más probable, lo que puede limitar la creatividad, la diversidad y la innovación humana." },
+    { cat: "Desafíos THD", q: "¿Qué es la 'Brecha de Habilidades Digitales'?", a: "Escasez de profesionales cualificados en áreas como Big Data, IA y Ciberseguridad, lo que limita el potencial de innovación de las empresas." },
+    { cat: "Casos Reales", q: "¿En qué reside el valor principal de las empresas líderes GAFAN?", a: "En su cadena de suministro digital y en la explotación intensiva de los datos (Google, Amazon, Facebook, Apple, Netflix)." },
+    { cat: "Estrategia IA", q: "¿Qué duración media debe tener un proyecto piloto de IA Generativa?", a: "Una duración media de 3 meses para probar el impacto con KPIs claros antes de escalarlo." },
+    { cat: "Estrategia IA", q: "¿Qué significa la regla 'Garbage In, Garbage Out' en IA?", a: "Que la calidad del resultado depende totalmente de la calidad de los datos: si los datos de entrada están sucios o erróneos, los resultados de la IA serán incorrectos." },
+    { cat: "Rol DASP", q: "¿Qué brecha existe entre la evolución tecnológica y la sociedad?", a: "La sociedad avanza a un ritmo más lento que la tecnología, creando una brecha exponencial que requiere constante adaptación y reciclaje." },
+    { cat: "Rol DASP", q: "¿Qué actitud crítica debe mantener el profesional DASP ante los datos?", a: "Entender que la cesión de datos (ej. geolocalización) es a menudo un sacrificio a cambio del servicio y no creer ciegamente en la tecnología." }
+];
+
+/* BANCO OFICIAL DE CUESTIONARIOS (30 PREGUNTAS INICIALES SIN CITAS DE FORMATO [cite]) */
+let quizData = [
+    {
+        q: "Según la Unidad 2, ¿qué define fundamentalmente a la Transformación Digital?",
+        opts: [
+            "La mera adopción o compra de nuevas herramientas informáticas.",
+            "Una reinvención fundamental de la manera en que las empresas operan y entregan valor.",
+            "Un proceso opcional aconsejado únicamente para grandes empresas tecnológicas.",
+            "La sustitución del 100% de los puestos de trabajo humanos por robots."
+        ],
+        correct: 1,
+        exp: "El texto subraya que la TD no es la simple adopción de tecnologías, sino una reinvención profunda en la Industria 4.0."
+    },
+    {
+        q: "¿Cuál es el doble propósito de las Tecnologías Habilitadoras Digitales (THD)?",
+        opts: [
+            "Aumentar el precio de venta y reducir la plantilla de administración.",
+            "Innovar en productos/servicios y mejorar la eficiencia operativa hacia la sostenibilidad.",
+            "Eliminar el uso de bases de datos y utilizar solo documentos físicos.",
+            "Cumplir con trámites fiscales obligatorios en la Unión Europea."
+        ],
+        correct: 1,
+        exp: "El propósito de las THD es doble: 1) Innovar abriendo nuevos mercados, y 2) Mejorar eficiencia operativa y sostenibilidad."
+    },
+    {
+        q: "¿Qué diferencia existe entre Inteligencia Artificial (IA) y Machine Learning (ML)?",
+        opts: [
+            "Son dos conceptos idénticos sin ninguna diferencia técnica.",
+            "La IA simula la inteligencia humana; el ML es la subdisciplina donde la máquina aprende de datos sin intervención humana directa.",
+            "El ML solo se aplica en robótica y la IA solo en software contable.",
+            "La IA requiere programación manual continua y el ML no utiliza ordenadores."
+        ],
+        correct: 1,
+        exp: "La IA abarca la simulación de aspectos de inteligencia humana; el ML es el aprendizaje autónomo a partir de grandes datos."
+    },
+    {
+        q: "¿Cuáles son las '5 Vs' que caracterizan al Big Data?",
+        opts: [
+            "Volumen, Velocidad, Variedad, Veracidad y Valor.",
+            "Valor, Ventaja, Visibilidad, Vector y Variabilidad.",
+            "Volumen, Varianza, Verificación, Velocidad y Ventas.",
+            "Visión, Variedad, Verdad, Virtualización y Valor."
+        ],
+        correct: 0,
+        exp: "Las 5 Vs del Big Data son Volumen, Velocidad, Variedad, Veracidad y Valor."
+    },
+    {
+        q: "¿Qué ventaja técnica destaca Apache Spark frente a Hadoop MapReduce?",
+        opts: [
+            "Procesamiento exclusivo en discos ópticos.",
+            "Procesamiento en memoria, ofreciendo una velocidad muy superior.",
+            "Menor nivel de seguridad cibernética.",
+            "Es un software gratuito que no requiere infraestructura."
+        ],
+        correct: 1,
+        exp: "Apache Spark destaca por el procesamiento de datos en memoria y su velocidad superior a Hadoop MapReduce."
+    },
+    {
+        q: "En el retail de alimentación, ¿qué uso práctico del IoT se cita en el texto?",
+        opts: [
+            "Automatizar el cobro mediante cheques bancarios.",
+            "Sensores de temperatura en refrigeradores con alertas en tiempo real para productos perecederos.",
+            "Impresión de ofertas en papel periódico local.",
+            "Sustituir los transportistas por barcos autónomos."
+        ],
+        correct: 1,
+        exp: "En el retail alimentario, los sensores IoT monitorizan refrigeradores en tiempo real y ajustan horarios de enfriamiento."
+    },
+    {
+        q: "¿Cómo se define el modelo económico del Cloud Computing?",
+        opts: [
+            "Compra de hardware con amortización a 10 años.",
+            "Acceso flexible y eficiente a recursos informáticos por Internet bajo pago por uso.",
+            "Subvención pública a fondo perdido para almacenamiento.",
+            "Licencia fija mensual independientemente del uso."
+        ],
+        correct: 1,
+        exp: "El Cloud Computing permite el acceso flexible a recursos por Internet bajo un modelo de pago por uso."
+    },
+    {
+        q: "¿Qué modelo de servicio en la nube proporciona la infraestructura base (servidores, red, almacenamiento)?",
+        opts: [
+            "SaaS (Software como Servicio)",
+            "PaaS (Plataforma como Servicio)",
+            "IaaS (Infraestructura como Servicio)",
+            "CaaS (Ciberseguridad como Servicio)"
+        ],
+        correct: 2,
+        exp: "IaaS (Infrastructure as a Service) proporciona los recursos de infraestructura base como servidores y almacenamiento."
+    },
+    {
+        q: "¿Cuál es el valor fundamental de la tecnología Blockchain?",
+        opts: [
+            "Aumentar la velocidad de navegación por páginas web.",
+            "Eliminar la necesidad de intermediarios o autoridades centrales de confianza.",
+            "Reemplazar la memoria RAM de los ordenadores.",
+            "Permitir la copia ilimitada y no rastreable de archivos de texto."
+        ],
+        correct: 1,
+        exp: "Blockchain es un registro distribuido e inmutable que elimina la necesidad de intermediarios centrales."
+    },
+    {
+        q: "¿Qué es un 'Contrato Inteligente' (Smart Contract)?",
+        opts: [
+            "Un contrato en PDF firmado con certificado digital.",
+            "Un acuerdo autoejecutable escrito en código de programación sobre Blockchain.",
+            "Un contrato de trabajo redactado por una agencia de colocación.",
+            "Un documento que cambia de cláusulas automáticamente según la inflación."
+        ],
+        correct: 1,
+        exp: "Los Smart Contracts son acuerdos autoejecutables escritos en código dentro de la red Blockchain."
+    },
+    {
+        q: "¿Qué tipo de ciberataque utiliza técnicas de ingeniería social para manipular al usuario y robar sus credenciales?",
+        opts: [
+            "Ransomware",
+            "Phishing",
+            "Denegación de Servicio (DDoS)",
+            "Firewall"
+        ],
+        correct: 1,
+        exp: "El Phishing utiliza la ingeniería social para engañar a los usuarios y robar información confidencial."
+    },
+    {
+        q: "¿En qué consiste la arquitectura de ciberseguridad 'Zero Trust' (Confianza Cero)?",
+        opts: [
+            "Confiar automáticamente en los dispositivos dentro de la red local.",
+            "No confiar automáticamente en ningún usuario o dispositivo, verificando siempre identidad y autorización.",
+            "Eliminar las contraseñas y utilizar solo códigos SMS.",
+            "Desconectar los servidores de la red durante los fines de semana."
+        ],
+        correct: 1,
+        exp: "Zero Trust establece la verificación constante de todo usuario y dispositivo, sin conceder confianza implícita."
+    },
+    {
+        q: "¿Qué significan las siglas IT y OT en el contexto de digitalización industrial?",
+        opts: [
+            "IT = Tecnologías de la Información; OT = Tecnologías Operativas.",
+            "IT = Internet Total; OT = Operaciones Telefónicas.",
+            "IT = Infraestructura Técnica; OT = Organización de Trabajo.",
+            "IT = Innovación Transversal; OT = Optimización Temporal."
+        ],
+        correct: 0,
+        exp: "IT abarca la tecnología de la información (datos/software) y OT gestiona el control físico industrial."
+    },
+    {
+        q: "¿Cómo ayuda la convergencia de IT y OT al mantenimiento de maquinaria?",
+        opts: [
+            "Permite aplicar mantenimiento predictivo combinando datos analíticos de IT con sensores de OT.",
+            "Permite reparar las máquinas solo cuando sufran una avería total.",
+            "Sustituye las piezas mecánicas por código informático.",
+            "Elimina por completo la necesidad de energía eléctrica en planta."
+        ],
+        correct: 0,
+        exp: "La convergencia IT/OT combina analítica y sensores físicos para anticipar fallos mediante mantenimiento predictivo."
+    },
+    {
+        q: "¿Qué fenómeno analiza la analítica predictiva mediante el término 'Churning'?",
+        opts: [
+            "El incremento acelerado de ventas en época navideña.",
+            "La fuga o pérdida potencial de clientes.",
+            "El fallo en los servidores de correo electrónico.",
+            "La rotación de personal directivo."
+        ],
+        correct: 1,
+        exp: "El Churning se refiere a la fuga de clientes. Predicho por IA, permite lanzar ofertas de retención con gran ROI."
+    },
+    {
+        q: "¿Qué ventaja ofrece la Ciberseguridad como Servicio (SaaS / Security as a Service)?",
+        opts: [
+            "Proporciona protección bajo demanda a empresas sin requerir grandes inversiones en infraestructura propia.",
+            "Garantiza la ausencia total de virus sin necesidad de actualizar el software.",
+            "Sustituye la labor de la policía judicial cibernética.",
+            "Permite acceder a redes de la competencia de manera transparente."
+        ],
+        correct: 0,
+        exp: "La Ciberseguridad bajo demanda democratiza la protección avanzada para PYMEs sin infraestructura física local."
+    },
+    {
+        q: "En el caso de estudio de manufactura presentado, ¿qué reducción se logró en el tiempo de inactividad de las máquinas?",
+        opts: [
+            "Una reducción del 5%",
+            "Una reducción del 20%",
+            "Una reducción del 50%",
+            "No hubo reducción, sólo aumentó la eficiencia"
+        ],
+        correct: 1,
+        exp: "El caso real de manufactura demostró un 20% de reducción en el tiempo de inactividad y +15% en eficiencia operativa."
+    },
+    {
+        q: "¿Cuál es el primer paso metodológico para elaborar un informe de impacto sobre THD?",
+        opts: [
+            "Comprar inmediatamente sensores IoT.",
+            "Definición clara de objetivos medibles.",
+            "Analizar datos sin establecer metas previa.",
+            "Contratar una auditoría externa de cibercrimen."
+        ],
+        correct: 1,
+        exp: "El primer paso metodológico es la definición clara de objetivos (ej. reducir costes de combustible)."
+    },
+    {
+        q: "¿Por qué el Cloud Computing reduce la huella de carbono de las organizaciones?",
+        opts: [
+            "Porque los servidores en la nube no consumen electricidad.",
+            "Porque centraliza recursos en infraestructuras altamente eficientes alimentadas con energías renovables.",
+            "Porque elimina los viajes de negocios en avión.",
+            "Porque obliga a trabajar sin monitores de pantalla."
+        ],
+        correct: 1,
+        exp: "El Cloud centraliza recursos en datacenters hiper-eficientes alimentados por energías limpias (ej. Google Cloud)."
+    },
+    {
+        q: "¿En qué consiste el 'sesgo algorítmico' en modelos de IA?",
+        opts: [
+            "Un fallo de hardware que ralentiza la velocidad de cálculo.",
+            "La perpetuación de prejuicios humanos inconscientes presentes en los datos de entrenamiento.",
+            "Un error de traducción entre inglés y español en el software.",
+            "La incompatibilidad entre sistemas operativos diferentes."
+        ],
+        correct: 1,
+        exp: "El sesgo algorítmico se produce cuando la IA reproduce o amplifica sesgos sociales presentes en los datos iniciales."
+    },
+    {
+        q: "¿Qué peligro representa el 'sesgo de la estandarización' de la IA según el documento?",
+        opts: [
+            "La tendencia a dar la respuesta más probable, afectando la creatividad y la innovación.",
+            "El encarecimiento de los equipos informáticos.",
+            "La sobrecarga de tráfico en redes Wi-Fi.",
+            "La pérdida de licencias comerciales de software."
+        ],
+        correct: 0,
+        exp: "Al tender a la respuesta estadísticamente más frecuente, la IA puede uniformar el conocimiento y frenar la innovación."
+    },
+    {
+        q: "¿Qué problema genera la 'Brecha de Habilidades Digitales'?",
+        opts: [
+            "Una escasez de profesionales cualificados en áreas como Big Data, IA y Ciberseguridad.",
+            "Un exceso de ingenieros sin trabajo en el sector productivo.",
+            "La imposibilidad de fabricar chips de silicona en Europa.",
+            "La incompatibilidad de formatos de archivo en PDF."
+        ],
+        correct: 0,
+        exp: "La rápida evolución de las THD genera escasez de perfiles especializados, limitando el ritmo de innovación empresarial."
+    },
+    {
+        q: "¿En qué se diferencia el modelo de negocio de las empresas GAFAN del de las empresas tradicionales?",
+        opts: [
+            "Las GAFAN se basan fuertemente en la tecnología digital y la explotación de la cadena de datos.",
+            "Las GAFAN obtienen sus ingresos exclusivamente de la venta de maquinaria pesada.",
+            "Las empresas tradicionales no utilizan datos para la toma de decisiones.",
+            "Las GAFAN no requieren de clientes finales para su modelo."
+        ],
+        correct: 0,
+        exp: "El valor de gigantes como Google, Amazon, Facebook, Apple y Netflix reside en sus datos y cadenas de suministro digitales."
+    },
+    {
+        q: "En proyectos de Big Data e IA, ¿por qué son relevantes mejoras porcentuales de solo un 1%?",
+        opts: [
+            "Porque en grandes volúmenes de negocio un 1% representa un impacto de millones de euros de ROI.",
+            "Porque permite recibir subvenciones públicas automáticas.",
+            "Porque es el porcentaje mínimo legal exigido por la ley DASP.",
+            "No tienen relevancia real y son solo teóricas."
+        ],
+        correct: 0,
+        exp: "En grandes volúmenes de facturación o clientes, optimizar un 1% la conversión o retención supone millones de euros."
+    },
+    {
+        q: "Al implementar IA Generativa en una empresa, ¿cuál es la duración promedio recomendada para un proyecto piloto?",
+        opts: [
+            "1 semana",
+            "Aproximadamente 3 meses",
+            "2 años",
+            "5 años"
+        ],
+        correct: 1,
+        exp: "Un piloto de IA Generativa debe acotarse a un periodo medio de 3 meses para validar KPIs antes de escalarlo."
+    },
+    {
+        q: "¿Qué establece el principio 'Garbage In, Garbage Out' en la gestión de datos?",
+        opts: [
+            "Si los datos de entrada son de mala calidad, las salidas de la IA serán erróneas o inútiles.",
+            "Hay que destruir los servidores antiguos cada 3 años.",
+            "Los archivos no guardados en la nube se consideran basura.",
+            "Los algoritmos deben limpiarse borrando el código fuente semanalmente."
+        ],
+        correct: 0,
+        exp: "Indica que la limpieza y normalización de datos es imprescindible; datos deficientes producen resultados defectuosos."
+    },
+    {
+        q: "¿Por qué se desaconseja desplegar la IA Generativa simultáneamente en toda la empresa?",
+        opts: [
+            "Porque diluye esfuerzos; es mejor validar con un piloto acotado, analizar datos y optimizar.",
+            "Porque está prohibido por la normativa internacional de protección de datos.",
+            "Porque la IA se apaga si gestiona más de dos departamentos a la vez.",
+            "Porque los trabajadores se negarán a utilizarla."
+        ],
+        correct: 0,
+        exp: "Es una buena práctica empezar con pilotos acotados (3 meses) para medir el impacto y formar a los equipos antes de escalar."
+    },
+    {
+        q: "¿Qué velocidad de avance relativo existe entre la sociedad y la tecnología según el texto?",
+        opts: [
+            "La sociedad evoluciona más rápido que las herramientas tecnológicas.",
+            "La tecnología evoluciona más rápido que la sociedad, generando una brecha exponencial.",
+            "Ambas avanzan exactamente al mismo ritmo constante.",
+            "La tecnología se ha estancado mientras la sociedad se digitaliza aceleradamente."
+        ],
+        correct: 1,
+        exp: "La tecnología evoluciona a un ritmo muy superior al de la adaptación social, exigiendo formación continua."
+    },
+    {
+        q: "¿Qué actitud de pensamiento crítico debe mantener un profesional de Formación Profesional sobre la tecnología?",
+        opts: [
+            "Aceptar las decisiones de los algoritmos sin cuestionarlas.",
+            "Entender que el uso de servicios suele implicar la cesión de datos y evaluar críticamente la tecnología.",
+            "Rechazar el uso de herramientas informáticas en la gestión de finanzas.",
+            "Creer que los modelos de IA son infalibles en un 100%."
+        ],
+        correct: 1,
+        exp: "El profesional DASP debe ejercer un pensamiento crítico, comprendiendo los riesgos de privacidad y los límites técnicos."
+    },
+    {
+        q: "¿Por qué los perfiles cualificados en Big Data e IA son de los más cotizados del mercado?",
+        opts: [
+            "Por la escasez de profesionales formados frente a una alta demanda de transformación digital.",
+            "Porque son perfiles con títulos expedidos exclusivamente en el extranjero.",
+            "Porque la legislación obliga a contratarlos en todas las PYMEs.",
+            "Porque solo ellos pueden comprar licencias de software."
+        ],
+        correct: 0,
+        exp: "Existe una acusada brecha de habilidades digitales que convierte a los especialistas en datos e IA en perfiles altamente demandados."
+    }
+];
+
+/* EXPLICACIONES DEL TUTOR VIRTUAL (SEPARANDO EXPLICACIÓN SENCILLA Y ANALOGÍA) */
+const tutorExpl = {
+    td: {
+        exp: "La Transformación Digital no consiste solo en comprar ordenadores o usar programas informáticos, sino en cambiar completamente la forma en que una empresa trabaja, gestiona sus procesos y atiende a sus clientes para aprovechar la tecnología moderna.",
+        ana: "Es como pasar de llevar la contabilidad en papel a rediseñar todo el negocio para vender y cobrar por Internet de forma automática. No se trata de cambiar la pluma por un teclado, sino de cambiar todo el modelo de trabajo."
+    },
+    thd: {
+        exp: "Las Tecnologías Habilitadoras Digitales son las herramientas tecnológicas avanzadas (como la Inteligencia Artificial, la Nube o el Internet de las Cosas) que permiten a las empresas innovar, crear nuevos productos y automatizar sus tareas.",
+        ana: "Son como las herramientas eléctricas de un taller: antes todo se hacía a mano con mucho tiempo y esfuerzo, pero estas herramientas permiten multiplicar la velocidad y la precisión del trabajo."
+    },
+    ia: {
+        exp: "La Inteligencia Artificial busca que los programas de ordenador simulen capacidades humanas como razonar o tomar decisiones. El Machine Learning es una parte de la IA que permite que la máquina aprenda sola analizando miles de datos pasados, sin que nadie la programe paso a paso.",
+        ana: "Es como enseñar a un nuevo administrativo en una empresa: en lugar de darle un libro de instrucciones gigantesco con todas las normas posibles, le muestras miles de facturas anteriores para que aprenda por sí solo a reconocer los errores."
+    },
+    bigdata: {
+        exp: "El Big Data es la gestión y análisis de volúmenes de información tan gigantescos, rápidos y variados que los programas de ordenador tradicionales no pueden procesarlos. Se caracteriza por las '5 Vs': Volumen, Velocidad, Variedad, Veracidad y Valor.",
+        ana: "Es como pasar de revisar el buzón de correo físico de la oficina una vez al día a gestionar un torrente ininterrumpido de miles de mensajes, vídeos y datos de compras que llegan cada segundo desde miles de tiendas a la vez."
+    },
+    iot: {
+        exp: "El Internet de las Cosas consiste en conectar objetos físicos (sensores, máquinas, vehículos) a Internet para que recojan datos de su entorno y se comuniquen entre sí de forma automática sin intervención humana.",
+        ana: "Es como ponerle 'sentidos' y teléfono móvil propio a las máquinas del almacén; por ejemplo, una nevera de supermercado que nota que pierde temperatura y llama ella sola al servicio técnico antes de que la comida se estropee."
+    },
+    cloud: {
+        exp: "La computación en la nube permite a una empresa acceder a programas, servidores y almacenamiento a través de Internet pagando solo por lo que utiliza, en lugar de tener que comprar y mantener caros equipos informáticos en sus propias oficinas.",
+        ana: "Es exactamente igual que el suministro de agua o electricidad: en lugar de construir tu propia central eléctrica en la empresa, te conectas a la red general y pagas a fin de mes únicamente por los kilovatios que has consumido."
+    },
+    blockchain: {
+        exp: "Blockchain es un registro digital descentralizado e inmutable donde las transacciones se anotan de forma segura sin necesidad de un banco u otro intermediario central. Un Smart Contract es un acuerdo digital que se ejecuta solo cuando se cumplen las condiciones acordadas.",
+        ana: "Imagina un libro contable público donde cada cifra que se escribe se copia instantáneamente en miles de ordenadores a la vez; nadie puede modificar o borrar una cifra a escondidas porque todos los demás ordenadores detectarían la trampa de inmediato."
+    },
+    ciberseguridad: {
+        exp: "La ciberseguridad protege los datos y sistemas de la empresa frente a robos o ataques informáticos. La estrategia 'Zero Trust' o 'Confianza Cero' establece que no se debe confiar automáticamente en ningún usuario o equipo, exigiendo siempre verificar la identidad.",
+        ana: "Es como un edificio de alta seguridad corporativa donde, aunque ya hayas pasado la puerta principal de la calle, tienes que escanear tu tarjeta y tu huella dactilar cada vez que quieras abrir cualquier puerta o pasillo interior."
+    },
+    it_ot: {
+        exp: "IT abarca la tecnología de la información de oficina (programas contables, correo, ERP), mientras que OT gestiona el control físico de las máquinas de la fábrica. Integrarlas permite usar los datos informáticos para predecir cuándo se averiará una máquina antes de que falle.",
+        ana: "Es como conectar el ordenador de a bordo del motor de un coche con la agenda del taller mecánico: en cuanto una pieza muestra el mínimo desgaste, el coche pide cita automáticamente y encarga el repuesto antes de quedarse tirado en la carretera."
+    },
+    churning: {
+        exp: "El 'Churning' es la pérdida o fuga de clientes que se van a la competencia. Utilizando análisis de datos e Inteligencia Artificial, las empresas pueden predecir qué clientes tienen intención de marcharse antes de que lo hagan.",
+        ana: "Es como un médico que detecta los primeros síntomas de un resfriado y le da un tratamiento al paciente antes de que caiga enfermo en cama; la empresa detecta señales de descontento y le ofrece un descuento personalizado para que no se dé de baja."
+    },
+    sesgo: {
+        exp: "El sesgo algorítmico ocurre cuando una IA repite o amplifica los prejuicios humanos presentes en los datos con los que fue entrenada. El sesgo de estandarización es la tendencia de la IA a ofrecer siempre la respuesta más común, reduciendo la creatividad e innovación.",
+        ana: "Es como un examen corregido por un profesor que solo da por buenas las frases memorizadas del libro de texto: cualquier idea diferente o creativa es marcada como incorrecta, obligando a todos los alumnos a responder exactamente igual."
+    },
+    gafan: {
+        exp: "Hace referencia a los grandes gigantes tecnológicos (Google, Amazon, Meta, Apple, Netflix) cuyo valor y modelo de negocio no reside en tener fábricas o camiones, sino en la captación, análisis y explotación estratégica de los datos de millones de usuarios.",
+        ana: "Las empresas tradicionales del siglo XX eran como minas de carbón que vendían toneladas de material pesado; las empresas GAFAN son como refinerías de datos que transforman pequeños clics invisibles en el 'petróleo' del siglo XXI."
+    }
+};
+
+/* POOL DINÁMICO DE GENERACIÓN DE RECURSOS */
+const generatorCardPool = {
+    ia_data: [
+        { q: "¿Cómo beneficia la IA Generativa al soporte administrativo y atención al cliente?", a: "Automatiza respuestas mediante chatbots avanzados, elabora informes financieros resumidos y redacta plantillas de correo personalizadas en segundos." },
+        { q: "¿Qué relación existe entre el valor de los datos y el ROI empresarial?", a: "Pequeñas mejoras de un 1% en la fidelización o captación mediante análisis de datos se traducen en retornos de millones de euros para la empresa." }
+    ],
+    iot_cloud: [
+        { q: "¿De qué forma democratiza el Cloud Computing la competencia entre startups y multinacionales?", a: "Al permitir el acceso a supercomputación y almacenamiento en la nube en formato pago por uso sin grandes desembolsos iniciales." },
+        { q: "¿Qué ventajas aporta la tecnología RFID en la gestión de inventario retail?", a: "Permite la localización y recuento automático de productos en tiempo real, erradicando el inventariado manual." }
+    ],
+    block_ciber: [
+        { q: "¿Qué papel juega la autenticación de dos factores (2FA) en finanzas?", a: "Añade una capa crucial de seguridad requiriendo dos pruebas de identidad para autorizar transacciones o acceder a sistemas sensibles." },
+        { q: "¿Cómo ayuda la Web3 impulsada por Blockchain a la descentralización digital?", a: "Permite que las transacciones y la gestión de datos no dependan del control absoluto de unas pocas multinacionales o servidores centrales." }
+    ],
+    estrategia: [
+        { q: "¿Por qué el informe de medición de impacto es crucial tras implantar THD?", a: "Permite evaluar cuantitativamente el logro de objetivos (ej. reducción del 20% en inactividad) para justificar la inversión en digitalización." },
+        { q: "¿Qué aporta la visión unificada de operaciones de la convergencia IT/OT?", a: "Proporciona un control total en tiempo real que combina el rendimiento operativo de la planta con la planificación financiera." }
+    ],
+    etica_rol: [
+        { q: "¿Qué significa la regla 'Garbage In, Garbage Out' para un analista administrativo?", a: "Que si introduce datos contables o de clientes erróneos, los informes y predicciones resultantes carecerán totalmente de validez." },
+        { q: "¿Por qué la formación continua es insustituible para el perfil DASP?", a: "Porque la brecha exponencial entre el avance tecnológico y la adaptación social exige actualizar constantemente habilidades en IA, datos y seguridad." }
+    ]
+};
+
+const generatorQuizPool = {
+    ia_data: [
+        {
+            q: "¿Qué ventaja ofrece Apache Spark en el procesamiento masivo de datos frente a herramientas tradicionales?",
+            opts: ["Procesamiento en memoria ultrarrápido.", "Almacenamiento exclusivo en papel.", "Uso de bases de datos relacionales sin red.", "Menor capacidad de análisis predictivo."],
+            correct: 0,
+            exp: "Apache Spark realiza procesamiento en memoria lo que permite analizar volúmenes masivos a gran velocidad."
+        }
+    ],
+    iot_cloud: [
+        {
+            q: "¿Cuál de los siguientes es un ejemplo claro de modelo Software como Servicio (SaaS)?",
+            opts: ["Un servidor físico comprado en tienda.", "Dropbox o una app contable en la nube accesible vía web.", "Un cable de fibra óptica.", "La instalación manual de un sistema operativo."],
+            correct: 1,
+            exp: "El SaaS ofrece la aplicación lista para su uso final por Internet sin instalar infraestructura local."
+        }
+    ],
+    block_ciber: [
+        {
+            q: "El ataque cibernético que busca saturar un servidor con peticiones falsas para colapsarlo se denomina:",
+            opts: ["Phishing", "Denegación de Servicio Distribuidos (DDoS)", "Ransomware", "Cifrado de datos"],
+            correct: 1,
+            exp: "Los ataques DDoS envían tráfico masivo desde dispositivos infectados para inhabilitar un servicio."
+        }
+    ],
+    estrategia: [
+        {
+            q: "En el caso práctico de manufactura citado, ¿qué incremento de eficiencia de producción se alcanzó?",
+            opts: ["Un 5%", "Un 15%", "Un 50%", "Un 100%"],
+            correct: 1,
+            exp: "Se citó un incremento del 15% en la eficiencia productiva combinado con un 20% menos de inactividad."
+        }
+    ],
+    etica_rol: [
+        {
+            q: "¿Qué riesgo entraña el 'sesgo de estandarización' producido por algoritmos de IA?",
+            opts: ["Tiende a ofrecer la respuesta más probable, pudiendo limitar la innovación y creatividad humana.", "Aumenta desproporcionadamente el coste de la electricidad.", "Prohíbe el teletrabajo en las empresas.", "Bloquea los antivirus informáticos."],
+            correct: 0,
+            exp: "Al primar la respuesta estadísticamente común, la IA puede uniformar los procesos restando creatividad."
+        }
+    ]
+};
+
+// ESTADO GLOBAL DE LA APLICACIÓN
+let currentCardIndex = 0;
+let userAnswers = new Array(quizData.length).fill(null);
+let fontScaleLevel = 0;
+let lastGeneratedCard = null;
+let lastGeneratedQuestion = null;
+
+// INICIALIZACIÓN
+window.onload = function() {
+    renderCard();
+    renderQuiz();
+    updateBadges();
+};
+
+// CAMBIO DE PESTAÑA
+function switchTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    
+    const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabId));
+    if (btn) btn.classList.add('active');
+}
+
+// ACCESIBILIDAD Y TAMAÑO DE TEXTO
+function toggleExpandedText() {
+    document.body.classList.toggle('accessible-reading');
+    document.getElementById('btn-expanded-text').classList.toggle('active');
+}
+
+function toggleContrast() {
+    document.body.classList.toggle('high-contrast');
+    document.getElementById('btn-high-contrast').classList.toggle('active');
+}
+
+function changeFontSize(direction) {
+    if (direction === 0) {
+        fontScaleLevel = 0;
+    } else {
+        fontScaleLevel += direction;
+        if (fontScaleLevel < -1) fontScaleLevel = -1;
+        if (fontScaleLevel > 2) fontScaleLevel = 2;
+    }
+
+    const sizes = { '-1': '14px', '0': '16px', '1': '18px', '2': '20px' };
+    document.body.style.fontSize = sizes[fontScaleLevel];
+}
+
+// LÓGICA DE TARJETAS INTELIGENTES
+function renderCard() {
+    if (flashcardsData.length === 0) return;
+    const card = flashcardsData[currentCardIndex];
+    document.getElementById('card-category').innerText = card.cat;
+    document.getElementById('card-front-text').innerText = card.q;
+    document.getElementById('card-back-text').innerHTML = card.a;
+    document.getElementById('card-counter').innerText = `${currentCardIndex + 1} / ${flashcardsData.length}`;
+    document.getElementById('flashcard').classList.remove('flipped');
+}
+
+function flipCard() {
+    document.getElementById('flashcard').classList.toggle('flipped');
+}
+
+function nextCard() {
+    currentCardIndex = (currentCardIndex + 1) % flashcardsData.length;
+    renderCard();
+}
+
+function prevCard() {
+    currentCardIndex = (currentCardIndex - 1 + flashcardsData.length) % flashcardsData.length;
+    renderCard();
+}
+
+function shuffleCards() {
+    flashcardsData.sort(() => Math.random() - 0.5);
+    currentCardIndex = 0;
+    renderCard();
+}
+
+function updateBadges() {
+    document.getElementById('total-cards-badge').innerText = flashcardsData.length;
+    document.getElementById('total-quiz-badge').innerText = quizData.length;
+}
+
+// LÓGICA DEL CUESTIONARIO
+function renderQuiz() {
+    const container = document.getElementById('quiz-container');
+    container.innerHTML = '';
+
+    quizData.forEach((q, idx) => {
+        const card = document.createElement('div');
+        card.className = 'quiz-card';
+
+        let optionsHTML = '';
+        q.opts.forEach((opt, optIdx) => {
+            let classState = '';
+            if (userAnswers[idx] !== null) {
+                if (optIdx === q.correct) classState = 'correct';
+                else if (userAnswers[idx] === optIdx) classState = 'incorrect';
+            }
+            optionsHTML += `<button class="option-btn ${classState}" id="opt-${idx}-${optIdx}" onclick="selectOption(${idx}, ${optIdx})">${String.fromCharCode(65 + optIdx)}) ${opt}</button>`;
+        });
+
+        card.innerHTML = `
+            <div class="quiz-question">${idx + 1}. ${q.q}</div>
+            <div class="options-grid">${optionsHTML}</div>
+            <div class="explanation-box" id="exp-${idx}" style="${userAnswers[idx] !== null ? 'display:block;' : ''}"><strong>Explicación:</strong> ${q.exp}</div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function selectOption(qIdx, optIdx) {
+    if (userAnswers[qIdx] !== null) return;
+
+    userAnswers[qIdx] = optIdx;
+    const q = quizData[qIdx];
+    const isCorrect = optIdx === q.correct;
+
+    const selectedBtn = document.getElementById(`opt-${qIdx}-${optIdx}`);
+    if (isCorrect) {
+        selectedBtn.classList.add('correct');
+    } else {
+        selectedBtn.classList.add('incorrect');
+        document.getElementById(`opt-${qIdx}-${q.correct}`).classList.add('correct');
+    }
+
+    document.getElementById(`exp-${qIdx}`).style.display = 'block';
+    updateQuizProgress();
+}
+
+function updateQuizProgress() {
+    const answeredCount = userAnswers.filter(a => a !== null).length;
+    const progressPct = (answeredCount / quizData.length) * 100;
+    document.getElementById('quiz-progress').style.width = `${progressPct}%`;
+
+    if (answeredCount === quizData.length) {
+        let correctCount = 0;
+        userAnswers.forEach((ans, idx) => {
+            if (ans === quizData[idx].correct) correctCount++;
+        });
+        const summary = document.getElementById('score-summary');
+        summary.style.display = 'block';
+        summary.innerHTML = `🏆 Cuestionario completado. Puntuación final: <strong>${correctCount} / ${quizData.length}</strong> (${((correctCount/quizData.length)*10).toFixed(1)} / 10)`;
+    }
+}
+
+function resetQuiz() {
+    userAnswers = new Array(quizData.length).fill(null);
+    document.getElementById('quiz-progress').style.width = '0%';
+    document.getElementById('score-summary').style.display = 'none';
+    renderQuiz();
+}
+
+// TUTOR VIRTUAL (DIFERENCIANDO EXPLICACIÓN SENCILLA DE ANALOGÍA)
+function explainConcept() {
+    const val = document.getElementById('concept-select').value;
+    const box = document.getElementById('tutor-response');
+    
+    if (val && tutorExpl[val]) {
+        const data = tutorExpl[val];
+        box.innerHTML = `
+            <div class="tutor-section">
+                <div class="tutor-section-title">📌 Explicación sencilla</div>
+                <div class="tutor-text">${data.exp}</div>
+            </div>
+            <div class="tutor-section tutor-section-analogy">
+                <div class="tutor-section-title">💡 Analogía práctica</div>
+                <div class="tutor-text">${data.ana}</div>
+            </div>
+        `;
+    } else {
+        box.innerHTML = '<em>Selecciona un concepto válido de la lista desplegable.</em>';
+    }
+}
+
+function handleCustomQuery() {
+    const query = document.getElementById('custom-query').value.toLowerCase().trim();
+    const box = document.getElementById('tutor-response');
+
+    if (!query) {
+        box.innerHTML = '<em>Por favor, escribe una duda o término para consultar.</em>';
+        return;
+    }
+
+    let key = null;
+    if (query.includes('blockchain') || query.includes('cadena') || query.includes('contrato')) key = 'blockchain';
+    else if (query.includes('ia') || query.includes('inteligencia') || query.includes('machine')) key = 'ia';
+    else if (query.includes('iot') || query.includes('cosas') || query.includes('sensor')) key = 'iot';
+    else if (query.includes('cloud') || query.includes('nube') || query.includes('saas')) key = 'cloud';
+    else if (query.includes('ciber') || query.includes('seguridad') || query.includes('zero')) key = 'ciberseguridad';
+    else if (query.includes('big data') || query.includes('datos') || query.includes('5 v')) key = 'bigdata';
+    else if (query.includes('it') || query.includes('ot') || query.includes('mantenimiento')) key = 'it_ot';
+
+    if (key && tutorExpl[key]) {
+        const data = tutorExpl[key];
+        box.innerHTML = `
+            <div class="tutor-section">
+                <div class="tutor-section-title">📌 Explicación sencilla</div>
+                <div class="tutor-text">${data.exp}</div>
+            </div>
+            <div class="tutor-section tutor-section-analogy">
+                <div class="tutor-section-title">💡 Analogía práctica</div>
+                <div class="tutor-text">${data.ana}</div>
+            </div>
+        `;
+    } else {
+        box.innerHTML = `
+            <div class="tutor-section">
+                <div class="tutor-section-title">📌 Explicación sencilla</div>
+                <div class="tutor-text">Para el término "${query}", el temario de la Unidad 2 señala que la digitalización busca aumentar la eficiencia y crear nuevos modelos de valor mediante la automatización y el análisis de datos fiables.</div>
+            </div>
+            <div class="tutor-section tutor-section-analogy">
+                <div class="tutor-section-title">💡 Analogía práctica</div>
+                <div class="tutor-text">Es como pasar de gestionar la agenda del negocio con lápiz y papel a tener un asistente virtual que recuerda citas, hace pedidos de stock automáticamente y avisa de los pagos pendientes.</div>
+            </div>
+        `;
+    }
+}
+
+// GENERADOR DINÁMICO
+function generateNewCard() {
+    const topic = document.getElementById('gen-topic').value;
+    const pool = generatorCardPool[topic] || generatorCardPool.ia_data;
+    const randomCard = pool[Math.floor(Math.random() * pool.length)];
+
+    lastGeneratedCard = {
+        cat: "Recurso Generado",
+        q: randomCard.q,
+        a: randomCard.a
+    };
+
+    const output = document.getElementById('generator-output');
+    output.innerHTML = `
+        <div style="border-left: 4px solid var(--accent); padding-left: 0.85rem;">
+            <strong style="color:var(--accent);">Tarjeta Generada:</strong>
+            <p style="font-weight:bold; margin: 0.35rem 0;">Pregunta: ${lastGeneratedCard.q}</p>
+            <p style="margin-bottom: 0.75rem;">Respuesta: ${lastGeneratedCard.a}</p>
+            <button class="btn-action btn-success" onclick="addCardToDeck()">➕ Añadir esta tarjeta al mazo principal</button>
+        </div>
+    `;
+}
+
+function addCardToDeck() {
+    if (!lastGeneratedCard) return;
+    flashcardsData.push(lastGeneratedCard);
+    currentCardIndex = flashcardsData.length - 1;
+    updateBadges();
+    renderCard();
+
+    showNotification("¡Tarjeta añadida con éxito! Ahora forma parte del mazo principal.");
+}
+
+function generateNewQuestion() {
+    const topic = document.getElementById('gen-topic').value;
+    const pool = generatorQuizPool[topic] || generatorQuizPool.ia_data;
+    const randomQ = pool[Math.floor(Math.random() * pool.length)];
+
+    lastGeneratedQuestion = {
+        q: randomQ.q,
+        opts: randomQ.opts,
+        correct: randomQ.correct,
+        exp: randomQ.exp
+    };
+
+    const output = document.getElementById('generator-output');
+    output.innerHTML = `
+        <div style="border-left: 4px solid var(--primary); padding-left: 0.85rem;">
+            <strong style="color:var(--primary);">Pregunta de Cuestionario Generada:</strong>
+            <p style="font-weight:bold; margin: 0.35rem 0;">${lastGeneratedQuestion.q}</p>
+            <ul style="margin-left: 1.25rem; font-size: 0.88rem; margin-bottom: 0.75rem;">
+                ${lastGeneratedQuestion.opts.map(o => `<li>${o}</li>`).join('')}
+            </ul>
+            <button class="btn-action" onclick="addQuestionToQuiz()">➕ Añadir esta pregunta al cuestionario activo</button>
+        </div>
+    `;
+}
+
+function addQuestionToQuiz() {
+    if (!lastGeneratedQuestion) return;
+    quizData.push(lastGeneratedQuestion);
+    userAnswers.push(null);
+    updateBadges();
+    renderQuiz();
+
+    showNotification("¡Pregunta añadida con éxito al cuestionario de autoevaluación!");
+}
+
+function showNotification(msg) {
+    const toast = document.getElementById('toast-notify');
+    toast.innerText = msg;
+    toast.style.display = 'block';
+    setTimeout(() => {
+        toast.style.display = 'none';
+    }, 3500);
+}
+</script>
+</body>
+</html>
