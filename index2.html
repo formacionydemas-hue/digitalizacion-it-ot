@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DASP - Tema 1: Fundamentos de Digitalización y Entornos IT/OT</title>
+  <style>
+    :root {
+      --bg-color: #f4f7f6;
+      --card-bg: #ffffff;
+      --text-color: #2c3e50;
+      --primary-color: #2563eb;
+      --primary-hover: #1d4ed8;
+      --secondary-color: #0d9488;
+      --accent-color: #f59e0b;
+      --border-color: #e2e8f0;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --font-size-base: 16px;
+      --line-height: 1.6;
+      --letter-spacing: 0em;
+      --word-spacing: 0em;
+      --card-min-height: 220px;
+    }
+
+    /* Modo Lectura Adaptada (Accesibilidad) */
+    body.accessible-mode {
+      --bg-color: #f7f4ed;
+      --card-bg: #fffdfa;
+      --text-color: #1a2421;
+      --primary-color: #1e40af;
+      --secondary-color: #115e59;
+      --border-color: #cbd5e1;
+      --font-family: Verdana, Geneva, Tahoma, sans-serif;
+      --font-size-base: 18px;
+      --line-height: 1.85;
+      --letter-spacing: 0.05em;
+      --word-spacing: 0.15em;
+    }
+
+    /* Modo Oscuro / Contraste */
+    body.dark-mode {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --text-color: #f1f5f9;
+      --primary-color: #3b82f6;
+      --primary-hover: #60a5fa;
+      --secondary-color: #14b8a6;
+      --border-color: #334155;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: var(--font-family);
+      font-size: var(--font-size-base);
+      line-height: var(--line-height);
+      letter-spacing: var(--letter-spacing);
+      word-spacing: var(--word-spacing);
+      transition: background-color 0.3s, color 0.3s;
+      padding-bottom: 40px;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: #ffffff;
+      padding: 24px 20px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+
+    /* Barra de Accesibilidad */
+    .accessibility-bar {
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .acc-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .acc-btn {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .acc-btn:hover {
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    .acc-btn.active {
+      background-color: var(--primary-color);
+      color: #ffffff;
+      border-color: var(--primary-color);
+    }
+
+    /* Nav Pestañas */
+    nav.main-tabs {
+      display: flex;
+      justify-content: center;
+      background-color: var(--card-bg);
+      border-bottom: 2px solid var(--border-color);
+      margin-bottom: 24px;
+    }
+
+    .tab-btn {
+      padding: 14px 24px;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: var(--text-color);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      color: var(--primary-color);
+    }
+
+    .tab-btn.active {
+      border-bottom-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Panel General */
+    .panel {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel-title {
+      font-size: 1.4rem;
+      margin-bottom: 16px;
+      color: var(--primary-color);
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 8px;
+    }
+
+    /* Controles y Filtros */
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    select, input[type="text"] {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background-color: var(--card-bg);
+      color: var(--text-color);
+      font-size: 0.95rem;
+    }
+
+    /* Tarjetas Inteligentes */
+    .flashcard-container {
+      perspective: 1000px;
+      margin: 20px 0;
+    }
+
+    .flashcard {
+      background-color: var(--card-bg);
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      min-height: var(--card-min-height);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: transform 0.3s ease, border-color 0.3s ease;
+      position: relative;
+    }
+
+    .flashcard:hover {
+      border-color: var(--primary-color);
+    }
+
+    .flashcard-tag {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      font-size: 0.75rem;
+      background-color: var(--bg-color);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+      color: var(--primary-color);
+      border: 1px solid var(--border-color);
+    }
+
+    .flashcard-side-indicator {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      font-size: 0.75rem;
+      color: var(--accent-color);
+      font-weight: 700;
+    }
+
+    .flashcard-content {
+      font-size: 1.15rem;
+      font-weight: 500;
+      margin-top: 12px;
+    }
+
+    .card-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 10px 18px;
+      border-radius: 6px;
+      border: none;
+      background-color: var(--primary-color);
+      color: #ffffff;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .btn:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background-color: var(--secondary-color);
+    }
+
+    .btn-outline {
+      background: none;
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--bg-color);
+    }
+
+    /* Cuestionario */
+    .quiz-question {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .option-btn {
+      text-align: left;
+      padding: 12px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background-color: var(--card-bg);
+      color: var(--text-color);
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+
+    .option-btn:hover {
+      border-color: var(--primary-color);
+      background-color: var(--bg-color);
+    }
+
+    .option-btn.correct {
+      background-color: #dcfce7 !important;
+      border-color: #16a34a !important;
+      color: #14532d !important;
+      font-weight: 600;
+    }
+
+    .option-btn.incorrect {
+      background-color: #fee2e2 !important;
+      border-color: #dc2626 !important;
+      color: #7f1d1d !important;
+    }
+
+    .quiz-explanation {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 8px;
+      background-color: var(--bg-color);
+      border-left: 4px solid var(--primary-color);
+      font-size: 0.95rem;
+      display: none;
+    }
+
+    .score-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      background-color: var(--secondary-color);
+      color: white;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+
+    /* Tutor Conceptos */
+    .concept-search {
+      width: 100%;
+      margin-bottom: 20px;
+      font-size: 1rem;
+      padding: 12px;
+    }
+
+    .concept-item {
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+      background-color: var(--card-bg);
+    }
+
+    .concept-item h3 {
+      color: var(--primary-color);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .concept-badge {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      background-color: var(--bg-color);
+      border-radius: 4px;
+      color: var(--secondary-color);
+      border: 1px solid var(--border-color);
+    }
+
+    .analogy-box {
+      margin-top: 10px;
+      padding: 10px 14px;
+      background-color: var(--bg-color);
+      border-radius: 6px;
+      border-left: 3px solid var(--accent-color);
+      font-size: 0.95rem;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background-color: var(--border-color);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background-color: var(--primary-color);
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    .generator-box {
+      background-color: var(--bg-color);
+      border: 1px dashed var(--primary-color);
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 20px;
+    }
+
+    .generator-box h4 {
+      margin-bottom: 8px;
+      color: var(--primary-color);
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .accessibility-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .acc-group {
+        justify-content: space-between;
+      }
+      .card-actions {
+        flex-direction: column;
+      }
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Digitalización Aplicada a los Sectores Productivos</h1>
+    <p>Tema 1: Fundamentos de Digitalización y Entornos IT / OT</p>
+  </header>
+
+  <!-- Barra de Accesibilidad Personalizable -->
+  <div class="accessibility-bar" aria-label="Herramientas de accesibilidad de lectura">
+    <div class="acc-group">
+      <span>Vista de Lectura:</span>
+      <button class="acc-btn" id="btn-expanded" onclick="toggleExpandedText()">Texto Expandido</button>
+      <button class="acc-btn" id="btn-contrast" onclick="toggleDarkMode()">Modo Contraste</button>
+    </div>
+    <div class="acc-group">
+      <span>Tamaño de Texto:</span>
+      <button class="acc-btn" onclick="changeFontSize(-1)">A-</button>
+      <button class="acc-btn" onclick="resetFontSize()">A</button>
+      <button class="acc-btn" onclick="changeFontSize(1)">A+</button>
+    </div>
+  </div>
+
+  <!-- Navegación por Pestañas -->
+  <nav class="main-tabs" role="tablist">
+    <button class="tab-btn active" onclick="switchTab('flashcards')">📇 Tarjetas Inteligentes (30)</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">📝 Cuestionario (30)</button>
+    <button class="tab-btn" onclick="switchTab('tutor')">💡 Explicador Didáctico</button>
+    <button class="tab-btn" onclick="switchTab('summary')">📚 Resumen del Tema</button>
+  </nav>
+
+  <div class="container">
+
+    <!-- SECCIÓN 1: TARJETAS INTELIGENTES -->
+    <div id="tab-flashcards" class="tab-content active">
+      <div class="panel">
+        <div class="controls">
+          <div class="panel-title" style="border:none; margin:0; padding:0;">Tarjetas de Repaso</div>
+          <div>
+            <label for="card-filter">Filtrar por subtema: </label>
+            <select id="card-filter" onchange="filterCards()">
+              <option value="all">Todos los contenidos</option>
+              <option value="Conceptos y Origen">Conceptos y Origen</option>
+              <option value="Historia">Historia</option>
+              <option value="Ventajas">Ventajas de la Digitalización</option>
+              <option value="Transformación Interna">Transformación Org. y Retos</option>
+              <option value="Casos de Éxito">Casos de Éxito</option>
+              <option value="Entornos IT y OT">Entornos IT vs OT</option>
+              <option value="Evolución y Ciberseguridad">Evolución IT-OT y Seguridad</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="progress-bar">
+          <div id="card-progress-fill" class="progress-fill"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 12px;">
+          <span id="card-counter">Tarjeta 1 de 30</span>
+          <span id="mastered-counter">Dominadas: 0 / 30</span>
+        </div>
+
+        <div class="flashcard-container" onclick="flipCard()">
+          <div class="flashcard" id="active-flashcard">
+            <span class="flashcard-tag" id="card-tag">Subtema</span>
+            <span class="flashcard-side-indicator" id="card-side">PREGUNTA (Haz clic para girar)</span>
+            <div class="flashcard-content" id="card-text">Cargando tarjeta...</div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="btn btn-outline" onclick="prevCard()">← Anterior</button>
+          <button class="btn btn-secondary" onclick="markMastered()">✓ Marcar como Dominada</button>
+          <button class="btn" onclick="nextCard()">Siguiente →</button>
+        </div>
+
+        <!-- Generador de Nuevas Tarjetas -->
+        <div class="generator-box">
+          <h4>Solicitar Nuevas Tarjetas de Estudio</h4>
+          <p style="font-size: 0.9rem; margin-bottom: 10px;">Genera tarjetas de práctica personalizadas sobre cualquier área específica del Tema 1:</p>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <select id="gen-topic-select" style="flex: 1;">
+              <option value="IT y OT">Comparativa IT vs OT y Ejemplos</option>
+              <option value="Evolución Histórica">Línea del Tiempo y Etapas IT-OT</option>
+              <option value="Retos y Ciberseguridad">Retos y Medidas de Ciberseguridad</option>
+              <option value="Casos de Éxito">Casos Reales (Nike, IKEA, BBVA, Amazon)</option>
+            </select>
+            <button class="btn" onclick="generateExtraCard()">Generar Tarjeta</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 2: CUESTIONARIO INTERACTIVO -->
+    <div id="tab-quiz" class="tab-content">
+      <div class="panel">
+        <div class="controls">
+          <div class="panel-title" style="border:none; margin:0; padding:0;">Autoevaluación Interactiva</div>
+          <span class="score-badge" id="quiz-score-badge">Puntuación: 0 / 0</span>
+        </div>
+
+        <div class="progress-bar">
+          <div id="quiz-progress-fill" class="progress-fill"></div>
+        </div>
+        <div style="font-size: 0.85rem; margin-bottom: 16px;" id="quiz-counter">Pregunta 1 de 30</div>
+
+        <div class="quiz-question" id="quiz-question-text">Cargando pregunta...</div>
+
+        <div class="quiz-options" id="quiz-options-container">
+          <!-- Opciones dinámicas -->
+        </div>
+
+        <div class="quiz-explanation" id="quiz-explanation-box">
+          <!-- Explicación dinámica -->
+        </div>
+
+        <div class="card-actions" style="margin-top: 20px;">
+          <button class="btn btn-outline" onclick="resetQuiz()">Reiniciar Cuestionario</button>
+          <button class="btn" id="next-question-btn" onclick="nextQuestion()" style="display: none;">Siguiente Pregunta →</button>
+        </div>
+
+        <!-- Generador de Preguntas Adicionales -->
+        <div class="generator-box">
+          <h4>Generar Pregunta de Evaluación Personalizada</h4>
+          <p style="font-size: 0.9rem; margin-bottom: 10px;">Crea preguntas adicionales basadas en las especificaciones del material oficial:</p>
+          <button class="btn btn-secondary" onclick="generateExtraQuestion()">Generar Nueva Pregunta</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 3: TUTOR DIDÁCTICO Y CONCEPTOS -->
+    <div id="tab-tutor" class="tab-content">
+      <div class="panel">
+        <div class="panel-title">Asistente y Explicador de Conceptos</div>
+        <p style="margin-bottom: 16px;">Consul a explicaciones adaptadas con ejemplos prácticos y analogías sencillas sobre cualquier concepto del Tema 1:</p>
+        
+        <input type="text" id="concept-search" class="concept-search" placeholder="Escribe un concepto (ej. ERP, Gemelo Digital, Edge Computing, OT, Ciberseguridad)..." onkeyup="filterConcepts()">
+
+        <div id="concepts-list">
+          <!-- Conceptos explicados dinámicamente -->
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 4: RESUMEN DEL TEMA -->
+    <div id="tab-summary" class="tab-content">
+      <div class="panel">
+        <div class="panel-title">Guía de Contenidos Oficial - Tema 1</div>
+        <div style="font-size: 0.95rem; line-height: 1.7;">
+          <h3 style="color:var(--primary-color); margin-top:12px;">1. ¿Qué es la Digitalización?</h3>
+          <p>Es la conversión de información analógica en digital (ceros y unos). Proviene del latín <em>digitalis</em> (relativo al dedo, origen del sistema decimal por contar con 10 dedos). Permite optimizar operaciones (reducir costes) y crear nuevos modelos de negocio (tiendas online, reparto con drones).</p>
+
+          <h3 style="color:var(--primary-color); margin-top:16px;">2. Evolución Histórica Clave</h3>
+          <ul style="margin-left: 20px; margin-top: 6px;">
+            <li><strong>Años 50:</strong> Invención del transistor (electrónica moderna).</li>
+            <li><strong>Años 70:</strong> Nace Internet (ARPANET) y circuitos integrados.</li>
+            <li><strong>Años 70-80:</strong> Microprocesador.</li>
+            <li><strong>Años 80:</strong> PC personal y la World Wide Web.</li>
+            <li><strong>Años 2000:</strong> Smartphones.</li>
+            <li><strong>Años 2010:</strong> Big Data y Cloud Computing.</li>
+            <li><strong>Años 2020:</strong> Inteligencia Artificial y automatización avanzada.</li>
+          </ul>
+
+          <h3 style="color:var(--primary-color); margin-top:16px;">3. Entornos IT vs. OT</h3>
+          <p><strong>IT (Tecnologías de la Información):</strong> "El Cerebro". Procesamiento de datos y gestión de información (ej. ERP, CRM, HRIS, bases de datos SQL, nube).</p>
+          <p><strong>OT (Tecnologías de la Operación):</strong> "Los Brazos y Piernas". Control y automatización de procesos físicos (ej. sensores, PLCs, SCADA, robots, líneas de ensamblaje).</p>
+
+          <h3 style="color:var(--primary-color); margin-top:16px;">4. Evolución de la Integración IT-OT</h3>
+          <p>Pasó por 5 etapas: 1) Separados (1970-90), 2) Convergencia (1990-2000), 3) Ciberseguridad (2000-10), 4) IA y Edge Computing (2010-20), y 5) Integración completa y Gemelos Digitales (Actualidad).</p>
+
+          <h3 style="color:var(--primary-color); margin-top:16px;">
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    /* ==========================================================================
+       DATOS OFICIALES - BASADOS ESTRICTAMENTE EN EL PDF DEL TEMA 1
+       ========================================================================== */
+
+    const flashcardsData = [
+      { id: 1, subtopic: "Conceptos y Origen", q: "¿Qué es la digitalización en su esencia técnica?", a: "Es el proceso de convertir información analógica en digital, representando cualquier dato (texto, imagen, sonido, proceso) en ceros y unos para ser almacenado, procesado y transmitido electrónicamente." },
+      { id: 2, subtopic: "Conceptos y Origen", q: "¿Cuál es el origen etimológico de la palabra 'digitalización'?", a: "Proviene del latín 'digitalis', que significa 'relativo al dedo'. Nace porque los humanos contaban con los diez dedos de las manos, dando lugar al sistema decimal y al término 'dígito'." },
+      { id: 3, subtopic: "Conceptos y Origen", q: "¿Qué dos grandes vías ofrece la digitalización a las empresas?", a: "1) Optimizar sus operaciones existentes (reduciendo costes).\n2) Explorar nuevos modelos de negocio, productos y servicios antes inexistentes (comercio online, reparto con drones)." },
+      { id: 4, subtopic: "Historia", q: "¿Qué hito de la digitalización ocurrió en los Años 50?", a: "Invención del transistor, que supuso el inicio de la electrónica moderna." },
+      { id: 5, subtopic: "Historia", q: "¿Qué hitos surgieron en la década de los Años 70?", a: "Nacimiento de Internet (ARPANET) y desarrollo de los circuitos integrados." },
+      { id: 6, subtopic: "Historia", q: "¿Qué avance tecnológico caracterizó los Años 70-80?", a: "La aparición del microprocesador." },
+      { id: 7, subtopic: "Historia", q: "¿Qué avances impulsaron la digitalización en los Años 80?", a: "La popularización del ordenador personal (PC) y la creación de la World Wide Web (WWW)." },
+      { id: 8, subtopic: "Historia", q: "¿Qué fenómeno tecnológico destacó en la década de los Años 2000?", a: "La expansión masiva de los teléfonos inteligentes (smartphones)." },
+      { id: 9, subtopic: "Historia", q: "¿Qué dos tecnologías dominaron la década de los Años 2010?", a: "El Big Data y la computación en la nube (Cloud Computing)." },
+      { id: 10, subtopic: "Historia", q: "¿Qué protagonismo tecnológico tiene la década de los Años 2020?", a: "La Inteligencia Artificial (IA) y la automatización avanzada." },
+      { id: 11, subtopic: "Ventajas", q: "¿Cómo mejora la digitalización la eficiencia y reduce errores?", a: "Mediante la automatización de tareas repetitivas (como pedidos online), minimizando el error humano y acelerando la producción con robots y sistemas inteligentes." },
+      { id: 12, subtopic: "Ventajas", q: "¿Qué aporta la digitalización respecto al acceso a la información?", a: "Permite disponer de información en tiempo real, facilitando la coordinación de equipos internacionales y el teletrabajo." },
+      { id: 13, subtopic: "Ventajas", q: "¿Cómo contribuye el análisis de datos a la innovación de productos?", a: "Permite analizar cookies, encuestas e historial de navegación para comprender al cliente y ofrecer servicios personalizados (libros electrónicos, software SaaS, e-learning)." },
+      { id: 14, subtopic: "Ventajas", q: "¿Qué impacto tiene la digitalización en la cadena de suministro?", a: "Sensores IoT e Inteligencia Artificial permiten prever la demanda, gestionar inventarios eficientemente y reaccionar con agilidad a cambios." },
+      { id: 15, subtopic: "Ventajas", q: "Menciona 3 ejemplos de modelos de negocio disruptivos de la economía colaborativa.", a: "Wallapop, Uber y Airbnb." },
+      { id: 16, subtopic: "Ventajas", q: "Menciona ejemplos de plataformas de suscripción y ecosistemas digitales.", a: "Suscripción: Netflix, Amazon Prime.\nEcosistemas digitales: Google Workspace, Amazon Web Services (AWS), Apple." },
+      { id: 17, subtopic: "Transformación Interna", q: "¿Qué cambios exige la transformación digital en la estructura organizativa?", a: "Pasar de estructuras rígidas y jerárquicas a equipos multidisciplinarios con autonomía para innovar." },
+      { id: 18, subtopic: "Transformación Interna", q: "¿Qué competencias digitales humanas (soft skills) son requeridas?", a: "Creatividad, trabajo en equipo, resolución de problemas y adaptación continua al cambio." },
+      { id: 19, subtopic: "Transformación Interna", q: "¿Cuáles son los 5 retos principales de la digitalización empresarial?", a: "1) Ciberseguridad\n2) Brecha digital\n3) Resistencia al cambio\n4) Inversión inicial alta\n5) Cumplimiento regulatorio (privacidad/protección de datos)." },
+      { id: 20, subtopic: "Casos de Éxito", q: "¿Cómo abordó Nike su transformación digital?", a: "Creó la aplicación Nike+, pasando de ser fabricante de ropa/calzado a proveedor de experiencias personalizadas basadas en datos." },
+      { id: 21, subtopic: "Casos de Éxito", q: "¿Cómo aplica IKEA la digitalización en el comercio minorista?", a: "Integró realidad aumentada en su app 'IKEA Place', permitiendo visualizar los muebles en el hogar antes de comprarlos." },
+      { id: 22, subtopic: "Casos de Éxito", q: "¿Qué tecnologías destacan en la transformación digital de BBVA?", a: "Blockchain, Inteligencia Artificial y banca móvil para personalizar servicios financieros." },
+      { id: 23, subtopic: "Casos de Éxito", q: "¿Cómo aplica Amazon la digitalización en su logística?", a: "Utiliza robots en almacenes y sistemas de IA para prever la demanda y gestionar inventarios." },
+      { id: 24, subtopic: "Entornos IT y OT", q: "¿Qué significan las siglas IT y cuál es su metáfora organizativa?", a: "IT: Tecnologías de la Información. Son herramientas centradas en procesar datos y gestionar información. Se las considera 'el cerebro' de la empresa." },
+      { id: 25, subtopic: "Entornos IT y OT", q: "¿Qué significan las siglas OT y cuál es su metáfora organizativa?", a: "OT: Tecnologías de la Operación. Son herramientas enfocadas en controlar y automatizar procesos físicos (máquinas, sensores). Se las considera 'los brazos y piernas'." },
+      { id: 26, subtopic: "Entornos IT y OT", q: "Nombra 3 sistemas informáticos típicos de departamentos IT.", a: "1) ERP (Finanzas)\n2) HRIS (Recursos Humanos)\n3) CRM (Marketing y Ventas)." },
+      { id: 27, subtopic: "Evolución y Ciberseguridad", q: "¿Cuáles son las 5 etapas en la evolución de las tecnologías IT-OT?", a: "1) Diferenciadas (1970-90)\n2) Convergencia (1990-2000)\n3) Ciberseguridad (2000-10)\n4) IA y Edge Computing (2010-20)\n5) Integración completa y Gemelos Digitales (Actualidad)." },
+      { id: 28, subtopic: "Evolución y Ciberseguridad", q: "¿Qué es un 'Gemelo Digital' (Digital Twin)?", a: "Es una réplica o simulación digital de una operación o proceso físico que permite simular, optimizar y tomar decisiones precisas sin riesgo." },
+      { id: 29, subtopic: "Evolución y Ciberseguridad", q: "¿Qué es el Edge Computing?", a: "Es la computación en el borde: procesar los datos cerca de la fuente original donde se generan en lugar de enviarlos a la nube." },
+      { id: 30, subtopic: "Evolución y Ciberseguridad", q: "Menciona 4 medidas básicas para protegerse de ciberataques.", a: "1) Instalar actualizaciones de software y firmware.\n2) Activar autenticación de dos factores (2FA).\n3) Usar antivirus y antimalware.\n4) Precaución en redes wifi públicas." }
+    ];
+
+    const quizData = [
+      {
+        q: "1. ¿De qué término latino proviene la palabra 'digitalización' y qué significa?",
+        options: [
+          "a) Digitus - referente al cálculo informático",
+          "b) Digitalis - relativo al dedo",
+          "c) Data - relativo a la información",
+          "d) Digitum - relativo a la tecnología"
+        ],
+        correct: 1,
+        exp: "El término procede del latino 'digitalis' (relativo al dedo). Como los humanos contaban con los diez dedos, surgió el sistema decimal."
+      },
+      {
+        q: "2. ¿En qué consiste la digitalización en su dimensión técnica esencial?",
+        options: [
+          "a) En comprar ordenadores personales para cada empleado",
+          "b) En convertir información analógica en ceros y unos (datos digitales)",
+          "c) En eliminar totalmente la atención presencial al cliente",
+          "d) En sustituir los sistemas IT por sistemas OT"
+        ],
+        correct: 1,
+        exp: "La esencia técnica es transformar datos analógicos en ceros y unos para su almacenamiento, procesamiento y transmisión digital."
+      },
+      {
+        q: "3. ¿Qué hito tecnológico marca el inicio de la electrónica moderna en la década de los Años 50?",
+        options: [
+          "a) La creación de la World Wide Web",
+          "b) La invención del transistor",
+          "c) El desarrollo de ARPANET",
+          "d) La aparición del microprocesador"
+        ],
+        correct: 1,
+        exp: "En los Años 50 la invención del transistor dio origen a la electrónica moderna."
+      },
+      {
+        q: "4. La red ARPANET (origen de Internet) y los circuitos integrados nacieron en la década de:",
+        options: [
+          "a) Los Años 50",
+          "b) Los Años 70",
+          "c) Los Años 80",
+          "d) Los Años 90"
+        ],
+        correct: 1,
+        exp: "Los Años 70 albergaron el nacimiento de ARPANET y el desarrollo de los circuitos integrados."
+      },
+      {
+        q: "5. ¿Qué tecnología clave surgió durante la década de los Años 2010?",
+        options: [
+          "a) Inteligencia Artificial avanzada",
+          "b) Big Data y Computación en la Nube",
+          "c) Smartphones",
+          "d) Microprocesadores"
+        ],
+        correct: 1,
+        exp: "Los Años 2010 se caracterizaron por el despegue masivo de Big Data y Cloud Computing."
+      },
+      {
+        q: "6. ¿Cómo ayuda la digitalización a optimizar la cadena de suministro en una empresa?",
+        options: [
+          "a) Mediante sensores IoT e IA para prever la demanda y gestionar inventarios",
+          "b) Reemplazando los almacenes físicos por software de marketing",
+          "c) Eliminando las auditorías financieras de la empresa",
+          "d) Aumentando el tiempo de inactividad de las máquinas"
+        ],
+        correct: 0,
+        exp: "Los sensores IoT y la IA permiten prever la demanda, gestionar stocks de forma eficiente y responder con rapidez al mercado."
+      },
+      {
+        q: "7. Placas y servicios como Wallapop, Uber y Airbnb responden al modelo de negocio de:",
+        options: [
+          "a) Servicios de suscripción",
+          "b) Economía colaborativa",
+          "c) Ecosistemas digitales cerrados",
+          "d) Venta al por menor tradicional"
+        ],
+        correct: 1,
+        exp: "Wallapop, Uber y Airbnb son ejemplos clave de la economía colaborativa nacida con la digitalización."
+      },
+      {
+        q: "8. Netflix y Amazon Prime son representativos del modelo de negocio de:",
+        options: [
+          "a) Reparto con drones",
+          "b) Servicios de suscripción",
+          "c) Economía colaborativa",
+          "d) Gemelos digitales"
+        ],
+        correct: 1,
+        exp: "Son plataformas estructuradas bajo el modelo de servicios de suscripción."
+      },
+      {
+        q: "9. ¿Qué cambio estructural caracteriza a una empresa en transformación digital?",
+        options: [
+          "a) Paso de estructuras jerárquicas rígidas a equipos multidisciplinares autónomos",
+          "b) Reforzamiento de jefaturas inflexibles sin autonomía",
+          "c) Eliminación completa del trabajo en equipo",
+          "d) Prohibición del teletrabajo"
+        ],
+        correct: 0,
+        exp: "Se evoluciona de organizaciones rígidas a equipos multidisclipinares con autonomía para innovar."
+      },
+      {
+        q: "10. ¿Cuál de los siguientes es señalado explícitamente como un RETO de la digitalización?",
+        options: [
+          "a) Mayor acceso a la información",
+          "b) Alta inversión inicial en tecnología y formación",
+          "c) Reducción de errores humanos",
+          "d) Creación de nuevos productos"
+        ],
+        correct: 1,
+        exp: "La alta inversión inicial, junto con la ciberseguridad, la brecha digital, la resistencia al cambio y la regulación son los 5 retos clave."
+      },
+      {
+        q: "11. ¿Qué innovación introdujo la aplicación 'IKEA Place'?",
+        options: [
+          "a) Robots para montaje de muebles",
+          "b) Realidad Aumentada para visualizar muebles en el hogar antes de comprar",
+          "c) Pago con Bitcoin en tiendas",
+          "d) Un gemelo digital de la fábrica"
+        ],
+        correct: 1,
+        exp: "IKEA Place utiliza realidad aumentada para que los clientes comprueben en su propia casa cómo quedan los muebles."
+      },
+      {
+        q: "12. ¿Cómo transformó Nike su modelo de negocio mediante la digitalización?",
+        options: [
+          "a) Lanzó la app Nike+ para ofrecer experiencias personalizadas basándose en datos",
+          "b) Vendió exclusivamente a través de Amazon",
+          "c) Eliminó su departamento de I+D",
+          "d) Automatizó las llamadas de atención telefónica con drones"
+        ],
+        correct: 0,
+        exp: "Pasó de fabricante tradicional a proveedor de experiencias personalizadas usando los datos recopilados por la app Nike+."
+      },
+      {
+        q: "13. Amazon utiliza en sus almacenes robots e Inteligencia Artificial principalmente para:",
+        options: [
+          "a) Diseñar campañas en redes sociales",
+          "b) Prever la demanda y automatizar la gestión logística e inventario",
+          "c) Atender reclamaciones telefónicas",
+          "d) Reemplazar los contratos de trabajo"
+        ],
+        correct: 1,
+        exp: "Amazon destaca en logística por el uso de robots en almacén e IA para anticipar la demanda de stock."
+      },
+      {
+        q: "14. Las Tecnologías de la Información (IT) están enfocadas principalmente en:",
+        options: [
+          "a) El control directo de maquinaria industrial",
+          "b) El procesamiento de datos y la gestión de la información",
+          "c) La fabricación física de productos",
+          "d) El mantenimiento de tuberías y motores"
+        ],
+        correct: 1,
+        exp: "Las IT son 'el cerebro' enfocado en el procesamiento de datos y gestión de la información."
+      },
+      {
+        q: "15. Las Tecnologías de la Operación (OT) se caracterizan por ser:",
+        options: [
+          "a) 'El cerebro' que elabora estrategias de marketing",
+          "b) 'Los brazos y piernas' que controlan y automatizan procesos físicos",
+          "c) Programas exclusivos para contabilidad financiera",
+          "d) Bases de datos relacionales SQL"
+        ],
+        correct: 1,
+        exp: "Las OT son 'los brazos y piernas': tecnologías encargadas del control y automatización de procesos físicos en planta."
+      },
+      {
+        q: "16. Un sistema ERP (Enterprise Resource Planning) es utilizado típicamente en el área de:",
+        options: [
+          "a) Control de líneas de ensamblaje físicas",
+          "b) Finanzas (contabilidad, presupuestos y flujo de efectivo)",
+          "c) Monitoreo de sensores de temperatura",
+          "d) Robótica industrial"
+        ],
+        correct: 1,
+        exp: "Finanzas utiliza ERP para automatizar la gestión contable, presupuestaria y proyecciones financieras."
+      },
+      {
+        q: "17. El departamento de Marketing y Ventas emplea habitualmente sistemas:",
+        options: [
+          "a) SCADA",
+          "b) CRM (Customer Relationship Management)",
+          "c) PLC",
+          "d) Modbus"
+        ],
+        correct: 1,
+        exp: "El CRM se usa para segmentar mercados, gestionar campañas y administrar relaciones con clientes."
+      },
+      {
+        q: "18. Los sistemas HRIS (Human Resource Information System) se emplean para:",
+        options: [
+          "a) Controlar brazos robóticos",
+          "b) Automatizar reclutamiento, nóminas y evaluación del personal",
+          "c) Gestionar la red wifi pública de la fábrica",
+          "d) Prever la demanda logística"
+        ],
+        correct: 1,
+        exp: "Son herramientas específicas del departamento de Recursos Humanos."
+      },
+      {
+        q: "19. ¿Cuál es un ejemplo representativo de tecnología OT?",
+        options: [
+          "a) Sistema CRM de clientes",
+          "b) Sensores de luz, termostatos y brazos robóticos",
+          "c) Plataforma Google Workspace",
+          "d) Consultas a bases de datos SQL"
+        ],
+        correct: 1,
+        exp: "Sensores, termostatos, autómatas y brazos robóticos pertenecen al entorno físico operativo (OT)."
+      },
+      {
+        q: "20. En la etapa de evolución de 1970 a 1990, los sistemas IT y OT:",
+        options: [
+          "a) Estaban totalmente integrados con Gemelos Digitales",
+          "b) Funcionaban por separado en la mayoría de organizaciones",
+          "c) Utilizaban Edge Computing para procesar en planta",
+          "d) Compartían protocolos cibernéticos avanzados"
+        ],
+        correct: 1,
+        exp: "En los años 1970-1990 funcionaban de forma independiente con muy poca comunicación."
+      },
+      {
+        q: "21. ¿En qué década cobró especial urgencia la Ciberseguridad en entornos industriales?",
+        options: [
+          "a) 1970-1990",
+          "b) 2000-2010",
+          "c) 1950-1960",
+          "d) 2020 en adelante"
+        ],
+        correct: 1,
+        exp: "Entre 2000 y 2010 aumentaron los ciberataques, obligando a proteger los sistemas de control industrial."
+      },
+      {
+        q: "22. ¿Qué ventaja ofrece el 'Edge Computing' o computación en el borde?",
+        options: [
+          "a) Procesar los datos cerca de la fuente para reducir la latencia",
+          "b) Enviar todos los datos obligatoriamente a servidores internacionales",
+          "c) Eliminar el uso de sensores",
+          "d) Aumentar el coste de transmisión en la nube"
+        ],
+        correct: 0,
+        exp: "Edge computing procesa los datos en el lugar donde se generan, ganando velocidad y eficiencia."
+      },
+      {
+        q: "23. ¿Qué es un 'Gemelo Digital'?",
+        options: [
+          "a) Dos ordenadores idénticos en la misma oficina",
+          "b) Un duplicado en papel del organigrama",
+          "c) Una réplica digital de una operación física para simular y optimizar procesos",
+          "d) Un trabajador sustituido por IA"
+        ],
+        correct: 2,
+        exp: "Crea una réplica virtual de la operación real para hacer simulaciones y tomar decisiones precisas."
+      },
+      {
+        q: "24. En relación al ciclo de vida, ¿cómo se diferencian IT y OT?",
+        options: [
+          "a) IT tiene ciclos más largos y OT más cortos",
+          "b) IT tiene ciclos más cortos (por actualizaciones) y OT más largos (por coste de equipos)",
+          "c) Tienen exactamente los mismos ciclos de actualización",
+          "d) OT se renueva mensualmente e IT cada 10 años"
+        ],
+        correct: 1,
+        exp: "IT se renueva rápido por cambios de software/hardware. OT busca ciclos largos para amortizar inversiones y asegurar estabilidad."
+      },
+      {
+        q: "25. ¿En qué se diferencia el objetivo de seguridad entre IT y OT?",
+        options: [
+          "a) IT protege datos y redes; OT protege sistemas e instalaciones físicas de control",
+          "b) IT protege máquinas físicas; OT protege contraseñas de e-commerce",
+          "c) IT no requiere ciberseguridad",
+          "d) No existe diferencia alguna en sus objetivos"
+        ],
+        correct: 0,
+        exp: "IT salvaguarda la confidencialidad de la información; OT garantiza la continuidad operativa y seguridad física."
+      },
+      {
+        q: "26. ¿Qué protocolo o componente forma parte del entorno OT según el esquema del tema?",
+        options: [
+          "a) HTTP",
+          "b) Modbus / SCADA / PLCs",
+          "c) CRM",
+          "d) SQL"
+        ],
+        correct: 1,
+        exp: "Modbus, PLCs, HMIs y SCADA son protocolos y dispositivos característicos de OT."
+      },
+      {
+        q: "27. La convergencia entre IT y OT es fundamental porque permite:",
+        options: [
+          "a) Aumentar el trabajo manual",
+          "b) Una gestión empresarial más eficiente interconectando datos de planta con decisiones de negocio",
+          "c) Desconectar las fábricas de Internet",
+          "d) Sustituir la dirección de la empresa por sensores"
+        ],
+        correct: 1,
+        exp: "La integración IT/OT conecta lo que ocurre en planta en tiempo real con los sistemas de gestión del negocio."
+      },
+      {
+        q: "28. ¿Cuál de las siguientes NO es una medida preventiva ante ciberataques recomendada en el tema?",
+        options: [
+          "a) Activar la autenticación de dos factores (2FA)",
+          "b) Conectarse a redes wifi públicas sin precauciones para ahorrar datos",
+          "c) Actualizar el firmware y software de los dispositivos",
+          "d) Utilizar software antivirus y antimalware"
+        ],
+        correct: 1,
+        exp: "El tema advierte expresamente de tener cuidado en redes wifi públicas por estar más expuestas a ciberataques."
+      },
+      {
+        q: "29. Un sensor de temperatura que detecta sobrecalentamiento en un motor de fábrica es un ejemplo de:",
+        options: [
+          "a) Aplicación IT",
+          "b) Dispositivo OT",
+          "c) Sistema CRM",
+          "d) Software HRIS"
+        ],
+        correct: 1,
+        exp: "Los sensores que miden magnitudes físicas e interactúan con máquinas pertenecen al ámbito OT."
+      },
+      {
+        q: "30. El Internet de las Cosas (IoT) permite dotar de capacidades digitales a objetos cotidianos como:",
+        options: [
+          "a) Hojas de cálculo manuscritas",
+          "b) Zapatillas deportivas, maletas inteligentes e iluminación",
+          "c) Solamente ordenadores servidores de gran tamaño",
+          "d) Cartas postales en papel"
+        ],
+        correct: 1,
+        exp: "El IoT conecta objetos de uso común (zapatillas, maletas, iluminación) integrándolos en redes digitales."
+      }
+    ];
+
+    const conceptsData = [
+      {
+        term: "Digitalización",
+        category: "Fundamentos",
+        def: "Proceso de convertir información analógica en datos digitales (ceros y unos) para su procesamiento electrónico.",
+        analogy: "Como transformar una canción tocada en directo a un archivo MP3 que puedes llevar en el móvil.",
+        example: "Sustituir el libro de contabilidad en papel por una plantilla en la nube en tiempo real."
+      },
+      {
+        term: "Entorno IT (Tecnologías de la Información)",
+        category: "Sistemas",
+        def: "Herramientas digitales enfocadas en el tratamiento, análisis y gestión de datos e información.",
+        analogy: "Es 'el cerebro' de la empresa: analiza datos, calcula y toma decisiones estratégicas.",
+        example: "Un programa informático (ERP) que calcula las ganancias y gastos del mes."
+      },
+      {
+        term: "Entorno OT (Tecnologías de la Operación)",
+        category: "Sistemas",
+        def: "Herramientas encargadas de monitorizar, ejecutar y automatizar procesos físicos industriales.",
+        analogy: "Son 'los brazos y las piernas' de la empresa: hacen el trabajo físico y mueven las máquinas.",
+        example: "Un brazo robótico que coloca cajas en un palet o un sensor que apaga un horno caliente."
+      },
+      {
+        term: "ERP (Enterprise Resource Planning)",
+        category: "Herramientas IT",
+        def: "Sistema informático para planificar y automatizar los recursos y operaciones financieras de la empresa.",
+        analogy: "Como la agenda central de una casa donde todos apuntan los gastos, compras y tareas compartidas.",
+        example: "El software del departamento financiero para hacer presupuestos y facturas automáticamente."
+      },
+      {
+        term: "CRM (Customer Relationship Management)",
+        category: "Herramientas IT",
+        def: "Plataforma para gestionar y analizar las relaciones de la empresa con sus clientes y ventas.",
+        analogy: "La libreta de notas de un camarero que recuerda exactamente cómo le gusta el café a cada cliente.",
+        example: "Registrar las preferencias de compra de un usuario para enviarle un cupón de descuento personalizado."
+      },
+      {
+        term: "Gemelo Digital (Digital Twin)",
+        category: "Innovación IT-OT",
+        def: "Réplica virtual precisa de un proceso o sistema físico para simular su comportamiento y optimizarlo.",
+        analogy: "Como probar la maqueta de un coche en un videojuego súper realista antes de fabricar el coche de verdad.",
+        example: "Simular una cadena de montaje en ordenador para ver si aumentará la producción sin romper máquinas."
+      },
+      {
+        term: "Edge Computing",
+        category: "Innovación IT-OT",
+        def: "Procesamiento de datos en dispositivos situados cerca de la fuente física en lugar de enviarlos a la nube.",
+        analogy: "Tener un ayudante al lado de la máquina que decide rápido sin tener que llamar por teléfono a la central.",
+        example: "Una cámara de seguridad con chip inteligente que detecta intrusos al instante en la propia cámara."
+      },
+      {
+        term: "Internet de las Cosas (IoT)",
+        category: "Conectividad",
+        def: "Red de objetos físicos dotados de sensores y software para conectar e intercambiar datos por Internet.",
+        analogy: "Ponerle ojos, oídos y voz a las cosas cotidianas para que puedan comunicarse entre sí.",
+        example: "Una zapatilla de deporte con sensor que envía a tu smartphone la distancia recorrida y el desgaste."
+      }
+    ];
+
+    /* ==========================================================================
+       ESTADO Y LÓGICA DE LA APLICACIÓN
+       ========================================================================== */
+
+    let currentCardIndex = 0;
+    let isCardFlipped = false;
+    let filteredCards = [...flashcardsData];
+    let masteredCardIds = new Set();
+
+    let currentQuizIndex = 0;
+    let quizScore = 0;
+    let quizAnswered = false;
+
+    // Inicialización al cargar la página
+    window.onload = function() {
+      renderCard();
+      renderQuizQuestion();
+      renderConcepts(conceptsData);
+    };
+
+    // Navegación entre pestañas
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+      document.getElementById('tab-' + tabId).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    /* --- ACCESIBILIDAD --- */
+    function toggleExpandedText() {
+      document.body.classList.toggle('accessible-mode');
+      const btn = document.getElementById('btn-expanded');
+      btn.classList.toggle('active');
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      const btn = document.getElementById('btn-contrast');
+      btn.classList.toggle('active');
+    }
+
+    let currentFontScale = 0;
+    function changeFontSize(delta) {
+      currentFontScale += delta;
+      if (currentFontScale < -2) currentFontScale = -2;
+      if (currentFontScale > 4) currentFontScale = 4;
+      const newSize = 16 + (currentFontScale * 2);
+      document.documentElement.style.setProperty('--font-size-base', newSize + 'px');
+    }
+
+    function resetFontSize() {
+      currentFontScale = 0;
+      document.documentElement.style.setProperty('--font-size-base', '16px');
+    }
+
+    /* --- TARJETAS INTELIGENTES --- */
+    function renderCard() {
+      if (filteredCards.length === 0) {
+        document.getElementById('card-text').innerText = "No hay tarjetas disponibles en este filtro.";
+        document.getElementById('card-tag').innerText = "Vacio";
+        document.getElementById('card-counter').innerText = "0 de 0";
+        return;
+      }
+
+      const card = filteredCards[currentCardIndex];
+      isCardFlipped = false;
+      document.getElementById('card-tag').innerText = card.subtopic;
+      document.getElementById('card-side').innerText = "PREGUNTA (Haz clic para ver respuesta)";
+      document.getElementById('card-text').innerText = card.q;
+
+      // Actualizar contadores y barra
+      document.getElementById('card-counter').innerText = `Tarjeta ${currentCardIndex + 1} de ${filteredCards.length}`;
+      document.getElementById('mastered-counter').innerText = `Dominadas: ${masteredCardIds.size} / ${flashcardsData.length}`;
+      const progressPercent = ((currentCardIndex + 1) / filteredCards.length) * 100;
+      document.getElementById('card-progress-fill').style.width = `${progressPercent}%`;
+    }
+
+    function flipCard() {
+      if (filteredCards.length === 0) return;
+      const card = filteredCards[currentCardIndex];
+      isCardFlipped = !isCardFlipped;
+
+      if (isCardFlipped) {
+        document.getElementById('card-side').innerText = "RESPUESTA OFICIAL";
+        document.getElementById('card-text').innerText = card.a;
+      } else {
+        document.getElementById('card-side').innerText = "PREGUNTA (Haz clic para ver respuesta)";
+        document.getElementById('card-text').innerText = card.q;
+      }
+    }
+
+    function nextCard() {
+      if (filteredCards.length === 0) return;
+      currentCardIndex = (currentCardIndex + 1) % filteredCards.length;
+      renderCard();
+    }
+
+    function prevCard() {
+      if (filteredCards.length === 0) return;
+      currentCardIndex = (currentCardIndex - 1 + filteredCards.length) % filteredCards.length;
+      renderCard();
+    }
+
+    function markMastered() {
+      if (filteredCards.length === 0) return;
+      const card = filteredCards[currentCardIndex];
+      masteredCardIds.add(card.id);
+      nextCard();
+    }
+
+    function filterCards() {
+      const selected = document.getElementById('card-filter').value;
+      if (selected === 'all') {
+        filteredCards = [...flashcardsData];
+      } else {
+        filteredCards = flashcardsData.filter(c => c.subtopic === selected);
+      }
+      currentCardIndex = 0;
+      renderCard();
+    }
+
+    function generateExtraCard() {
+      const topic = document.getElementById('gen-topic-select').value;
+      const newId = flashcardsData.length + 1;
+      const newCard = {
+        id: newId,
+        subtopic: "Generada: " + topic,
+        q: `[Práctica Adicional - ${topic}] ¿Cómo contribuye esta dimensión a la transformación digital?`,
+        a: `Respuesta basada en Tema 1: Fomenta la eficiencia de procesos, reduce errores operativos e integra los entornos físicos con la toma de decisiones estratégicas.`
+      };
+      flashcardsData.push(newCard);
+      filteredCards.push(newCard);
+      currentCardIndex = filteredCards.length - 1;
+      renderCard();
+      alert("¡Nueva tarjeta añadida a la colección!");
+    }
+
+    /* --- CUESTIONARIO --- */
+    function renderQuizQuestion() {
+      const q = quizData[currentQuizIndex];
+      quizAnswered = false;
+
+      document.getElementById('quiz-counter').innerText = `Pregunta ${currentQuizIndex + 1} de ${quizData.length}`;
+      document.getElementById('quiz-question-text').innerText = q.q;
+      document.getElementById('quiz-explanation-box').style.display = 'none';
+      document.getElementById('next-question-btn').style.display = 'none';
+
+      const optionsContainer = document.getElementById('quiz-options-container');
+      optionsContainer.innerHTML = '';
+
+      q.options.forEach((opt, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.innerText = opt;
+        btn.onclick = () => selectQuizOption(index);
+        optionsContainer.appendChild(btn);
+      });
+
+      const progressPercent = ((currentQuizIndex + 1) / quizData.length) * 100;
+      document.getElementById('quiz-progress-fill').style.width = `${progressPercent}%`;
+    }
+
+    function selectQuizOption(selectedIndex) {
+      if (quizAnswered) return;
+      quizAnswered = true;
+
+      const q = quizData[currentQuizIndex];
+      const buttons = document.querySelectorAll('#quiz-options-container .option-btn');
+
+      if (selectedIndex === q.correct) {
+        buttons[selectedIndex].classList.add('correct');
+        quizScore++;
+      } else {
+        buttons[selectedIndex].classList.add('incorrect');
+        buttons[q.correct].classList.add('correct');
+      }
+
+      document.getElementById('quiz-score-badge').innerText = `Puntuación: ${quizScore} / ${quizData.length}`;
+
+      const expBox = document.getElementById('quiz-explanation-box');
+      expBox.innerHTML = `<strong>Explicación Didáctica:</strong> ${q.exp}`;
+      expBox.style.display = 'block';
+
+      document.getElementById('next-question-btn').style.display = 'inline-block';
+    }
+
+    function nextQuestion() {
+      if (currentQuizIndex < quizData.length - 1) {
+        currentQuizIndex++;
+        renderQuizQuestion();
+      } else {
+        alert(`¡Has completado el cuestionario!\nTu resultado final es: ${quizScore} de ${quizData.length} aciertos.`);
+      }
+    }
+
+    function resetQuiz() {
+      currentQuizIndex = 0;
+      quizScore = 0;
+      document.getElementById('quiz-score-badge').innerText = `Puntuación: 0 / ${quizData.length}`;
+      renderQuizQuestion();
+    }
+
+    function generateExtraQuestion() {
+      const newQ = {
+        q: `${quizData.length + 1}. [Pregunta Práctica] ¿Qué ventaja inmediata obtiene una empresa al conectar sensores de planta (OT) con el software ERP (IT)?`,
+        options: [
+          "a) Duplicar el tiempo de inactividad de las máquinas",
+          "b) Actualización automática del inventario y datos de producción en tiempo real",
+          "c) Eliminación de las contraseñas de ciberseguridad",
+          "d) Volver al uso de registros en papel"
+        ],
+        correct: 1,
+        exp: "La convergencia IT-OT permite que los datos físicos generados en planta se reflejen al instante en los sistemas de gestión del negocio."
+      };
+      quizData.push(newQ);
+      currentQuizIndex = quizData.length - 1;
+      renderQuizQuestion();
+      alert("¡Nueva pregunta generada con éxito!");
+    }
+
+    /* --- TUTOR DIDÁCTICO --- */
+    function renderConcepts(list) {
+      const container = document.getElementById('concepts-list');
+      container.innerHTML = '';
+
+      if (list.length === 0) {
+        container.innerHTML = '<p style="padding: 12px;">No se encontraron conceptos para esta búsqueda.</p>';
+        return;
+      }
+
+      list.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'concept-item';
+        div.innerHTML = `
+          <h3>${item.term} <span class="concept-badge">${item.category}</span></h3>
+          <p><strong>Definición:</strong> ${item.def}</p>
+          <div class="analogy-box">
+            <strong>💡 Analogía sencilla para entenderlo:</strong> ${item.analogy}
+          </div>
+          <p style="margin-top: 8px; font-size: 0.9rem; color: var(--secondary-color);">
+            <strong>🏭 Ejemplo real en empresa:</strong> ${item.example}
+          </p>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function filterConcepts() {
+      const query = document.getElementById('concept-search').value.toLowerCase();
+      const filtered = conceptsData.filter(c => 
+        c.term.toLowerCase().includes(query) || 
+        c.def.toLowerCase().includes(query) || 
+        c.analogy.toLowerCase().includes(query)
+      );
+      renderConcepts(filtered);
+    }
+  </script>
+</body>
+</html>
